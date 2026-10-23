@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Encuentra tu grupo de estudio o comparte lo que sabes como tutor. Aprende, colabora y avanza en comunidad con Yachani.">
+  <title>Yachani | Aprende y avanza en equipo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar-inicio.css">
+  <script src="js/navbar-inicio.js" defer></script>
+</head>
+<body class="yl-preview">
+  <!-- Leicy: barra de navegación -->
+  <header class="yl-navbar" data-yl-navbar data-menu-abierto="false">
+    <div class="yl-container yl-nav-row">
+      <a class="yl-brand" href="#inicio" aria-label="Yachani, ir al inicio">
+        <svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 11v6c3 2 7 2 10 0v-6M21 9v7"/></svg><span>Yachani</span>
+      </a>
+
+      <nav class="yl-nav-panel" id="yl-navigation" aria-label="Navegación principal">
+        <ul class="yl-nav-links">
+          <li><a class="yl-nav-link" href="#inicio" aria-current="location">Inicio</a></li>
+          <li><a class="yl-nav-link" href="#quienes-somos">Quiénes somos</a></li>
+          <li><a class="yl-nav-link" href="#beneficios">Qué ofrecemos</a></li>
+          <li><a class="yl-nav-link" href="#como-funciona">Cómo funciona</a></li>
+          <li><a class="yl-nav-link" href="#contacto">Contáctanos</a></li>
+        </ul>
+      </nav>
+
+      <!-- La dirección real de la app se configura una sola vez en el JS. -->
+      <a class="yl-login" href="#acceso-app" data-yl-app-link aria-label="Iniciar sesión en la app web de Yachani">
+        <span class="yl-login-long">Iniciar sesión</span><span class="yl-login-short">Entrar</span><svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>
+      </a>
+      <button class="yl-menu" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="yl-navigation" data-yl-menu>
+        <svg class="yl-icon yl-menu-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><svg class="yl-icon yl-menu-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="contenido-principal">
+    <!-- Leicy: presentación de Yachani. La estructura es la misma para ambos perfiles. -->
+    <section class="yl-hero" id="inicio" data-yl-inicio data-perfil="estudiante" aria-labelledby="yl-title">
+      <div class="yl-container">
+        <div class="yl-hero-grid">
+          <div class="yl-copy">
+            <nav class="yl-audience" aria-label="Elige cómo quieres conocer Yachani">
+              <a class="yl-audience-link" href="?perfil=estudiante#inicio" data-yl-perfil="estudiante" aria-current="page">
+                <svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Zm0 0v15"/></svg>Estudiante
+              </a>
+              <a class="yl-audience-link" href="?perfil=tutor#inicio" data-yl-perfil="tutor" >
+                <svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 11v6c3 2 7 2 10 0v-6M21 9v7"/></svg>Estudiante tutor
+              </a>
+            </nav>
+
+            <p class="yl-eyebrow" data-yl-text="label" >UN BUEN GRUPO CAMBIA CÓMO APRENDES</p>
+            <h1 class="yl-title" id="yl-title"><span class="" data-yl-text="heading" >Aprende a tu ritmo.</span><span class="yl-title-accent" data-yl-text="accent" >Avanza en equipo.</span></h1>
+            <p class="yl-description" data-yl-text="description" >Encuentra tu grupo por curso o tema, comparte materiales y resuelve dudas con compañeros y tutores que entienden lo que estás aprendiendo.</p>
+
+            <div class="yl-actions">
+              <a class="yl-button yl-button-primary" href="#acceso-app" data-yl-app-link><span class="" data-yl-text="cta" >Encontrar mi grupo</span><svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a>
+              <a class="yl-button yl-button-secondary" href="#como-funciona"><svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 11 7-11 7V5Z"/></svg>Ver cómo funciona</a>
+            </div>
+            <p class="yl-cta-note" data-yl-text="ctaNote" >Tu próximo paso empieza en la app web de Yachani.</p>
+            <p class="yl-app-status" id="acceso-app" role="status" aria-live="polite" hidden></p>
+
+            <!-- Beneficios de la propuesta; no son cifras de usuarios inventadas. -->
+            <ul class="yl-values" aria-label="Aprender y compartir con Yachani">
+              <li class="yl-value"><strong class="" data-yl-text="value1" >Conecta</strong><span class="" data-yl-text="detail1" >con tus compañeros</span></li><li class="yl-value"><strong class="" data-yl-text="value2" >Comparte</strong><span class="" data-yl-text="detail2" >lo que aprendes</span></li><li class="yl-value"><strong class="" data-yl-text="value3" >Avanza</strong><span class="" data-yl-text="detail3" >con tu comunidad</span></li>
+            </ul>
+          </div>
+
+          <!-- Ilustración de la propuesta, sin recrear pantallas de la app web. -->
+          <figure class="yl-scene" aria-label="Ejemplo ilustrativo de un grupo de estudio">
+            <div class="yl-ai-chip">
+              <span class="yl-ai-symbol"><svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 6.4L21 12l-6.4 2.6L12 21l-2.6-6.4L3 12l6.4-2.6L12 3ZM20 2v4M18 4h4"/></svg></span>
+              <div><strong class="" data-yl-text="aiTitle" >Conexiones con ayuda de IA</strong><small class="" data-yl-text="aiDescription" >Encuentra afinidad para estudiar</small></div>
+            </div>
+            <div class="yl-scene-stage">
+              <p class="yl-scene-label" data-yl-text="sceneLabel" >UN TEMA EN COMÚN. MÁS IDEAS.</p>
+              <div class="yl-group-card">
+                <div class="yl-group-top">
+                  <span class="yl-course-tag"><svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Zm0 0v15"/></svg>INGENIERÍA DE SOFTWARE</span>
+                  <span class="yl-group-symbol"><svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 21v-3a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v3M16 4a3.5 3.5 0 0 1 0 7M22 21v-3a4 4 0 0 0-3-3.87"/></svg></span>
+                </div>
+                <h2 class="yl-group-title" data-yl-text="cardTitle" >Las dudas se resuelven mejor juntos.</h2>
+                <p class="yl-group-description" data-yl-text="cardDescription" >Un espacio para repasar, preguntar y compartir distintas formas de entender.</p>
+                <div class="yl-topic-tags" aria-label="Temas de ejemplo">
+                  <span class="yl-topic-tag">Diagramas UML</span>
+                  <span class="yl-topic-tag">Casos de uso</span>
+                  <span class="yl-topic-tag">Buenas prácticas</span>
+                </div>
+                <div class="yl-community">
+                  <div class="yl-avatars" aria-hidden="true"><span class="yl-avatar">AH</span><span class="yl-avatar yl-avatar-pink">LR</span><span class="yl-avatar yl-avatar-blue">DF</span><span class="yl-avatar yl-avatar-green">CM</span></div>
+                  <span class="yl-community-copy" data-yl-text="community" >Compañeros que aprenden contigo</span>
+                </div>
+              </div>
+
+              <div class="yl-scene-bottom">
+                <div class="yl-chat-card">
+                  <svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9 10 10 0 0 1-4-1l-5 2 1-5a9 9 0 1 1 17-5ZM8 10h8M8 14h5"/></svg><small class="" data-yl-text="chatLabel" >Una pregunta abre la conversación</small><p class="" data-yl-text="chatMessage" >¿Repasamos los diagramas de clases hoy?</p>
+                </div>
+                <div class="yl-flash-card">
+                  <svg class="yl-icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="7" width="15" height="14" rx="3"/><path d="M17 3H5a2 2 0 0 0-2 2v12M10 12h7M10 16h4"/></svg><small class="" data-yl-text="flashLabel" >UN CONCEPTO A LA VEZ</small><p class="" data-yl-text="flashTitle" >Entender. Practicar. Recordar.</p>
+                </div>
+              </div>
+            </div>
+            <figcaption class="yl-scene-caption">Una muestra de cómo se vive el aprendizaje en comunidad.</figcaption>
+          </figure>
+        </div>
+        <a class="yl-scroll-hint" href="#quienes-somos">Conoce lo que nos mueve</a>
+      </div>
+    </section>
+    <!-- Aquí se integrarán las secciones de Libertad, Vanessa y Anabella. -->
+  </main>
+</body>
+</html>
