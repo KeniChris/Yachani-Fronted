@@ -27,3 +27,15 @@ h2 span { color: var(--mat-sys-inverse-primary); }
 @media (max-width: 1100px) { .auth-banner { padding: 40px 32px; } h2 { font-size: 50px; }.illustration { transform: scale(.85); transform-origin: left top; }.banner-description { font-size: 16px; } }
 @media (max-width: 800px) { .auth-page { grid-template-columns: 1fr; }.auth-banner { padding: 24px; }.banner-content, .banner-footer, .auth-banner::before, .auth-banner::after { display: none; }.auth-panel { padding: 40px 24px 64px; }.auth-page { grid-template-rows: auto 1fr; } }
 @media (prefers-reduced-motion: reduce) { .study-card, .mini-card { backdrop-filter: none; } }
+.recovery-layout { grid-template-columns: 47% 53%; background: var(--color-background); }
+.recovery-layout .auth-banner { padding: 52px 64px; background: linear-gradient(145deg, #25102f, #3d2050 58%, #642d78); }
+.recovery-layout .auth-banner::before { top: -100px; right: -120px; width: 330px; height: 330px; border: 0; background: #ffffff12; }
+.recovery-layout .auth-banner::after { left: -210px; bottom: -220px; width: 440px; height: 440px; background: #ffffff12; }
+.recovery-layout .brand-icon { width: 46px; height: 46px; border-radius: 13px; background: linear-gradient(135deg, var(--color-accent), var(--color-primary)); }
+.recovery-layout .banner-content { margin-top: 92px; }
+.recovery-layout .banner-label { padding: 8px 14px; border-color: #ffffff33; background: #ffffff1a; color: white; font-size: 14px; line-height: 19px; }
+.recovery-layout h2 { max-width: 480px; margin-top: 24px; color: white; font-size: 57.6px; line-height: 1.08; letter-spacing: -1.5px; }
+.recovery-layout .banner-description { max-width: 431px; color: #ffffffc7; font-size: 18px; line-height: 27.9px; }
+.recovery-layout .auth-panel { min-width: 0; padding: clamp(48px, 19.2vh, 197px) 32px 64px; background: var(--color-background); }
+@media (max-width: 1100px) { .recovery-layout .auth-banner { padding: 40px 32px; }.recovery-layout h2 { font-size: 46px; } }
+@media (max-width: 800px) { .recovery-layout { grid-template-columns: minmax(0, 1fr); }.recovery-layout .auth-banner { padding: 24px; }.recovery-layout .auth-panel { padding: 32px 16px 48px; } }

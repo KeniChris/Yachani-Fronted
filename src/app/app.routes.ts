@@ -6,6 +6,18 @@ import { AuthLayout } from './layouts/auth-layout/auth-layout';
 
 export const routes: Routes = [
   {
+    path: 'recuperar-contrasena', component: AuthLayout, data: { variante: 'recuperacion' },
+    children: [{ path: '', title: 'Recuperar contraseña | Yachani', loadComponent: () => import('./features/auth/pages/recuperar-contrasena/recuperar-contrasena').then(m => m.RecuperarContrasena) }],
+  },
+  {
+    path: 'verificar-codigo', component: AuthLayout, data: { variante: 'recuperacion' },
+    children: [{ path: '', title: 'Verificar código | Yachani', loadComponent: () => import('./features/auth/pages/verificar-codigo/verificar-codigo').then(m => m.VerificarCodigo) }],
+  },
+  {
+    path: 'restablecer-contrasena', component: AuthLayout, data: { variante: 'recuperacion' },
+    children: [{ path: '', title: 'Nueva contraseña | Yachani', loadComponent: () => import('./features/auth/pages/restablecer-contrasena/restablecer-contrasena').then(m => m.RestablecerContrasena) }],
+  },
+  {
     path: 'registro',
     component: AuthLayout,
     children: [{

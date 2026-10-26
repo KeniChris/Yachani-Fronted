@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
   imports: [RouterLink, RouterOutlet],
@@ -7,4 +7,6 @@ import { RouterLink, RouterOutlet } from '@angular/router';
   styleUrl: './auth-layout.css',
   templateUrl: './auth-layout.html',
 })
-export class AuthLayout {}
+export class AuthLayout {
+  readonly esRecuperacion = inject(ActivatedRoute).snapshot.data['variante'] === 'recuperacion';
+}
