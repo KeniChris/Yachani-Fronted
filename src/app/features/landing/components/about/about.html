@@ -1,0 +1,94 @@
+<section
+  id="quienes-somos"
+  class="about"
+  aria-labelledby="about-title"
+>
+  <div class="about-container">
+    <div class="about-intro">
+      <span class="section-tag">Quiénes somos</span>
+
+      <h2 id="about-title">
+        Hecho por estudiantes,
+        <span>para estudiantes</span>
+      </h2>
+
+      <p>
+        Somos un equipo de estudiantes de la UPC. Vivimos lo difícil
+        que es coordinar grupos de estudio por WhatsApp, con horarios
+        que chocan y materiales dispersos. Por eso creamos Yachani.
+      </p>
+    </div>
+
+    <div class="purpose-grid">
+      <article id="mision" class="about-card">
+        <span class="icon-box">
+          <mat-icon fontSet="material-symbols-rounded">
+            target
+          </mat-icon>
+        </span>
+
+        <h3>Misión</h3>
+
+        <p>
+          Facilitar el aprendizaje colaborativo entre universitarios,
+          conectándolos con compañeros y tutores compatibles en un
+          espacio organizado y seguro.
+        </p>
+      </article>
+
+      <article class="about-card">
+        <span class="icon-box">
+          <mat-icon fontSet="material-symbols-rounded">
+            visibility
+          </mat-icon>
+        </span>
+
+        <h3>Visión</h3>
+
+        <p>
+          Ser la plataforma de referencia en el Perú para estudiar
+          en grupo y aprender entre pares, ayudando a reducir
+          la deserción universitaria.
+        </p>
+      </article>
+    </div>
+
+    <h3 class="values-title">Nuestros valores</h3>
+
+    <div class="values-grid">
+      @for (value of values; track value.title) {
+        <article class="about-card">
+          <span class="icon-box">
+            <mat-icon fontSet="material-symbols-rounded">
+              {{ value.icon }}
+            </mat-icon>
+          </span>
+
+          <h4>{{ value.title }}</h4>
+          <p>{{ value.description }}</p>
+        </article>
+      }
+    </div>
+
+    <section class="team-panel" aria-labelledby="team-title">
+      <div class="team-heading">
+        <h3 id="team-title">Nuestro equipo</h3>
+      </div>
+
+      <div class="team-grid">
+        @for (member of team; track member.name) {
+          <div class="team-member">
+            <span class="member-avatar" aria-hidden="true">
+              {{ member.initials }}
+            </span>
+
+            <div>
+              <h4>{{ member.name }}</h4>
+              <p>Integrante</p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+</section>

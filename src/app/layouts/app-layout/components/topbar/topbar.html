@@ -1,0 +1,49 @@
+<div class="topbar">
+  @if (showMenuButton) {
+    <button
+      mat-icon-button
+      class="menu-toggle"
+      type="button"
+      aria-label="Abrir menú principal"
+      aria-controls="app-navigation"
+      [attr.aria-expanded]="menuOpen"
+      (click)="menuToggle.emit()"
+    >
+      <mat-icon fontSet="material-symbols-rounded">
+        menu
+      </mat-icon>
+    </button>
+  }
+
+  <button
+    mat-icon-button
+    type="button"
+    aria-label="Abrir notificaciones"
+    [matMenuTriggerFor]="notificationsMenu"
+  >
+    <mat-icon fontSet="material-symbols-rounded">
+      notifications
+    </mat-icon>
+  </button>
+
+  <mat-menu #notificationsMenu="matMenu">
+    <div class="notifications-empty">
+      No tienes notificaciones nuevas.
+    </div>
+  </mat-menu>
+
+  @if (userName) {
+    <div class="user-info">
+      <span class="avatar" aria-hidden="true">
+        {{ initials }}
+      </span>
+
+      <div class="user-details">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">
+          {{ role === 'tutor' ? 'Tutor' : 'Estudiante' }}
+        </span>
+      </div>
+    </div>
+  }
+</div>

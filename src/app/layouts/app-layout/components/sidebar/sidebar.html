@@ -1,0 +1,36 @@
+<div class="sidebar">
+  <a class="brand" routerLink="/app" aria-label="Yachani, inicio">
+    <span class="brand-symbol">
+      <mat-icon fontSet="material-symbols-rounded">school</mat-icon>
+    </span>
+
+    <span>Yachani</span>
+  </a>
+
+  <p class="menu-heading">MENÚ PRINCIPAL</p>
+
+  <nav aria-label="Navegación de la plataforma">
+    @for (item of visibleItems; track item.route) {
+      <a
+        class="menu-link"
+        [routerLink]="item.route"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+      >
+        <mat-icon fontSet="material-symbols-rounded">
+          {{ item.icon }}
+        </mat-icon>
+
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="help-box">
+    <strong>¿Necesitas ayuda?</strong>
+    <p>
+      Consulta nuestras preguntas frecuentes o comunícate con soporte.
+    </p>
+  </div>
+</div>
