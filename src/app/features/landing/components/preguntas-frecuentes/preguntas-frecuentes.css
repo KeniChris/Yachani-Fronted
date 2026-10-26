@@ -1,0 +1,132 @@
+:host {
+  display: block;
+}
+
+.preguntas-frecuentes {
+  padding: 88px 24px;
+  background-color: #2e183b;
+  color: #f8fafc;
+}
+
+.contenedor {
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.encabezado {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.etiqueta-seccion {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid #684179;
+  border-radius: 24px;
+  background-color: #45294f;
+  color: #d8b4fe;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+}
+
+h2 {
+  margin: 20px 0 16px;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h2 span {
+  color: #c084fc;
+}
+
+.descripcion {
+  max-width: 580px;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+.enlace-ayuda {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: 1px solid #684179;
+  border-radius: 24px;
+  color: #f8fafc;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.enlace-ayuda:hover {
+  background-color: #45294f;
+}
+
+.enlace-ayuda:focus-visible {
+  outline: 2px solid #c084fc;
+  outline-offset: 4px;
+}
+
+.lista-preguntas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lista-preguntas mat-expansion-panel {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #684179;
+  border-radius: 16px;
+  background-color: #3a2045;
+  color: #f8fafc;
+  box-shadow: none;
+}
+
+.lista-preguntas mat-expansion-panel-header {
+  min-height: 72px;
+  height: auto;
+  padding: 16px 24px;
+}
+
+.lista-preguntas mat-panel-title {
+  color: #f8fafc;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.respuesta {
+  margin: 0;
+  padding-top: 8px;
+  color: #cbd5e1;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+@media (max-width: 600px) {
+  .preguntas-frecuentes {
+    padding: 56px 16px;
+  }
+
+  .encabezado {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .lista-preguntas mat-expansion-panel-header {
+    padding: 16px;
+  }
+
+  .lista-preguntas mat-panel-title {
+    font-size: 14px;
+    line-height: 22px;
+  }
+}

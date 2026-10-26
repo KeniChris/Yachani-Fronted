@@ -1,0 +1,49 @@
+<section
+  id="video"
+  class="video-section"
+  aria-labelledby="video-title"
+>
+  <div class="video-container">
+    <div class="section-heading">
+      <span class="section-tag">Video</span>
+
+      <h2 id="video-title">Mira cómo funciona Yachani</h2>
+
+      <p>
+        Descubre cómo encontrar tu grupo y empezar a estudiar
+        en comunidad.
+      </p>
+    </div>
+
+    <div class="video-frame">
+      @if (videoUrl) {
+        <video
+          controls
+          preload="metadata"
+          playsinline
+          aria-label="Tutorial de uso de Yachani"
+        >
+          <source [src]="videoUrl" type="video/mp4" />
+          Tu navegador no admite la reproducción de este video.
+        </video>
+      } @else {
+        <div class="video-placeholder">
+          <span class="video-symbol" aria-hidden="true">
+            <mat-icon fontSet="material-symbols-rounded">
+              play_arrow
+            </mat-icon>
+          </span>
+
+          <h3>Video próximamente</h3>
+          <p>Estamos preparando una guía para acompañarte.</p>
+        </div>
+      }
+    </div>
+
+    <ul class="video-topics" aria-label="Contenido del tutorial">
+      <li><span>01</span> Regístrate</li>
+      <li><span>02</span> Busca un grupo</li>
+      <li><span>03</span> Únete y aprende</li>
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,161 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.landing-header {
+  background-color: #2e183b;
+  color: #f8fafc;
+  border-bottom: 1px solid #ffffff14;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1440px;
+  min-height: 88px;
+  margin-inline: auto;
+  padding: 16px 32px;
+}
+
+.brand {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+  color: #f8fafc;
+  text-decoration: none;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+.brand-symbol {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: var(--color-accent);
+}
+
+.navigation {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+nav {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+nav a {
+  padding-block: 12px;
+  color: #ddd2e5;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+nav a:hover {
+  color: #c084fc;
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.auth-actions .login-button {
+  color: #f8fafc;
+  border-color: #c084fc;
+}
+
+.auth-actions .register-button {
+  background-color: #9333ea;
+  color: #f8fafc;
+}
+
+.auth-actions .register-button:hover {
+  background-color: #7e22ce;
+}
+
+.mobile-toggle {
+  display: none;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #c084fc;
+  outline-offset: 4px;
+}
+
+@media (max-width: 1200px) {
+  .navbar {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0;
+    min-height: 72px;
+    padding: 16px;
+  }
+
+  .brand img {
+    width: 140px;
+    height: 36px;
+  }
+
+  .mobile-toggle {
+    display: inline-flex;
+    color: #f8fafc;
+  }
+
+  .navigation {
+    display: none;
+    flex-basis: 100%;
+    padding-block: 24px 8px;
+  }
+
+  .navigation.is-open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  nav a {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  nav a:hover {
+    background-color: #45294f;
+  }
+
+  .auth-actions {
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .auth-actions a {
+    flex: 1;
+  }
+}
