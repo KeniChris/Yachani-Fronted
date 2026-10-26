@@ -1,0 +1,135 @@
+@if (modoPrevisualizacion) { <p class="preview-note" role="status">Vista previa: no se guardan datos reales.</p> }
+@if (estado === 'exito') {
+  <section class="card success-card" aria-labelledby="student-success-title" role="status">
+    <div class="success-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">check</mat-icon></div>
+    <h1 id="student-success-title">¡Tu perfil está listo!</h1>
+    <p>Ya podemos recomendarte grupos de estudio según tus preferencias.</p>
+    @if (rutaInicioEstudiante) {
+      <a mat-flat-button class="primary-button" [routerLink]="rutaInicioEstudiante">Ir al inicio</a>
+    } @else {
+      <button mat-flat-button class="primary-button" type="button" disabled aria-describedby="student-home-pending">Ir al inicio</button>
+      <p class="pending-home" id="student-home-pending">El acceso al inicio del estudiante aún no está disponible.</p>
+    }
+  </section>
+} @else {
+  <div class="intro">
+    <h1>Completa tu perfil de estudiante</h1>
+    <p>Esta información nos ayudará a recomendarte grupos compatibles contigo.</p>
+  </div>
+  <ol class="steps" aria-label="Progreso de la configuración">
+    <li class="step active" [class.done]="paso === 2" [attr.aria-current]="paso === 1 ? 'step' : null">
+      <span class="step-dot" aria-hidden="true">@if (paso === 2) { <mat-icon fontSet="material-symbols-rounded">check</mat-icon> } @else { 1 }</span>
+      <span>Perfil académico</span>
+      @if (paso === 2) { <span class="sr-only">Completado</span> }
+    </li>
+    <li class="step" [class.active]="paso === 2" [attr.aria-current]="paso === 2 ? 'step' : null"><span class="step-dot" aria-hidden="true">2</span><span>Preferencias</span></li>
+  </ol>
+  <section class="card" [attr.aria-busy]="estado === 'guardando'">
+    @if (paso === 1) {
+      <form [formGroup]="perfilAcademico" (ngSubmit)="siguiente()">
+        <div class="card-content">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">account_balance</mat-icon></span>
+            <div><h2>Perfil académico</h2><p>Cuéntanos qué estudias y cuál es tu nivel en cada curso.</p></div>
+          </div>
+          <div class="academic-grid">
+            <div class="form-group">
+              <label for="student-university">Universidad <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="student-university" formControlName="universidad" autocomplete="organization" placeholder="Universidad Peruana de Ciencias Aplicadas" required />
+                @if (perfilAcademico.controls.universidad.invalid) { <mat-error>Ingresa tu universidad.</mat-error> }
+              </mat-form-field>
+            </div>
+            <div class="form-group">
+              <label for="student-career">Carrera <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="student-career" formControlName="carrera" placeholder="Ej. Ingeniería de Software" required />
+                @if (perfilAcademico.controls.carrera.invalid) { <mat-error>Ingresa tu carrera.</mat-error> }
+              </mat-form-field>
+            </div>
+          </div>
+          <section class="courses-box" aria-labelledby="courses-title" formArrayName="cursos">
+            <div class="courses-heading">
+              <h3 id="courses-title">Cursos y nivel de conocimiento</h3>
+              <button mat-stroked-button class="add-button" type="button" (click)="agregarCurso()"><mat-icon fontSet="material-symbols-rounded">add</mat-icon>Agregar curso</button>
+            </div>
+            @for (fila of cursos.controls; track fila; let i = $index) {
+              <div class="course-row" [formGroupName]="i">
+                <div class="form-group">
+                  <label [for]="'course-' + i">Curso</label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <input matInput [id]="'course-' + i" formControlName="curso" placeholder="Ej. Base de datos" [errorStateMatcher]="errorCurso" required />
+                    @if (fila.controls.curso.invalid) { <mat-error>Ingresa el nombre del curso.</mat-error> }
+                    @else if (esDuplicado(fila.controls.curso.value)) { <mat-error>Este curso ya está agregado.</mat-error> }
+                  </mat-form-field>
+                </div>
+                <div class="form-group">
+                  <label [for]="'level-' + i">Nivel</label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <select matNativeControl [id]="'level-' + i" formControlName="nivel" required>
+                      <option value="" disabled>Seleccionar</option>
+                      @for (nivel of niveles; track nivel) { <option [value]="nivel">{{ nivel }}</option> }
+                    </select>
+                    @if (fila.controls.nivel.invalid) { <mat-error>Selecciona el nivel de conocimiento.</mat-error> }
+                  </mat-form-field>
+                </div>
+                <button mat-icon-button class="remove-course" type="button" [attr.aria-label]="'Eliminar curso ' + (i + 1)" (click)="eliminarCurso(i)"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button>
+              </div>
+            }
+            @if (cursos.hasError('sinCursos') && cursos.touched) { <p class="field-error" role="alert">Agrega al menos un curso completo con su nivel de conocimiento.</p> }
+          </section>
+        </div>
+        <div class="card-actions first-actions"><button mat-flat-button class="primary-button" type="submit">Siguiente</button></div>
+      </form>
+    } @else {
+      <form [formGroup]="preferencias" (ngSubmit)="finalizar()">
+        <div class="card-content">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">favorite</mat-icon></span>
+            <div><h2>Preferencias de estudio</h2><p>Elige cómo prefieres aprender para encontrar grupos más compatibles.</p></div>
+          </div>
+          <fieldset [disabled]="estado === 'guardando'" [attr.aria-describedby]="errorPreferencia('modalidad') ? 'modality-error' : null">
+            <legend>Modalidad preferida <span class="required" aria-hidden="true">*</span></legend>
+            <div class="methods">
+              @for (modalidad of modalidades; track modalidad) {
+                <label class="method" [class.selected]="preferencias.controls.modalidad.value === modalidad"><input type="radio" formControlName="modalidad" [value]="modalidad" (blur)="preferencias.controls.modalidad.markAsTouched()" [attr.aria-invalid]="errorPreferencia('modalidad')" /><span>{{ modalidad }}</span></label>
+              }
+            </div>
+            @if (errorPreferencia('modalidad')) { <p class="field-error" id="modality-error">Selecciona una modalidad.</p> }
+          </fieldset>
+          <fieldset class="preference-section" [disabled]="estado === 'guardando'" [attr.aria-describedby]="errorPreferencia('metodo') ? 'study-method-error' : null">
+            <legend>Método de estudio <span class="required" aria-hidden="true">*</span></legend>
+            <div class="study-methods">
+              @for (metodo of metodos; track metodo) {
+                <label class="method study-chip" [class.selected]="preferencias.controls.metodo.value === metodo"><input type="radio" formControlName="metodo" [value]="metodo" (blur)="preferencias.controls.metodo.markAsTouched()" [attr.aria-invalid]="errorPreferencia('metodo')" /><span>{{ metodo }}</span></label>
+              }
+            </div>
+            @if (errorPreferencia('metodo')) { <p class="field-error" id="study-method-error">Selecciona un método de estudio.</p> }
+          </fieldset>
+          <div class="preference-section">
+            <label class="topic-label" for="student-topic">Temas de interés</label>
+            <div class="topic-row">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="student-topic" [formControl]="tema" placeholder="Ej. Base de datos" [readonly]="estado === 'guardando'" (input)="limpiarErrorTema()" (keydown.enter)="$event.preventDefault(); agregarTema()" />
+                @if (tema.hasError('vacio')) { <mat-error>Escribe un tema antes de agregarlo.</mat-error> }
+                @else if (tema.hasError('duplicado')) { <mat-error>Este tema ya está agregado.</mat-error> }
+              </mat-form-field>
+              <button mat-stroked-button class="add-button" type="button" (click)="agregarTema()" [disabled]="estado === 'guardando'">Agregar</button>
+            </div>
+            <ul class="topics" aria-label="Temas de interés agregados">
+              @for (valor of temas; track valor; let i = $index) {
+                <li><span>{{ valor }}</span><button type="button" [attr.aria-label]="'Eliminar tema ' + valor" (click)="eliminarTema(i)" [disabled]="estado === 'guardando'"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></li>
+              }
+            </ul>
+          </div>
+          @if (estado === 'error') { <p class="feedback error" role="alert">{{ mensajeError }}</p> }
+          @if (mensaje) { <p class="feedback info" role="status">{{ mensaje }}</p> }
+        </div>
+        <div class="card-actions">
+          <button mat-stroked-button class="secondary-button" type="button" (click)="atras()" [disabled]="estado === 'guardando'">Atrás</button>
+          <button mat-flat-button class="primary-button" type="submit" [disabled]="estado === 'guardando'">{{ estado === 'guardando' ? 'Guardando…' : 'Finalizar' }}</button>
+        </div>
+      </form>
+    }
+  </section>
+}

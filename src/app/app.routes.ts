@@ -3,8 +3,22 @@ import { PublicLayout } from './layouts/public-layout/public-layout';
 import { AppLayout } from './layouts/app-layout/app-layout';
 import { LandingPage } from './features/landing/pages/landing-page/landing-page';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
+import { ConfiguracionLayout } from './layouts/configuracion-layout/configuracion-layout';
 
 export const routes: Routes = [
+  {
+    path: 'configuracion-inicial',
+    component: ConfiguracionLayout,
+    children: [{
+      path: 'estudiante',
+      title: 'Completa tu perfil de estudiante | Yachani',
+      loadComponent: () => import('./features/configuracion-inicial/pages/configuracion-estudiante/configuracion-estudiante').then(m => m.ConfiguracionEstudiante),
+    }, {
+      path: 'tutor',
+      title: 'Completa tu perfil de tutor | Yachani',
+      loadComponent: () => import('./features/configuracion-inicial/pages/configuracion-tutor/configuracion-tutor').then(m => m.ConfiguracionTutor),
+    }],
+  },
   {
     path: 'recuperar-contrasena', component: AuthLayout, data: { variante: 'recuperacion' },
     children: [{ path: '', title: 'Recuperar contraseña | Yachani', loadComponent: () => import('./features/auth/pages/recuperar-contrasena/recuperar-contrasena').then(m => m.RecuperarContrasena) }],

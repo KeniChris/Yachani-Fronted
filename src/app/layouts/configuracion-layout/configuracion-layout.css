@@ -1,0 +1,6 @@
+:host { display: block; min-height: 100vh; min-height: 100dvh; background: var(--color-background); }
+.configuration-header { display: flex; align-items: center; min-height: 76px; padding: 16px 5%; border-bottom: 1px solid var(--color-card-border); }
+.brand { display: inline-flex; align-items: center; gap: 11px; color: var(--color-brand); font-size: 24px; line-height: 29px; font-weight: 700; text-decoration: none; }
+.brand-icon { display: grid; place-items: center; width: 43px; height: 43px; border-radius: var(--radius-control); background: linear-gradient(135deg, var(--color-accent), var(--color-primary)); box-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary) 19%, transparent); }
+.configuration-main { padding: 42px 24px 64px; }
+@media (max-width: 600px) { .configuration-header { padding-inline: 20px; }.configuration-main { padding: 28px 16px 40px; } }
