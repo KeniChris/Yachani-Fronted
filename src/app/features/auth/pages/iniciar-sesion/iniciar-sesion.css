@@ -1,4 +1,4 @@
-:host { display: block; width: 100%; max-width: 475px; margin-inline: auto; }
+:host { display: block; width: 100%; min-width: 0; max-width: 475px; margin-inline: auto; }
 .welcome { margin: 0 0 10px; color: var(--mat-sys-inverse-primary); font-size: 13px; font-weight: 500; line-height: 15px; letter-spacing: .3px; }
 h1 { margin: 0; color: var(--color-text-inverse); font-size: 36px; line-height: 41px; font-weight: 700; letter-spacing: -.8px; }
 .description { margin: 12px 0 32px; color: #d6cedd; font-size: 15px; line-height: 24px; }
@@ -16,7 +16,8 @@ mat-form-field { width: 100%; border-radius: var(--radius-control); background: 
 .status { margin: 16px 0 0; color: #d6cedd; font-size: 14px; line-height: 22px; }
 .status:empty { display: none; }
 @media (max-width: 400px) { h1 { font-size: 32px; } }
-:host.error-view { max-width: 580px; }
+mat-form-field, .form-group { min-width: 0; }
+mat-error, .login-error p, .status { white-space: normal; overflow-wrap: anywhere; }
 :host.success-view { max-width: 560px; }
 .login-error { display: flex; align-items: center; gap: 8px; min-height: 56px; margin-bottom: 28px; padding: 12px 6px; border: 1px solid #fb7185; border-radius: var(--radius-control); background: #fb71850f; color: #fda4af; }
 .login-error img { flex: 0 0 auto; }

@@ -44,7 +44,7 @@
     <button class="text-action forgot-password" type="button" (click)="informarPendiente('recuperar')">¿Olvidaste tu contraseña?</button>
     <button mat-flat-button class="submit-button" type="submit">Iniciar sesión</button>
   </form>
-  <p class="switch-form">¿No tienes cuenta? <button class="text-action" type="button" (click)="informarPendiente('registrar')">Regístrate</button></p>
+  <p class="switch-form">¿No tienes cuenta? <button class="text-action" type="button" routerLink="/registro">Regístrate</button></p>
   <p class="status" role="status" aria-live="polite">{{ mensajeEstado }}</p>
 </div>
 }

@@ -6,6 +6,15 @@ import { AuthLayout } from './layouts/auth-layout/auth-layout';
 
 export const routes: Routes = [
   {
+    path: 'registro',
+    component: AuthLayout,
+    children: [{
+      path: '',
+      title: 'Crea tu cuenta | Yachani',
+      loadComponent: () => import('./features/auth/pages/registro/registro').then(m => m.Registro),
+    }],
+  },
+  {
     path: 'login',
     component: AuthLayout,
     children: [
