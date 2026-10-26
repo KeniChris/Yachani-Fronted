@@ -1,0 +1,50 @@
+@if (estadoVista === 'exito') {
+  <section class="login-success" role="status" aria-live="polite" aria-labelledby="success-title">
+    <div class="success-icon"><img src="images/auth/success.svg" alt="" width="42" height="42" /></div>
+    <h1 id="success-title">¡Inicio de sesión exitoso!</h1>
+    <p>Has ingresado correctamente a tu cuenta.</p>
+  </section>
+} @else {
+<div class="login-view" [class.has-login-error]="estadoVista === 'error'">
+  <p class="welcome">Bienvenido de nuevo</p>
+  <h1>Iniciar sesión</h1>
+  <p class="description">Ingresa con tu correo institucional para continuar.</p>
+  @if (estadoVista === 'error') {
+    <div class="login-error" id="login-error" role="alert">
+      <img src="images/auth/error.svg" alt="" width="20" height="20" />
+      <p>Correo o contraseña incorrectos. Verifica tus datos e inténtalo nuevamente</p>
+    </div>
+  }
+  <form [formGroup]="formulario" (ngSubmit)="iniciarSesion()" (input)="corregirDatos()" [attr.aria-describedby]="estadoVista === 'error' ? 'login-error' : null">
+    <div class="form-group">
+      <label for="login-email">Correo institucional</label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input matInput id="login-email" type="email" formControlName="correo" autocomplete="username" placeholder="u20xxxxxx@upc.edu.pe" required />
+        @if (formulario.controls.correo.hasError('required')) {
+          <mat-error>Ingresa tu correo institucional</mat-error>
+        } @else if (formulario.controls.correo.hasError('email')) {
+          <mat-error>Ingresa un correo válido.</mat-error>
+        } @else if (formulario.controls.correo.hasError('pattern')) {
+          <mat-error>El correo debe terminar en @upc.edu.pe</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <label for="login-password">Contraseña</label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input matInput id="login-password" [type]="mostrarContrasena ? 'text' : 'password'" formControlName="contrasena" autocomplete="current-password" placeholder="Ingresa tu contraseña" required />
+        <button mat-icon-button matSuffix type="button" class="password-toggle" (click)="mostrarContrasena = !mostrarContrasena" [attr.aria-label]="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="mostrarContrasena">
+          @if (mostrarContrasena) { <mat-icon fontSet="material-symbols-rounded">visibility_off</mat-icon> }
+          @else if (estadoVista === 'error') { <img src="images/auth/visibility-error.svg" alt="" width="22" height="22" /> }
+          @else { <img src="images/auth/visibility.svg" alt="" width="20" height="20" /> }
+        </button>
+        @if (formulario.controls.contrasena.hasError('required')) { <mat-error>Ingresa tu contraseña.</mat-error> }
+      </mat-form-field>
+    </div>
+    <button class="text-action forgot-password" type="button" (click)="informarPendiente('recuperar')">¿Olvidaste tu contraseña?</button>
+    <button mat-flat-button class="submit-button" type="submit">Iniciar sesión</button>
+  </form>
+  <p class="switch-form">¿No tienes cuenta? <button class="text-action" type="button" (click)="informarPendiente('registrar')">Regístrate</button></p>
+  <p class="status" role="status" aria-live="polite">{{ mensajeEstado }}</p>
+</div>
+}

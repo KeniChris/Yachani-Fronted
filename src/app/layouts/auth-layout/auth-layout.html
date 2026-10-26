@@ -1,0 +1,27 @@
+<main class="auth-page theme-dark">
+  <aside class="auth-banner" aria-labelledby="banner-title">
+    <a class="brand" routerLink="/" aria-label="Yachani, inicio">
+      <span class="brand-icon"><img src="images/auth/school.svg" alt="" width="25" height="25" /></span>
+      <span>Yachani</span>
+    </a>
+    <div class="banner-content">
+      <span class="banner-label">Aprende en comunidad</span>
+      <h2 id="banner-title">Tu grupo de estudio <span>te espera.</span></h2>
+      <p class="banner-description">Conecta con estudiantes y tutores que comparten tus intereses, organiza sesiones y avanza acompañado.</p>
+      <div class="illustration" aria-hidden="true">
+        <div class="study-card">
+          <div class="card-tag"></div>
+          <div class="card-line long"></div><div class="card-line medium"></div>
+          <div class="card-progress"><span></span></div>
+          <div class="avatars"><span>AH</span><span>JM</span><span>LC</span><span>+1</span></div>
+        </div>
+        <div class="mini-card">
+          <div class="card-line long"></div><div class="card-line medium"></div>
+          <div class="card-progress"><span></span></div>
+        </div>
+      </div>
+    </div>
+    <p class="banner-footer">Aprende, colabora y alcanza tus objetivos con Yachani.</p>
+  </aside>
+  <section class="auth-panel" aria-label="Acceso a Yachani"><router-outlet /></section>
+</main>
