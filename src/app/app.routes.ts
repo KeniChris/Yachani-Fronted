@@ -66,7 +66,20 @@ export const routes: Routes = [
     path: 'app',
     component: AppLayout,
     children: [
-      // Aquí se agregarán las rutas de las funcionalidades.
+      {
+        path: 'inicio-estudiante',
+        title: 'Inicio del estudiante | Yachani',
+        data: { rolVista: 'estudiante' },
+        // La autenticación deberá comprobar el rol; esta ruta no lo valida.
+        loadComponent: () => import('./features/dashboard/pages/inicio-estudiante/inicio-estudiante').then(m => m.InicioEstudiante),
+      },
+      {
+        path: 'inicio-tutor',
+        title: 'Inicio del tutor | Yachani',
+        // Solo indica la variante visual. El backend deberá autorizar el rol real.
+        data: { rolVista: 'tutor' },
+        loadComponent: () => import('./features/dashboard/pages/inicio-tutor/inicio-tutor').then(m => m.InicioTutor),
+      },
     ]
   }
 ];

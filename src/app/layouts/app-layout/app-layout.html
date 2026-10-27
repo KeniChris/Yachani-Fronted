@@ -20,7 +20,7 @@
       <header class="app-topbar">
         <app-topbar
           [role]="role"
-          [userName]="userName"
+          [userName]="userName || nombrePrevisualizacion()"
           [showMenuButton]="isMobile()"
           [menuOpen]="drawer.opened"
           (menuToggle)="drawer.toggle()"
