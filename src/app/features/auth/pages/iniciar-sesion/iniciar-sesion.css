@@ -1,0 +1,38 @@
+:host { display: block; width: 100%; min-width: 0; max-width: 475px; margin-inline: auto; }
+.welcome { margin: 0 0 10px; color: var(--mat-sys-inverse-primary); font-size: 13px; font-weight: 500; line-height: 15px; letter-spacing: .3px; }
+h1 { margin: 0; color: var(--color-text-inverse); font-size: 36px; line-height: 41px; font-weight: 700; letter-spacing: -.8px; }
+.description { margin: 12px 0 32px; color: #d6cedd; font-size: 15px; line-height: 24px; }
+.form-group { margin-bottom: 18px; }
+label { display: block; margin-bottom: 8px; color: var(--color-text-inverse); font-size: 13px; font-weight: 500; line-height: 15px; }
+mat-form-field { width: 100%; border-radius: var(--radius-control); background: #3a2349; --mat-form-field-outlined-outline-color: #d8b4fe38; --mat-form-field-outlined-hover-outline-color: #c084fc; --mat-form-field-outlined-input-text-placeholder-color: #998da3; --mat-form-field-outlined-error-outline-color: #fca5a5; --mat-form-field-error-text-color: #fca5a5; }
+.password-toggle { margin-right: 4px; color: #998da3; }
+.password-toggle img { margin: auto; }
+.text-action { padding: 0; border: 0; background: transparent; color: var(--mat-sys-inverse-primary); font-size: inherit; line-height: inherit; font-weight: 500; cursor: pointer; }
+.text-action:hover { text-decoration: underline; }
+.forgot-password { display: block; margin: 0 0 24px; font-size: 13px; line-height: 15px; }
+.submit-button { width: 100%; min-height: 50px; background: linear-gradient(135deg, var(--color-accent), var(--color-primary)); box-shadow: 0 12px 27px #9333ea40; color: var(--color-text-inverse); }
+.submit-button:hover { filter: brightness(1.08); }
+.switch-form { margin: 26px 0 0; color: #d6cedd; text-align: center; font-size: 14px; line-height: 20px; }
+.status { margin: 16px 0 0; color: #d6cedd; font-size: 14px; line-height: 22px; }
+.status:empty { display: none; }
+@media (max-width: 400px) { h1 { font-size: 32px; } }
+mat-form-field, .form-group { min-width: 0; }
+mat-error, .login-error p, .status { white-space: normal; overflow-wrap: anywhere; }
+:host.success-view { max-width: 560px; }
+.login-error { display: flex; align-items: center; gap: 8px; min-height: 56px; margin-bottom: 28px; padding: 12px 6px; border: 1px solid #fb7185; border-radius: var(--radius-control); background: #fb71850f; color: #fda4af; }
+.login-error img { flex: 0 0 auto; }
+.login-error p { margin: 0; font-size: 14px; line-height: 22.4px; overflow-wrap: anywhere; }
+.has-login-error .welcome { font-size: 14px; line-height: 16px; margin-bottom: 16px; }
+.has-login-error h1 { font-size: 40px; line-height: 44px; letter-spacing: -1px; }
+.has-login-error .description { margin: 20px 0 30px; color: #c6b9cf; font-size: 17px; line-height: 28.9px; }
+.has-login-error .form-group { margin-bottom: 22px; }
+.has-login-error label { font-size: 14px; line-height: 16px; margin-bottom: 10px; }
+.has-login-error mat-form-field { background: #ffffff05; --mat-form-field-container-height: 56px; --mat-form-field-container-vertical-padding: 16px; --mat-form-field-outlined-outline-color: #fb7185; --mat-form-field-outlined-hover-outline-color: #fb7185; --mat-form-field-outlined-focus-outline-color: #fb7185; --mat-form-field-outlined-error-outline-color: #fb7185; }
+.has-login-error .forgot-password { font-size: 14px; line-height: 16px; margin-bottom: 28px; }
+.has-login-error .submit-button { min-height: 54px; font-size: 16px; font-weight: 700; background: linear-gradient(100deg, var(--color-accent), var(--color-primary)); box-shadow: none; }
+.login-success { margin-top: 255px; text-align: center; }
+.success-icon { display: grid; place-items: center; width: 88px; height: 88px; margin: 0 auto 30px; border: 1px solid var(--mat-sys-inverse-primary); border-radius: 50%; background: #a855f71a; }
+.login-success h1 { font-size: 36px; line-height: 43.2px; letter-spacing: -1px; }
+.login-success p { margin: 19px 0 0; color: #c6b9cf; font-size: 17px; line-height: 28.9px; }
+@media (max-width: 800px) { .login-success { margin-top: clamp(40px, 15vh, 160px); } }
+@media (max-width: 400px) { .has-login-error h1, .login-success h1 { font-size: 30px; line-height: 36px; } }

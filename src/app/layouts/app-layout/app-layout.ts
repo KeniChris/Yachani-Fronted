@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { map } from 'rxjs';
+import { filter, map } from 'rxjs';
 
 import { Sidebar } from './components/sidebar/sidebar';
 import { Topbar } from './components/topbar/topbar';
@@ -22,6 +22,15 @@ import { Topbar } from './components/topbar/topbar';
 })
 export class AppLayout {
   private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly router = inject(Router);
+  private readonly rolSesion = signal<'estudiante' | 'tutor' | null>(null);
+  private readonly rolVista = toSignal(
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.leerRolVista()),
+    ),
+    { initialValue: this.leerRolVista() },
+  );
 
   readonly isMobile = toSignal(
     this.breakpointObserver
@@ -30,7 +39,17 @@ export class AppLayout {
     { initialValue: false }
   );
 
-  // Pendiente: recibir estos datos desde autenticación.
-  role: 'estudiante' | 'tutor' = 'estudiante';
+  // Al integrar autenticación, asignar role desde la sesión: tiene prioridad.
+  // Sin sesión, el rol de ruta solo configura la interfaz, no concede permisos.
+  get role(): 'estudiante' | 'tutor' { return this.rolSesion() ?? this.rolVista(); }
+  set role(value: 'estudiante' | 'tutor' | null) { this.rolSesion.set(value); }
   userName = '';
+  // Nombre solo visual, separado del usuario autenticado y limpiado al salir.
+  readonly nombrePrevisualizacion = signal('');
+
+  private leerRolVista(): 'estudiante' | 'tutor' {
+    let ruta = this.router.routerState.snapshot.root;
+    while (ruta.firstChild) ruta = ruta.firstChild;
+    return ruta.data['rolVista'] === 'tutor' ? 'tutor' : 'estudiante';
+  }
 }

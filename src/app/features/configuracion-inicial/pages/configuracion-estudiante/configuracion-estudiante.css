@@ -1,0 +1,14 @@
+:host { max-width: 1080px; }
+.courses-box { margin-top: 28px; padding: 24px; border: 1px solid var(--color-card-border); border-radius: 17px; background: color-mix(in srgb, var(--color-background) 30%, var(--color-surface)); }
+.courses-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }h3 { margin: 0; font-size: 17px; line-height: 24px; }
+.add-button { color: var(--color-primary); border-color: var(--color-primary); flex: 0 0 auto; }
+.course-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 42px; align-items: start; gap: 12px; margin-top: 12px; }
+.course-row mat-form-field { --mat-form-field-enabled-select-arrow-color: transparent; --mat-form-field-focus-select-arrow-color: transparent; --mat-form-field-disabled-select-arrow-color: transparent; }
+select[matNativeControl] { background-image: url('/images/configuracion/select-arrow.svg'); background-repeat: no-repeat; background-position: right 4px center; padding-right: 24px; }
+.remove-course { margin-top: 30px; width: 42px; height: 42px; border-radius: 10px; background: var(--color-error-background); color: var(--color-error); }
+.preference-section { margin-top: 28px; }.study-methods { display: flex; flex-wrap: wrap; gap: 10px; }.study-chip { min-height: 41px; padding: 10px 16px; border-radius: 24px; font-size: 14px; font-weight: 500; }.study-chip.selected { background: var(--color-primary); color: var(--color-text-inverse); }
+.topic-label { display: block; margin-bottom: 8px; }.topic-row { display: flex; align-items: start; gap: 10px; min-width: 0; }.topic-row .add-button { min-height: 50px; }
+.topics { display: flex; flex-wrap: wrap; gap: 9px; margin: 12px 0 0; padding: 0; list-style: none; }.topics li { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 5px 10px 5px 13px; border-radius: 20px; background: var(--color-category); font-size: 13px; line-height: 23px; }.topics span { min-width: 0; overflow-wrap: anywhere; }.topics button { display: grid; place-items: center; flex: 0 0 24px; padding: 0; border: 0; background: transparent; color: var(--color-text); cursor: pointer; }.topics mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.success-card { max-width: 860px; margin-inline: auto; }
+@media (max-width: 650px) { .courses-box { padding: 18px; }.courses-heading { align-items: start; flex-direction: column; }.course-row { grid-template-columns: minmax(0, 1fr) 42px; }.course-row > .form-group:first-child { grid-column: 1 / -1; }.remove-course { margin-top: 30px; } }
+@media (max-width: 400px) { .topic-row { flex-wrap: wrap; }.topic-row .add-button { width: 100%; } }

@@ -68,6 +68,8 @@ nav {
 .menu-link:hover {
   background-color: #3a2045;
 }
+.menu-link.is-pending { opacity: .65; cursor: not-allowed; }
+.menu-link.is-pending:hover { background: transparent; }
 
 .menu-link.is-active {
   background-color: #45294f;

@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, Input, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, Routes } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 type UserRole = 'estudiante' | 'tutor';
@@ -19,6 +19,7 @@ interface MenuItem {
   styleUrl: './sidebar.css'
 })
 export class Sidebar {
+  private readonly router = inject(Router);
   @Input() role: UserRole = 'estudiante';
 
   readonly items: MenuItem[] = [
@@ -73,6 +74,19 @@ export class Sidebar {
   ];
 
   get visibleItems(): MenuItem[] {
-    return this.items.filter(item => item.roles.includes(this.role));
+    return this.items.filter(item => item.roles.includes(this.role))
+      .map(item => item.label === 'Inicio' ? { ...item, route: this.homeRoute } : item);
+  }
+
+  get homeRoute(): string { return this.role === 'estudiante' ? '/app/inicio-estudiante' : '/app/inicio-tutor'; }
+
+  rutaDisponible(ruta: string): boolean {
+    const buscar = (config: Routes, segmentos: string[]): boolean => config.some(route => {
+      const partes = (route.path ?? '').split('/').filter(Boolean);
+      if (!partes.every((parte, i) => parte === segmentos[i])) return false;
+      const restantes = segmentos.slice(partes.length);
+      return restantes.length === 0 || (!!route.children && buscar(route.children, restantes));
+    });
+    return buscar(this.router.config, ruta.split('/').filter(Boolean));
   }
 }
