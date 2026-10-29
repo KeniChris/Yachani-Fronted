@@ -67,6 +67,10 @@ export const routes: Routes = [
     component: AppLayout,
     children: [
       {
+        path: 'grupos/:idGrupo',
+        loadChildren: () => import('./features/recursos/recursos.routes').then(m => m.RECURSOS_ROUTES),
+      },
+      {
         path: 'inicio-estudiante',
         title: 'Inicio del estudiante | Yachani',
         data: { rolVista: 'estudiante' },

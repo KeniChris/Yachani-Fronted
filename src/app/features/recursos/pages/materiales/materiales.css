@@ -1,0 +1,14 @@
+.filter {
+  margin-bottom: 24px;
+}
+.flashcards {
+  margin-top: 24px;
+}
+@media (max-width: 600px) {
+  .flashcards .row {
+    flex-wrap: wrap;
+  }
+  .flashcards button {
+    width: 100%;
+  }
+}

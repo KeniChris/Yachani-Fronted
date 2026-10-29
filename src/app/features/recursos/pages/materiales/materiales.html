@@ -1,0 +1,83 @@
+@if (tema) {
+  <a class="back" mat-button routerLink="/app/grupos/1/temas"
+    ><mat-icon fontSet="material-symbols-rounded">arrow_back</mat-icon>Temas / {{ tema }}</a
+  >
+}
+<div class="heading">
+  <div>
+    <h1 class="page-title">{{ tema || 'Materiales del grupo' }}</h1>
+    <p>
+      {{
+        tema
+          ? 'Archivos para practicar y estudiar este tema.'
+          : 'Encuentra y descarga los archivos compartidos.'
+      }}
+    </p>
+  </div>
+  <a mat-flat-button routerLink="/app/grupos/1/materiales/subir">Subir materiales</a>
+</div>
+@if (!tema) {
+  <form [formGroup]="filtros" class="filter">
+    <mat-form-field appearance="outline"
+      ><mat-label>Tema</mat-label
+      ><mat-select formControlName="idTema"
+        ><mat-option value="todos">Todos los temas</mat-option
+        ><mat-option value="1">Límites y continuidad</mat-option
+        ><mat-option value="2">Reglas de derivación</mat-option
+        ><mat-option value="3">Aplicaciones de la derivada</mat-option
+        ><mat-option value="sin-tema">Sin tema</mat-option></mat-select
+      ><mat-hint>Consulta todos los materiales o elige un tema.</mat-hint></mat-form-field
+    >
+  </form>
+}
+<mat-card
+  ><div class="row">
+    <h2 class="grow">Materiales compartidos</h2>
+    <mat-chip-set aria-label="Cantidad de archivos"><mat-chip>3 archivos</mat-chip></mat-chip-set>
+  </div>
+  <div class="list">
+    @for (material of materiales; track material.idMaterial) {
+      <div class="file">
+        <mat-icon fontSet="material-symbols-rounded">{{ material.icono }}</mat-icon>
+        <div class="grow">
+          <a class="file-name" [routerLink]="material.detalle">{{ material.nombre }}</a>
+          <p>
+            {{ material.autor }} · {{ material.formato }} · {{ material.tamano }} ·
+            {{ material.fecha }}
+          </p>
+        </div>
+        <button
+          mat-icon-button
+          type="button"
+          [attr.aria-label]="'Descargar ' + material.nombre"
+          title="Descarga pendiente de integración"
+        >
+          <mat-icon fontSet="material-symbols-rounded">download</mat-icon></button
+        ><a
+          mat-icon-button
+          [routerLink]="material.detalle"
+          [attr.aria-label]="'Ver detalles de ' + material.nombre"
+          ><mat-icon fontSet="material-symbols-rounded">more_vert</mat-icon></a
+        >
+      </div>
+    }
+  </div>
+  <mat-paginator
+    [length]="3"
+    [pageSize]="3"
+    [hidePageSize]="true"
+    aria-label="Paginación de materiales"
+/></mat-card>
+@if (tema) {
+  <mat-card class="flashcards"
+    ><h2>Flashcards de este tema</h2>
+    <div class="row">
+      <mat-icon fontSet="material-symbols-rounded">style</mat-icon>
+      <div class="grow">
+        <h3>Fórmulas de derivadas</h3>
+        <p class="muted">Leicy Cahuana · 4 tarjetas</p>
+      </div>
+      <button mat-stroked-button disabled title="Módulo de flashcards pendiente">Ver mazo</button>
+    </div></mat-card
+  >
+}

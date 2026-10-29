@@ -1,0 +1,23 @@
+<mat-card class="form-card"
+  ><div class="heading row">
+    <h1>{{ material.nombre }}</h1>
+    <a mat-icon-button routerLink="/app/grupos/1/materiales" aria-label="Cerrar detalle"
+      ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
+    >
+  </div>
+  <p class="muted">Consulta los datos del archivo y sus opciones.</p>
+  <div class="metadata">
+    <p>Tema: Reglas de derivación</p>
+    <p>Autor: {{ material.autor }}</p>
+    <p>Formato: {{ material.formato }} · Tamaño: {{ material.tamano }}</p>
+    <p>Publicado: {{ material.fecha }}</p>
+  </div>
+  <button mat-flat-button type="button" title="Descarga pendiente de integración">
+    Descargar archivo</button
+  ><a mat-stroked-button [routerLink]="material.cambiar">Cambiar tema</a>
+  @if (material.puedeEliminar) {
+    <a class="danger" mat-button routerLink="/app/grupos/1/materiales/1/eliminar"
+      >Eliminar material</a
+    >
+  }
+</mat-card>
