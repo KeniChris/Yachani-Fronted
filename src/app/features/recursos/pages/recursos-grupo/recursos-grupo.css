@@ -27,17 +27,18 @@
   background: var(--color-selection);
   border-bottom: 2px solid var(--color-primary);
 }
-:host:has(.group-flashcards.selected) .resources-link {
-  background: transparent;
-  border-bottom: 0;
-}
-:host:has(.group-flashcards.selected) .resource-tabs {
-  display: none;
+.group-tabs a:focus-visible,
+.resource-tabs a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -3px;
 }
 .resource-tabs {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
+}
+.resource-tabs[hidden] {
+  display: none;
 }
 .resource-tabs a {
   min-width: 132px;
