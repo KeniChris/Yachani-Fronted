@@ -1,0 +1,89 @@
+<div class="heading">
+  <div>
+    <h1 class="page-title">Fórmulas de derivadas</h1>
+    <p>Agrega preguntas y respuestas a tu mazo personal.</p>
+  </div>
+</div>
+<ol class="steps" aria-label="Pasos de creación">
+  <li>
+    <span class="step-number">1</span><span class="step-mobile">Paso 1 de 3</span
+    ><span>Datos del mazo</span>
+  </li>
+  <li aria-current="step">
+    <span class="step-number">2</span><span class="step-mobile">Paso 2 de 3</span
+    ><span>Tarjetas</span>
+  </li>
+  <li>
+    <span class="step-number">3</span><span class="step-mobile">Paso 3 de 3</span
+    ><span>Compartir</span>
+  </li>
+</ol>
+<mat-card class="editor-card"
+  ><h2>{{ editando ? 'Editar tarjeta' : 'Agregar tarjeta' }}</h2>
+  <form [formGroup]="formulario">
+    <mat-form-field appearance="outline" floatLabel="always"
+      ><mat-label>Pregunta</mat-label
+      ><textarea matInput formControlName="pregunta" required rows="4"></textarea
+      ><mat-hint>Hasta 1000 caracteres.</mat-hint>
+      @if (formulario.controls.pregunta.hasError('required')) {
+        <mat-error>La pregunta es obligatoria.</mat-error>
+      }
+      @if (formulario.controls.pregunta.hasError('maxlength')) {
+        <mat-error>La pregunta no puede superar los 1000 caracteres.</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field appearance="outline" floatLabel="always"
+      ><mat-label>Respuesta</mat-label
+      ><textarea matInput formControlName="respuesta" required rows="4"></textarea
+      ><mat-hint>Hasta 1000 caracteres.</mat-hint>
+      @if (formulario.controls.respuesta.hasError('required')) {
+        <mat-error>La respuesta es obligatoria.</mat-error>
+      }
+      @if (formulario.controls.respuesta.hasError('maxlength')) {
+        <mat-error>La respuesta no puede superar los 1000 caracteres.</mat-error>
+      }
+    </mat-form-field>
+    <div class="actions">
+      <a mat-stroked-button routerLink="/app/flashcards/1">Cancelar</a
+      ><button
+        mat-flat-button
+        type="button"
+        [disabled]="formulario.invalid"
+        routerLink="/app/flashcards/1"
+      >
+        {{ editando ? 'Guardar tarjeta' : 'Agregar tarjeta' }}
+      </button>
+    </div>
+  </form></mat-card
+>
+<div class="actions section-space">
+  <a mat-stroked-button routerLink="/app/flashcards/1">Ver tarjetas del mazo</a
+  ><a mat-stroked-button routerLink="/app/grupos/1/flashcards/compartir/1">Compartir en un grupo</a>
+</div>
+
+<mat-card class="section-space"
+  ><h2>Tarjetas</h2>
+  <div class="list">
+    @for (tarjeta of listaTarjetas; track tarjeta.idTarjeta) {
+      <article class="study-item">
+        <div class="row">
+          <span class="eyebrow grow">{{ tarjeta.etiqueta }}</span
+          ><a
+            mat-icon-button
+            [routerLink]="tarjeta.editar"
+            [attr.aria-label]="'Editar ' + tarjeta.etiqueta"
+            ><mat-icon fontSet="material-symbols-rounded">edit</mat-icon></a
+          ><a
+            mat-icon-button
+            class="danger"
+            [routerLink]="tarjeta.eliminar"
+            [attr.aria-label]="'Eliminar ' + tarjeta.etiqueta"
+            ><mat-icon fontSet="material-symbols-rounded">delete</mat-icon></a
+          >
+        </div>
+        <h3 class="question-text">{{ tarjeta.pregunta }}</h3>
+        <p class="muted">{{ tarjeta.respuesta }}</p>
+      </article>
+    }
+  </div></mat-card
+>

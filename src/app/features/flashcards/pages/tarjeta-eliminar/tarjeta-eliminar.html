@@ -1,0 +1,14 @@
+<mat-card class="form-card"
+  ><div class="heading row">
+    <h1>¿Eliminar esta tarjeta?</h1>
+    <a mat-icon-button routerLink="/app/flashcards/1" aria-label="Cerrar confirmación"
+      ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
+    >
+  </div>
+  <p class="muted">La tarjeta dejará de aparecer en el mazo.</p>
+  <blockquote>{{ tarjeta?.pregunta }}</blockquote>
+  <div class="actions">
+    <a mat-stroked-button routerLink="/app/flashcards/1">Conservar tarjeta</a
+    ><a mat-flat-button class="danger" routerLink="/app/flashcards/1">Eliminar tarjeta</a>
+  </div></mat-card
+>

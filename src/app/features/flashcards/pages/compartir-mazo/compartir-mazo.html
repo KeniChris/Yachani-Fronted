@@ -1,0 +1,55 @@
+<mat-card class="form-card"
+  ><div class="heading row">
+    <h1>Compartir en un grupo</h1>
+    <a mat-icon-button routerLink="/app/grupos/1/flashcards" aria-label="Cerrar confirmación"
+      ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
+    >
+  </div>
+  <p class="muted">Fórmulas de derivadas · 4 tarjetas</p>
+  <ol class="steps" aria-label="Pasos de creación">
+    <li>
+      <span class="step-number">1</span><span class="step-mobile">Paso 1 de 3</span
+      ><span>Datos del mazo</span>
+    </li>
+    <li>
+      <span class="step-number">2</span><span class="step-mobile">Paso 2 de 3</span
+      ><span>Tarjetas</span>
+    </li>
+    <li aria-current="step">
+      <span class="step-number">3</span><span class="step-mobile">Paso 3 de 3</span
+      ><span>Compartir</span>
+    </li>
+  </ol>
+  <form [formGroup]="formulario">
+    <mat-form-field appearance="outline" floatLabel="always"
+      ><mat-label>Grupo</mat-label
+      ><mat-select formControlName="idGrupo" required
+        ><mat-option value="1">Dominando Cálculo</mat-option></mat-select
+      ><mat-hint>Solo los grupos a los que tienes acceso.</mat-hint
+      ><mat-error>Selecciona un grupo.</mat-error></mat-form-field
+    >
+    <mat-form-field appearance="outline" floatLabel="always"
+      ><mat-label>Tema del grupo</mat-label
+      ><mat-select formControlName="idTema" required
+        ><mat-option value="1">Límites y continuidad</mat-option
+        ><mat-option value="2">Reglas de derivación</mat-option
+        ><mat-option value="3">Aplicaciones de la derivada</mat-option></mat-select
+      ><mat-hint>El tema debe pertenecer al grupo elegido.</mat-hint
+      ><mat-error>Selecciona un tema del grupo.</mat-error></mat-form-field
+    >
+    <p class="helper-text">
+      Se comparte el mismo mazo. Los cambios del autor se reflejan donde esté publicado.
+    </p>
+    <div class="actions">
+      <a mat-stroked-button routerLink="/app/grupos/1/flashcards">Cancelar</a
+      ><button
+        mat-flat-button
+        type="button"
+        [disabled]="formulario.invalid"
+        routerLink="/app/grupos/1/flashcards"
+      >
+        Compartir mazo
+      </button>
+    </div>
+  </form></mat-card
+>

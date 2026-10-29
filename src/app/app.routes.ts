@@ -67,8 +67,16 @@ export const routes: Routes = [
     component: AppLayout,
     children: [
       {
+        path: 'flashcards',
+        loadChildren: () => import('./features/flashcards/flashcards.routes').then(m => m.FLASHCARDS_ROUTES),
+      },
+      {
         path: 'grupos/:idGrupo',
         loadChildren: () => import('./features/recursos/recursos.routes').then(m => m.RECURSOS_ROUTES),
+      },
+      {
+        path: 'grupos/:idGrupo/flashcards/:idMazo',
+        loadChildren: () => import('./features/flashcards/flashcards-grupo.routes').then(m => m.REPASO_ROUTES),
       },
       {
         path: 'inicio-estudiante',

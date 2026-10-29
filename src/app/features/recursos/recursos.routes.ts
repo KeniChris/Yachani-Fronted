@@ -6,6 +6,11 @@ export const RECURSOS_ROUTES: Routes = [
       import('./pages/recursos-grupo/recursos-grupo').then((m) => m.RecursosGrupo),
     children: [
       {
+        path: 'flashcards',
+        loadChildren: () =>
+          import('../flashcards/flashcards-grupo.routes').then((m) => m.FLASHCARDS_GRUPO_ROUTES),
+      },
+      {
         path: 'temas',
         title: 'Temas y materiales | Yachani',
         loadComponent: () => import('./pages/temas/temas').then((m) => m.Temas),
