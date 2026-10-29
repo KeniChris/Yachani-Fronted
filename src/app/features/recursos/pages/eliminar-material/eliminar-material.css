@@ -1,0 +1,11 @@
+.warning {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-error-background);
+  border-radius: 12px;
+}
+.warning p,
+.warning mat-icon {
+  color: var(--color-error);
+}

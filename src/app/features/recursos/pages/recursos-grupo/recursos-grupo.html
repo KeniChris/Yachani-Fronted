@@ -1,0 +1,36 @@
+<mat-card class="group-context">
+  <div class="row">
+    <mat-icon fontSet="material-symbols-rounded">groups</mat-icon>
+    <div>
+      <h2>Dominando Cálculo</h2>
+      <p class="muted">Resolución de ejercicios · Tutor: Carlos Ríos</p>
+    </div>
+  </div>
+  <nav class="group-tabs" aria-label="Secciones del grupo">
+    @for (pestana of pestanas; track pestana.nombre) {
+      @if (pestana.nombre === 'Temas y materiales') {
+        <a mat-button class="selected" routerLink="temas"
+          ><mat-icon fontSet="material-symbols-rounded">menu_book</mat-icon>Temas y materiales</a
+        >
+      } @else {
+        <span class="pending" aria-disabled="true">
+          <mat-icon fontSet="material-symbols-rounded">{{ pestana.icono }}</mat-icon
+          >{{ pestana.nombre }}</span
+        >
+      }
+    }
+  </nav>
+</mat-card>
+<nav class="resource-tabs" aria-label="Recursos del grupo">
+  <a mat-stroked-button routerLink="temas" routerLinkActive="active" ariaCurrentWhenActive="page"
+    >Temas</a
+  >
+  <a
+    mat-stroked-button
+    routerLink="materiales"
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page"
+    >Materiales</a
+  >
+</nav>
+<router-outlet />

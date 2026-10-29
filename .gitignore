@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Mis archivos personales excluidos
+AGENTS.md
+REVISION-RECURSOS.md
+TEMAS-MATERIALES-ANGULAR.md
