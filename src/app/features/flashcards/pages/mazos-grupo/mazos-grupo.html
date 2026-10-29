@@ -3,7 +3,7 @@
     <h1 class="page-title">Mazos del grupo</h1>
     <p>Practica con los mazos compartidos en este grupo.</p>
   </div>
-  <a mat-flat-button routerLink="/app/grupos/1/flashcards/elegir">Compartir un mazo</a>
+  <a mat-flat-button [routerLink]="flashcardsGrupo + '/elegir'">Compartir un mazo</a>
 </div>
 <form [formGroup]="filtros" class="section-bottom">
   <mat-form-field appearance="outline" floatLabel="always"
@@ -33,7 +33,7 @@
         [attr.aria-label]="mazo.progreso"
       />
       @if (mazo.disponible) {
-        <a mat-stroked-button routerLink="/app/grupos/1/flashcards/1">Ver mazo</a>
+        <a mat-stroked-button [routerLink]="flashcardsGrupo + '/1'">Ver mazo</a>
       } @else {
         <button mat-stroked-button disabled>Ver mazo</button>
       }

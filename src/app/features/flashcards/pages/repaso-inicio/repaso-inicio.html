@@ -15,9 +15,9 @@
   <mat-progress-bar mode="determinate" [value]="75" aria-label="75 % revisado" />
   <p class="helper-text">El progreso es personal. Puedes salir y continuar después.</p>
   <div class="actions">
-    <a mat-flat-button routerLink="/app/grupos/1/flashcards/1/repaso/pregunta"
+    <a mat-flat-button [routerLink]="flashcardsGrupo + '/1/repaso/pregunta'"
       >Continuar con tarjeta 4</a
-    ><a mat-stroked-button routerLink="/app/grupos/1/flashcards/1/repaso/pregunta"
+    ><a mat-stroked-button [routerLink]="flashcardsGrupo + '/1/repaso/pregunta'"
       >Repasar de nuevo</a
     >
   </div>
@@ -26,10 +26,10 @@
   }
   @if (esAutor || esAdministrador) {
     <div>
-      <a mat-button routerLink="/app/grupos/1/flashcards/1/retirar">Retirar de este grupo</a>
+      <a mat-button [routerLink]="flashcardsGrupo + '/1/retirar'">Retirar de este grupo</a>
     </div>
   }
 </mat-card>
 <div class="section-space">
-  <a mat-stroked-button routerLink="/app/grupos/1/flashcards">Volver al grupo</a>
+  <a mat-stroked-button [routerLink]="flashcardsGrupo">Volver al grupo</a>
 </div>

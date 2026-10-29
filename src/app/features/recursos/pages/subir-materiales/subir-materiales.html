@@ -1,7 +1,7 @@
 <mat-card class="form-card"
   ><div class="heading row">
     <h1>Subir materiales</h1>
-    <a mat-icon-button routerLink="/app/grupos/1/materiales" aria-label="Cerrar subida"
+    <a mat-icon-button [routerLink]="grupo + '/materiales'" aria-label="Cerrar subida"
       ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
     >
   </div>
@@ -51,12 +51,12 @@
       }
     </div>
     <div class="actions">
-      <a mat-stroked-button routerLink="/app/grupos/1/materiales">Cancelar</a
+      <a mat-stroked-button [routerLink]="grupo + '/materiales'">Cancelar</a
       ><button
         mat-flat-button
         type="button"
         [disabled]="formulario.invalid"
-        routerLink="/app/grupos/1/materiales"
+        [routerLink]="grupo + '/materiales'"
       >
         Publicar 3 archivos
       </button>

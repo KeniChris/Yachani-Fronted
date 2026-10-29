@@ -1,0 +1,26 @@
+<section class="main-column requests" aria-labelledby="requests-title">
+  <div class="section-head">
+    <div class="title-group"><h2 id="requests-title">Solicitudes de ingreso</h2>
+      @if (ctx.solicitudesPendientes()) { <span class="badge">{{ ctx.solicitudesPendientes() }} {{ ctx.solicitudesPendientes() === 1 ? 'pendiente' : 'pendientes' }}</span> }
+    </div>
+    <span class="slots" [class.is-full]="grupoLleno()">Cupos disponibles: {{ ctx.cuposDisponibles() }} de {{ ctx.grupo()?.capacidadMaxima }}</span>
+  </div>
+
+  @if (grupoLleno() && ctx.solicitudesPendientes()) {
+    <p class="alert alert-warning" role="status"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">lock</mat-icon>
+      <span>El grupo está completo. Para aceptar más solicitudes, aumenta el límite en <a [routerLink]="ctx.ruta('integrantes')">Integrantes</a>.</span></p>
+  }
+  @if (error()) { <p class="alert alert-error" role="alert"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">warning</mat-icon>{{ error() }}</p> }
+
+  @if (!ctx.solicitudesPendientes()) {
+    <section class="card empty-state" role="status">
+      <span class="empty-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">inbox</mat-icon></span>
+      <h3>No hay solicitudes pendientes</h3>
+      <p>Cuando un estudiante solicite unirse a {{ ctx.grupo()?.nombre }}, aparecerá aquí.</p>
+    </section>
+  }
+
+  @for (item of solicitudes(); track item.id) {
+    <app-tarjeta-solicitud [solicitud]="item" [grupoLleno]="grupoLleno()" (responder)="responder(item, $event)" />
+  }
+</section>

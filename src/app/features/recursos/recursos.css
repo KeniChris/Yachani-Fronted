@@ -167,3 +167,8 @@ textarea {
     flex-basis: calc(100% - 40px);
   }
 }
+/* Dentro del espacio del grupo, el título de la pestaña queda por debajo del nombre del grupo. */
+:host-context(app-espacio-grupo) .page-title {
+  font-size: 22px;
+  line-height: 30px;
+}

@@ -1,7 +1,7 @@
 <mat-card class="form-card"
   ><div class="heading row">
     <h1>{{ editando ? 'Editar tema' : 'Crear tema' }}</h1>
-    <a mat-icon-button routerLink="/app/grupos/1/temas" aria-label="Cerrar formulario"
+    <a mat-icon-button [routerLink]="grupo + '/temas'" aria-label="Cerrar formulario"
       ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
     >
   </div>
@@ -25,12 +25,12 @@
       ><mat-error>La descripción no puede superar los 300 caracteres.</mat-error></mat-form-field
     >
     <div class="actions">
-      <a mat-stroked-button routerLink="/app/grupos/1/temas">Cancelar</a
+      <a mat-stroked-button [routerLink]="grupo + '/temas'">Cancelar</a
       ><button
         mat-flat-button
         type="button"
         [disabled]="formulario.invalid"
-        routerLink="/app/grupos/1/temas"
+        [routerLink]="grupo + '/temas'"
       >
         {{ editando ? 'Guardar cambios' : 'Crear tema' }}
       </button>

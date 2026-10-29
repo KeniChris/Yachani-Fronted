@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaGrupoActual } from '../../../grupos/ruta-grupo-actual';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -23,6 +24,7 @@ import { MatSelectModule } from '@angular/material/select';
   styleUrls: ['../../recursos.css', './cambiar-tema.css'],
 })
 export class CambiarTema {
+  readonly grupo = rutaGrupoActual();
   readonly material;
   readonly materiales = {
     '1': {
@@ -33,8 +35,8 @@ export class CambiarTema {
       tamano: '1,1 MB',
       fecha: '28 oct 2026',
       puedeEliminar: true,
-      detalle: '/app/grupos/1/materiales/1',
-      cambiar: '/app/grupos/1/materiales/1/cambiar-tema',
+      detalle: this.grupo + '/materiales/1',
+      cambiar: this.grupo + '/materiales/1/cambiar-tema',
     },
     '2': {
       idMaterial: 2,
@@ -44,8 +46,8 @@ export class CambiarTema {
       tamano: '840 KB',
       fecha: '28 oct 2026',
       puedeEliminar: false,
-      detalle: '/app/grupos/1/materiales/2',
-      cambiar: '/app/grupos/1/materiales/2/cambiar-tema',
+      detalle: this.grupo + '/materiales/2',
+      cambiar: this.grupo + '/materiales/2/cambiar-tema',
     },
     '3': {
       idMaterial: 3,
@@ -55,8 +57,8 @@ export class CambiarTema {
       tamano: '350 KB',
       fecha: '27 oct 2026',
       puedeEliminar: false,
-      detalle: '/app/grupos/1/materiales/3',
-      cambiar: '/app/grupos/1/materiales/3/cambiar-tema',
+      detalle: this.grupo + '/materiales/3',
+      cambiar: this.grupo + '/materiales/3/cambiar-tema',
     },
   };
   constructor(route: ActivatedRoute) {

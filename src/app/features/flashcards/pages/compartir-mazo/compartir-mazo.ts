@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaFlashcardsGrupo } from '../../flashcards-grupo.routes';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +26,7 @@ import { MatSelectModule } from '@angular/material/select';
   styleUrls: ['../../../recursos/recursos.css', '../../flashcards.css', './compartir-mazo.css'],
 })
 export class CompartirMazo {
+  readonly flashcardsGrupo = rutaFlashcardsGrupo();
   readonly formulario = new FormGroup({
     idGrupo: new FormControl('1', { nonNullable: true, validators: Validators.required }),
     idTema: new FormControl('2', { nonNullable: true, validators: Validators.required }),

@@ -1,5 +1,6 @@
 import { Component, DestroyRef, afterNextRender, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -8,7 +9,7 @@ import { crearInicioTutorVacio, DatosInicioTutor } from './inicio-tutor.models';
 import { crearDatosTutorDemostracion, USUARIO_TUTOR_DEMOSTRACION } from './inicio-tutor.demo';
 
 @Component({
-  imports: [NgTemplateOutlet, MatButtonModule, MatIconModule, MatProgressBarModule],
+  imports: [NgTemplateOutlet, RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule],
   selector: 'app-inicio-tutor',
   styleUrls: ['../inicio-estudiante/inicio-estudiante.css', './inicio-tutor.css'],
   templateUrl: './inicio-tutor.html',

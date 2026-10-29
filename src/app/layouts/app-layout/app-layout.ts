@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -24,6 +24,8 @@ export class AppLayout {
   private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly router = inject(Router);
   private readonly rolSesion = signal<'estudiante' | 'tutor' | null>(null);
+  // Las rutas sin rolVista (p. ej. /app/flashcards) conservan la vista del último rol.
+  private ultimoRolVista: 'estudiante' | 'tutor' = 'estudiante';
   private readonly rolVista = toSignal(
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -48,8 +50,14 @@ export class AppLayout {
   readonly nombrePrevisualizacion = signal('');
 
   private leerRolVista(): 'estudiante' | 'tutor' {
-    let ruta = this.router.routerState.snapshot.root;
-    while (ruta.firstChild) ruta = ruta.firstChild;
-    return ruta.data['rolVista'] === 'tutor' ? 'tutor' : 'estudiante';
+    // Gana el rolVista más profundo; las pantallas de otros módulos dentro de un grupo lo heredan del grupo.
+    let ruta: ActivatedRouteSnapshot | null = this.router.routerState.snapshot.root;
+    let rolRuta: 'estudiante' | 'tutor' | null = null;
+    for (; ruta; ruta = ruta.firstChild) {
+      const rol = ruta.data['rolVista'];
+      if (rol === 'tutor' || rol === 'estudiante') rolRuta = rol;
+    }
+    if (rolRuta) this.ultimoRolVista = rolRuta;
+    return this.ultimoRolVista;
   }
 }

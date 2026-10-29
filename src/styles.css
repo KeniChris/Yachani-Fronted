@@ -177,3 +177,7 @@ html {
     scroll-behavior: smooth;
   }
 }
+/* Panel de notificaciones del topbar: más ancho que un menú estándar. */
+.notifications-menu.mat-mdc-menu-panel {
+  max-width: 380px;
+}

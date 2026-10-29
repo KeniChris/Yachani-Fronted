@@ -1,0 +1,47 @@
+@if (store.modoPrevisualizacion) { <p class="preview-note" role="status">Vista previa con datos de demostración. Los cambios no se guardan.</p> }
+@if (ctx.grupo(); as grupo) {
+  <div class="page-heading">
+    <h1>{{ grupo.nombre }}</h1>
+    <p class="breadcrumb"><a [routerLink]="misGrupos">Mis grupos</a><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon><span aria-current="page">{{ grupo.nombre }}</span></p>
+  </div>
+  <section class="card group-header" aria-label="Información del grupo">
+    <div class="group-top">
+      <div class="group-identity">
+        <span class="group-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">{{ grupo.icono }}</mat-icon></span>
+        <div class="group-text">
+          <p class="group-name">{{ grupo.nombre }} <span class="badge badge-muted">{{ ctx.esTutor ? 'Vista tutor' : 'Vista estudiante' }}</span></p>
+          <p class="group-meta">{{ grupo.curso }} · {{ grupo.tema }} · Método: {{ grupo.metodo.toLowerCase() }} · @if (ctx.esTutor) { Eres el tutor de este grupo } @else { Tutor: {{ ctx.tutor()?.nombre ?? 'Por asignar' }} }</p>
+        </div>
+      </div>
+      <div class="group-chips">
+        <span class="badge"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">group</mat-icon>{{ ctx.integrantes().length }}/{{ grupo.capacidadMaxima }} integrantes</span>
+        @if (proxima()) {
+          <a class="badge badge-link" [routerLink]="ctx.ruta('sesiones')" title="Ver sesiones del grupo"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>Próxima: {{ proxima() }}</a>
+        }
+        <span class="badge badge-muted">{{ grupo.modalidad }}</span>
+        @if (ctx.esTutor) { <a class="badge badge-link" [routerLink]="ctx.ruta() + '/editar'"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">edit</mat-icon>Editar grupo</a> }
+      </div>
+    </div>
+    <nav class="group-tabs" aria-label="Secciones del grupo">
+      @for (pestana of pestanasVisibles; track pestana.ruta) {
+        @if (pestana.disponible) {
+          <a class="tab" [routerLink]="pestana.ruta" [class.is-active]="activa(pestana)" [attr.aria-current]="activa(pestana) ? 'page' : null">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">{{ pestana.icono }}</mat-icon>{{ pestana.etiqueta }}
+            @if (pestana.ruta === 'solicitudes' && ctx.solicitudesPendientes()) { <span class="tab-count"><span class="sr-only">, </span>{{ ctx.solicitudesPendientes() }}<span class="sr-only"> pendientes</span></span> }
+          </a>
+        } @else {
+          <span class="tab is-pending" role="link" aria-disabled="true" [title]="pestana.etiqueta + ': disponible próximamente'">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">{{ pestana.icono }}</mat-icon>{{ pestana.etiqueta }}
+          </span>
+        }
+      }
+    </nav>
+  </section>
+  <router-outlet />
+} @else {
+  <section class="card empty-state" role="status">
+    <span class="empty-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">group_off</mat-icon></span>
+    <h1 class="not-found-title">No encontramos este grupo</h1>
+    <p>Es posible que ya no formes parte de él o que el enlace no sea correcto.</p>
+  </section>
+}

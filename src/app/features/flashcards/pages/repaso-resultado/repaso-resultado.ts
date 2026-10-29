@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaFlashcardsGrupo } from '../../flashcards-grupo.routes';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,4 +21,6 @@ import { MatChipsModule } from '@angular/material/chips';
   templateUrl: './repaso-resultado.html',
   styleUrls: ['../../../recursos/recursos.css', '../../flashcards.css', './repaso-resultado.css'],
 })
-export class RepasoResultado {}
+export class RepasoResultado {
+  readonly flashcardsGrupo = rutaFlashcardsGrupo();
+}

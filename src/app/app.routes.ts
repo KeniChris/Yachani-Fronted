@@ -4,6 +4,7 @@ import { AppLayout } from './layouts/app-layout/app-layout';
 import { LandingPage } from './features/landing/pages/landing-page/landing-page';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { ConfiguracionLayout } from './layouts/configuracion-layout/configuracion-layout';
+import { rutasGrupos } from './features/grupos/grupos.routes';
 
 export const routes: Routes = [
   {
@@ -71,14 +72,6 @@ export const routes: Routes = [
         loadChildren: () => import('./features/flashcards/flashcards.routes').then(m => m.FLASHCARDS_ROUTES),
       },
       {
-        path: 'grupos/:idGrupo',
-        loadChildren: () => import('./features/recursos/recursos.routes').then(m => m.RECURSOS_ROUTES),
-      },
-      {
-        path: 'grupos/:idGrupo/flashcards/:idMazo',
-        loadChildren: () => import('./features/flashcards/flashcards-grupo.routes').then(m => m.REPASO_ROUTES),
-      },
-      {
         path: 'inicio-estudiante',
         title: 'Inicio del estudiante | Yachani',
         data: { rolVista: 'estudiante' },
@@ -92,6 +85,7 @@ export const routes: Routes = [
         data: { rolVista: 'tutor' },
         loadComponent: () => import('./features/dashboard/pages/inicio-tutor/inicio-tutor').then(m => m.InicioTutor),
       },
+      ...rutasGrupos,
     ]
   }
 ];

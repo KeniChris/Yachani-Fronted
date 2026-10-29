@@ -1,0 +1,27 @@
+@let item = solicitud();
+<article class="card request-card" [attr.aria-labelledby]="'solicitud-' + item.id">
+  <div class="request-head">
+    <span class="avatar" [class.is-muted]="item.estado === 'rechazada'" aria-hidden="true">{{ iniciales() }}</span>
+    <div class="request-person"><h3 [id]="'solicitud-' + item.id">{{ item.nombre }}</h3><p>{{ detalle() }}</p>
+      @if (grupo()) { <p class="request-group"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>Solicita unirse a <strong>{{ grupo() }}</strong></p> }
+    </div>
+    <span class="badge" [class.badge-warning]="item.estado === 'pendiente'" [class.badge-success]="item.estado === 'aceptada'" [class.badge-muted]="item.estado === 'rechazada'">
+      {{ item.estado === 'pendiente' ? 'Pendiente' : item.estado === 'aceptada' ? 'Aceptada' : 'Rechazada' }}
+    </span>
+  </div>
+  @if (item.mensaje) { <blockquote class="request-message">“{{ item.mensaje }}”</blockquote> }
+  @switch (item.estado) {
+    @case ('pendiente') {
+      <div class="request-actions">
+        <button mat-stroked-button type="button" (click)="responder.emit('rechazada')">Rechazar<span class="sr-only"> a {{ item.nombre }}</span></button>
+        <button mat-flat-button type="button" [disabled]="grupoLleno()" [attr.title]="grupoLleno() ? 'El grupo está completo' : null" (click)="responder.emit('aceptada')">Aceptar<span class="sr-only"> a {{ item.nombre }}</span></button>
+      </div>
+    }
+    @case ('aceptada') {
+      <p class="alert alert-success"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon>{{ item.nombre }} ahora es integrante del grupo. Se ocupó 1 cupo y se le envió una notificación.</p>
+    }
+    @case ('rechazada') {
+      <p class="alert alert-info"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">info</mat-icon>Solicitud rechazada. Se notificó a {{ nombreCorto() }}. Los cupos disponibles no cambiaron.</p>
+    }
+  }
+</article>

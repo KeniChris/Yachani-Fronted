@@ -1,0 +1,50 @@
+/* Estilos compartidos por las pestañas del grupo y Notificaciones. */
+:host { display: block; min-width: 0; }
+h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 700; }h3 { margin: 0; font-size: 14px; line-height: 20px; font-weight: 700; }
+h1, h2, h3, p { overflow-wrap: anywhere; }
+.card { min-width: 0; padding: 20px; border: 1px solid var(--color-card-border); border-radius: 19px; background: var(--color-surface); box-shadow: 0 8px 28px color-mix(in srgb, var(--color-brand) 4%, transparent); }
+.tab-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); align-items: start; gap: 24px; }.tab-grid.single { grid-template-columns: minmax(0, 1fr); }
+.main-column, .side-column { display: flex; flex-direction: column; min-width: 0; gap: 16px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }.section-head .title-group { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
+.counter { color: var(--color-text-muted); font-size: 12px; line-height: 16px; font-weight: 500; }
+.muted { color: var(--color-text-muted); }
+
+/* Etiquetas */
+.badge { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; padding: 2px 9px; border-radius: 999px; background: var(--color-selection); color: var(--color-primary); font-size: 11px; line-height: 18px; font-weight: 700; white-space: nowrap; }.badge mat-icon { width: 14px; height: 14px; font-size: 14px; }
+.badge-muted { background: var(--color-background); color: var(--color-text-muted); }.badge-success { background: var(--color-success-background); color: var(--color-success); }.badge-warning { background: var(--color-warning-background); color: var(--color-warning); }.badge-error { background: var(--color-error-background); color: var(--color-error); }.badge-strong { background: var(--color-primary); color: var(--color-text-inverse); }
+
+/* Mensajes de estado */
+.alert { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 14px; border: 1px solid transparent; border-radius: var(--radius-control); font-size: 13px; line-height: 20px; }.alert mat-icon { flex: 0 0 18px; width: 18px; height: 18px; margin-top: 1px; font-size: 18px; }.alert p { margin: 0; }
+.alert-success { border-color: color-mix(in srgb, var(--color-success) 25%, transparent); background: var(--color-success-background); color: var(--color-success); }
+.alert-error { border-color: color-mix(in srgb, var(--color-error) 25%, transparent); background: var(--color-error-background); color: var(--color-error); }
+.alert-warning { border-color: color-mix(in srgb, var(--color-warning) 25%, transparent); background: var(--color-warning-background); color: var(--color-warning); }
+.alert-info { background: var(--color-selection); color: var(--color-text); }.alert-info mat-icon { color: var(--color-primary); }
+.alert-dismiss { margin-left: auto; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
+
+/* Estados vacíos */
+.empty-state { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 32px 16px; text-align: center; }.empty-state p { max-width: 380px; margin: 0; color: var(--color-text-muted); font-size: 13px; line-height: 20px; }
+.empty-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: var(--color-selection); color: var(--color-primary); }
+
+/* Elementos comunes */
+.icon-box { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: 11px; background: var(--color-selection); color: var(--color-primary); }.icon-box mat-icon { width: 20px; height: 20px; font-size: 20px; }
+.avatar { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--color-accent), var(--color-primary)); color: var(--color-text-inverse); font-size: 14px; font-weight: 700; }.avatar.is-muted { background: var(--color-text-muted); }
+.icon-button { display: grid; place-items: center; flex: 0 0 auto; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--color-text-muted); cursor: pointer; }.icon-button:hover { background: var(--color-selection); color: var(--color-primary); }.icon-button:disabled { cursor: not-allowed; opacity: .5; }
+
+/* Formularios */
+.form-card h2 { margin-bottom: 16px; }
+form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.form-group { min-width: 0; }.form-group > label, .form-label { display: block; margin-bottom: 6px; font-size: 13px; line-height: 18px; font-weight: 700; }.required { color: var(--color-error); }
+mat-form-field { width: 100%; min-width: 0; --mat-form-field-outlined-outline-color: var(--color-card-border); }mat-error, mat-hint { white-space: normal; overflow-wrap: anywhere; }textarea { min-height: 80px; resize: vertical; }
+.form-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 4px; }.form-actions button { min-width: 120px; }
+.form-note { margin: 0; color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
+
+/* Lista numerada de temas (crear grupo y propuesta de la IA) */
+.topic-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }.topic-list li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--color-card-border); font-size: 14px; }.topic-list li:last-child { border-bottom: 0; }
+.topic-number { display: grid; place-items: center; flex: 0 0 30px; height: 26px; border-radius: 8px; background: var(--color-selection); color: var(--color-primary); font-size: 12px; font-weight: 700; }.topic-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.topic-input { display: flex; align-items: flex-start; gap: 10px; }.topic-input mat-form-field { flex: 1; }.topic-input button { min-height: 48px; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 1100px) { .tab-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .card { padding: 16px; }.form-row { grid-template-columns: minmax(0, 1fr); }.form-actions button { flex: 1; } }

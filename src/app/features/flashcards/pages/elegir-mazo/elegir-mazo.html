@@ -1,7 +1,7 @@
 <mat-card class="form-card"
   ><div class="heading row">
     <h1>Compartir un mazo</h1>
-    <a mat-icon-button routerLink="/app/grupos/1/flashcards" aria-label="Cerrar confirmación"
+    <a mat-icon-button [routerLink]="flashcardsGrupo" aria-label="Cerrar confirmación"
       ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
     >
   </div>
@@ -22,6 +22,6 @@
   >
   <div class="actions">
     <a mat-stroked-button routerLink="/app/flashcards/crear">Crear uno nuevo</a
-    ><a mat-flat-button routerLink="/app/grupos/1/flashcards/compartir/1">Elegir este mazo</a>
+    ><a mat-flat-button [routerLink]="flashcardsGrupo + '/compartir/1'">Elegir este mazo</a>
   </div></mat-card
 >

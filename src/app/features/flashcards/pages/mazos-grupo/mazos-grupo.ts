@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaFlashcardsGrupo } from '../../flashcards-grupo.routes';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,6 +30,7 @@ import { MatChipsModule } from '@angular/material/chips';
   styleUrls: ['../../../recursos/recursos.css', '../../flashcards.css', './mazos-grupo.css'],
 })
 export class MazosGrupo {
+  readonly flashcardsGrupo = rutaFlashcardsGrupo();
   readonly filtros = new FormGroup({ idTema: new FormControl('todos', { nonNullable: true }) });
   readonly mazos = [
     {

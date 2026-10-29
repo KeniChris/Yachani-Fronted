@@ -25,7 +25,7 @@ Los IDs corresponden únicamente a los ejemplos de la especificación; no hay ca
 ## Adaptaciones y pendientes
 
 - El shell existente muestra su propia topbar y menú lateral desplegable en móvil; no se añadió la barra inferior del Figma ni se alteró la navegación de otras integrantes.
-- Las pestañas de grupo cuyos módulos aún no tienen rutas se presentan sin navegación. La entrega posterior de Flashcards habilita esa pestaña y conecta Ver mazo con `/app/grupos/1/flashcards/1`; el contenido sigue siendo de ejemplo.
+- Las pestañas de grupo cuyos módulos aún no tienen rutas se presentan sin navegación. La entrega posterior de Flashcards habilita esa pestaña y conecta Ver mazo con `/app/estudiante/grupos/dominando-calculo/flashcards/1`; el contenido sigue siendo de ejemplo.
 - Se conserva el tema global: su borde de campo es #7C6A88, frente al token CSS #7C6A8B de la especificación. No se cambió el tema compartido.
 - En el detalle de escritorio de Figma hay botones con ancho 1344 px que desbordan una tarjeta de 600 px. Aquí se ajustan al ancho de la tarjeta, como en móvil.
 - El PNG usa la fecha 27 oct 2026 de los datos acordados; su detalle en Figma indica 28 oct 2026.

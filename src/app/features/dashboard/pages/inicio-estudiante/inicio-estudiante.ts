@@ -1,5 +1,6 @@
 import { Component, DestroyRef, afterNextRender, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -8,7 +9,7 @@ import { DatosInicioEstudiante, FlashcardsInicio } from './inicio-estudiante.mod
 import { crearDatosDemostracion, USUARIO_DEMOSTRACION } from './inicio-estudiante.demo';
 
 @Component({
-  imports: [NgTemplateOutlet, MatButtonModule, MatIconModule, MatProgressBarModule],
+  imports: [NgTemplateOutlet, RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule],
   selector: 'app-inicio-estudiante',
   styleUrl: './inicio-estudiante.css',
   templateUrl: './inicio-estudiante.html',
