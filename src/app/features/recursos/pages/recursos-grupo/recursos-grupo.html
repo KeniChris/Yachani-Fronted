@@ -9,9 +9,19 @@
   <nav class="group-tabs" aria-label="Secciones del grupo">
     @for (pestana of pestanas; track pestana.nombre) {
       @if (pestana.nombre === 'Temas y materiales') {
-        <a mat-button class="selected" routerLink="temas"
+        <a mat-button class="selected resources-link" routerLink="temas"
           ><mat-icon fontSet="material-symbols-rounded">menu_book</mat-icon>Temas y materiales</a
         >
+      } @else if (pestana.nombre === 'Flashcards') {
+        <a
+          mat-button
+          class="group-flashcards"
+          routerLink="flashcards"
+          routerLinkActive="selected"
+          ariaCurrentWhenActive="page"
+        >
+          <mat-icon fontSet="material-symbols-rounded">style</mat-icon>Flashcards
+        </a>
       } @else {
         <span class="pending" aria-disabled="true">
           <mat-icon fontSet="material-symbols-rounded">{{ pestana.icono }}</mat-icon
