@@ -4,6 +4,9 @@
   gap: 8px;
   margin-bottom: 20px;
 }
+.resource-tabs[hidden] {
+  display: none;
+}
 .resource-tabs a {
   --mat-button-outlined-container-height: 36px;
   --mat-button-outlined-container-shape: 999px;
