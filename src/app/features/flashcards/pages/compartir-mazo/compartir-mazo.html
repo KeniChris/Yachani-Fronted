@@ -1,7 +1,7 @@
 <mat-card class="form-card"
   ><div class="heading row">
     <h1>Compartir en un grupo</h1>
-    <a mat-icon-button routerLink="/app/grupos/1/flashcards" aria-label="Cerrar confirmación"
+    <a mat-icon-button [routerLink]="flashcardsGrupo" aria-label="Cerrar confirmación"
       ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
     >
   </div>
@@ -41,12 +41,12 @@
       Se comparte el mismo mazo. Los cambios del autor se reflejan donde esté publicado.
     </p>
     <div class="actions">
-      <a mat-stroked-button routerLink="/app/grupos/1/flashcards">Cancelar</a
+      <a mat-stroked-button [routerLink]="flashcardsGrupo">Cancelar</a
       ><button
         mat-flat-button
         type="button"
         [disabled]="formulario.invalid"
-        routerLink="/app/grupos/1/flashcards"
+        [routerLink]="flashcardsGrupo"
       >
         Compartir mazo
       </button>

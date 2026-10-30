@@ -12,11 +12,11 @@
     <div><strong>1</strong><span>Por repasar</span></div>
   </div>
   <div class="actions">
-    <a mat-flat-button routerLink="/app/grupos/1/flashcards/1/repaso/pregunta"
+    <a mat-flat-button [routerLink]="flashcardsGrupo + '/1/repaso/pregunta'"
       >Repasar la pendiente</a
-    ><a mat-stroked-button routerLink="/app/grupos/1/flashcards/1/repaso/pregunta"
+    ><a mat-stroked-button [routerLink]="flashcardsGrupo + '/1/repaso/pregunta'"
       >Repasar de nuevo</a
-    ><a mat-stroked-button routerLink="/app/grupos/1/flashcards">Volver al grupo</a>
+    ><a mat-stroked-button [routerLink]="flashcardsGrupo">Volver al grupo</a>
   </div>
   <p class="helper-text">Tu progreso se conserva al volver al grupo.</p></mat-card
 >

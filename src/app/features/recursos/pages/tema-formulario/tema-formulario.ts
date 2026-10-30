@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaGrupoActual } from '../../../grupos/ruta-grupo-actual';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -23,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
   styleUrls: ['../../recursos.css', './tema-formulario.css'],
 })
 export class TemaFormulario {
+  readonly grupo = rutaGrupoActual();
   readonly editando;
   readonly formulario;
   readonly temas = {

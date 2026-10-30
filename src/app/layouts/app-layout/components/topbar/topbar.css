@@ -69,3 +69,29 @@
 .menu-toggle {
   margin-right: auto;
 }
+.bell { position: relative; }
+.bell-count { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border: 2px solid var(--color-background); border-radius: 9px; background: var(--color-primary); color: var(--color-text-inverse); font-size: 10px; line-height: 1; font-weight: 700; }
+
+.notifications-panel { width: min(360px, calc(100vw - 32px)); padding: 4px 0; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px 12px; }
+.panel-title { color: var(--color-text); font-size: 16px; line-height: 24px; font-weight: 700; }
+.text-action { padding: 0; border: 0; background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 700; cursor: pointer; }
+.reminder { margin: 0 12px 8px; padding: 14px; border: 1px solid var(--color-accent); border-radius: var(--radius-card); }
+.eyebrow { margin: 0; color: var(--color-primary); font-size: 11px; line-height: 16px; font-weight: 700; text-transform: uppercase; }
+.reminder-title { margin: 2px 0 8px; color: var(--color-text); font-size: 15px; line-height: 22px; font-weight: 700; }
+.reminder-details { display: flex; flex-direction: column; gap: 4px; margin: 0 0 12px; padding: 0; list-style: none; color: var(--color-text); font-size: 13px; line-height: 18px; }
+.reminder-details li { display: flex; align-items: center; gap: 6px; }.reminder-details mat-icon { width: 16px; height: 16px; font-size: 16px; }
+.reminder-action { min-height: 40px; }
+.notification { height: auto; min-height: 56px; padding-block: 8px; }.notification.is-unread { background: color-mix(in srgb, var(--color-selection) 60%, var(--color-surface)); }
+.notification ::ng-deep .mat-mdc-menu-item-text { display: flex; align-items: center; gap: 10px; }
+.notification-icon { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 10px; background: var(--color-selection); color: var(--color-primary); }
+.notification-text { display: flex; flex-direction: column; flex: 1; min-width: 0; white-space: normal; }.notification-text strong { font-size: 13px; line-height: 18px; font-weight: 500; }.notification-text small { color: var(--color-text-muted); font-size: 11px; line-height: 16px; }
+.unread-dot { flex: 0 0 8px; height: 8px; border-radius: 50%; background: var(--color-primary); }
+.see-all { color: var(--color-primary); font-size: 13px; font-weight: 700; }.see-all ::ng-deep .mat-mdc-menu-item-text { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.see-all mat-icon { width: 16px; height: 16px; margin: 0; font-size: 16px; color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+.reminder-toast { position: fixed; z-index: 1000; top: 16px; right: 16px; display: flex; align-items: flex-start; gap: 12px; width: min(420px, calc(100vw - 32px)); padding: 14px 16px; border-radius: var(--radius-card); background: var(--color-brand); color: var(--color-text-inverse); box-shadow: 0 16px 40px color-mix(in srgb, var(--color-brand) 30%, transparent); }
+.toast-icon { display: grid; place-items: center; flex: 0 0 40px; height: 40px; border-radius: 12px; background: var(--color-accent); }
+.toast-text { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 2px; font-size: 12px; line-height: 18px; }.toast-text strong { font-size: 14px; line-height: 20px; }.toast-text a { align-self: flex-start; color: var(--color-text-inverse); font-weight: 700; }
+.toast-close { display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }

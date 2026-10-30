@@ -3,7 +3,7 @@
     <h1>{{ publicacion ? '¿Retirar la publicación?' : '¿Retirar el mazo de este grupo?' }}</h1>
     <a
       mat-icon-button
-      [routerLink]="publicacion ? '/app/flashcards/1' : '/app/grupos/1/flashcards/1'"
+      [routerLink]="publicacion ? '/app/flashcards/1' : flashcardsGrupo + '/1'"
       aria-label="Cerrar confirmación"
       ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
     >
@@ -25,12 +25,12 @@
   <div class="actions">
     <a
       mat-stroked-button
-      [routerLink]="publicacion ? '/app/flashcards/1' : '/app/grupos/1/flashcards/1'"
+      [routerLink]="publicacion ? '/app/flashcards/1' : flashcardsGrupo + '/1'"
       >Cancelar</a
     ><a
       mat-flat-button
       class="danger"
-      [routerLink]="publicacion ? '/app/flashcards/1' : '/app/grupos/1/flashcards'"
+      [routerLink]="publicacion ? '/app/flashcards/1' : flashcardsGrupo"
       >{{ publicacion ? 'Retirar publicación' : 'Retirar de este grupo' }}</a
     >
   </div></mat-card

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaGrupoActual } from '../../../grupos/ruta-grupo-actual';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,4 +12,6 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './eliminar-material.html',
   styleUrls: ['../../recursos.css', './eliminar-material.css'],
 })
-export class EliminarMaterial {}
+export class EliminarMaterial {
+  readonly grupo = rutaGrupoActual();
+}

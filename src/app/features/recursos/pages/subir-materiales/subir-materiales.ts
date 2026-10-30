@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaGrupoActual } from '../../../grupos/ruta-grupo-actual';
 import { RouterLink } from '@angular/router';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -23,6 +24,7 @@ import { MatSelectModule } from '@angular/material/select';
   styleUrls: ['../../recursos.css', './subir-materiales.css'],
 })
 export class SubirMateriales {
+  readonly grupo = rutaGrupoActual();
   readonly formulario = new FormGroup({ idTema: new FormControl('2', { nonNullable: true }) });
   readonly materiales = [
     {
@@ -33,7 +35,7 @@ export class SubirMateriales {
       tamano: '1,1 MB',
       fecha: '28 oct 2026',
       icono: 'picture_as_pdf',
-      detalle: '/app/grupos/1/materiales/1',
+      detalle: this.grupo + '/materiales/1',
     },
     {
       idMaterial: 2,
@@ -43,7 +45,7 @@ export class SubirMateriales {
       tamano: '840 KB',
       fecha: '28 oct 2026',
       icono: 'description',
-      detalle: '/app/grupos/1/materiales/2',
+      detalle: this.grupo + '/materiales/2',
     },
     {
       idMaterial: 3,
@@ -53,7 +55,7 @@ export class SubirMateriales {
       tamano: '350 KB',
       fecha: '27 oct 2026',
       icono: 'image',
-      detalle: '/app/grupos/1/materiales/3',
+      detalle: this.grupo + '/materiales/3',
     },
   ];
 }

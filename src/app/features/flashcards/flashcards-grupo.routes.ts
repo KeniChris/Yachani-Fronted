@@ -1,4 +1,9 @@
 import { Routes } from '@angular/router';
+import { rutaGrupoActual } from '../grupos/ruta-grupo-actual';
+
+// Flashcards del grupo dentro de su espacio: /app/:rol/grupos/:grupoId/flashcards.
+export const rutaFlashcardsGrupo = (): string => rutaGrupoActual('flashcards');
+
 export const FLASHCARDS_GRUPO_ROUTES: Routes = [
   {
     path: '',

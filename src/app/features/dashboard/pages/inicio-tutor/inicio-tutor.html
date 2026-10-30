@@ -34,7 +34,7 @@
       } @else { <ng-container [ngTemplateOutlet]="estadoSeccion" [ngTemplateOutletContext]="{ estado: datos.sesiones.estado, vacio: 'No tienes próximas sesiones programadas.', error: 'No pudimos cargar tus próximas sesiones.' }" /> }
     </section>
     <section class="card" aria-labelledby="tutor-groups-title" [attr.aria-busy]="datos.grupos.estado === 'cargando'">
-      <div class="section-head"><h2 id="tutor-groups-title">Mis grupos</h2><button class="section-action" type="button" disabled title="La gestión de grupos aún no está disponible">Gestionar grupos →</button></div>
+      <div class="section-head"><h2 id="tutor-groups-title">Mis grupos</h2><a class="section-action" routerLink="/app/tutor/grupos">Gestionar grupos →</a></div>
       @if (datos.grupos.estado === 'listo' && datos.grupos.datos.length) {
         <div class="group-grid">
           @for (grupo of datos.grupos.datos; track grupo.id) {
@@ -50,7 +50,7 @@
   </div>
   <aside class="side-column tutor-requests" aria-label="Solicitudes de estudiantes">
     <section class="card" aria-labelledby="tutor-requests-title" [attr.aria-busy]="datos.solicitudes.estado === 'cargando'">
-      <div class="section-head"><h2 id="tutor-requests-title">Solicitudes pendientes</h2><button class="section-action" type="button" disabled title="La página de solicitudes aún no está disponible">Ver todas</button></div>
+      <div class="section-head"><h2 id="tutor-requests-title">Solicitudes pendientes</h2><a class="section-action" routerLink="/app/tutor/solicitudes">Ver todas</a></div>
       @if (datos.solicitudes.estado === 'listo' && datos.solicitudes.datos.length) {
         <ul class="request-list">
           @for (solicitud of datos.solicitudes.datos; track solicitud.id) {

@@ -8,7 +8,8 @@ interface MenuItem {
   label: string;
   icon: string;
   route: string;
-  roles: UserRole[];
+  // false: también queda activo en sus subrutas (p. ej. el espacio de un grupo).
+  exact: boolean;
 }
 
 @Component({
@@ -22,61 +23,27 @@ export class Sidebar {
   private readonly router = inject(Router);
   @Input() role: UserRole = 'estudiante';
 
-  readonly items: MenuItem[] = [
-    {
-      label: 'Inicio',
-      icon: 'home',
-      route: '/app',
-      roles: ['estudiante', 'tutor']
-    },
-    {
-      label: 'Explorar grupos',
-      icon: 'explore',
-      route: '/app/explorar',
-      roles: ['estudiante']
-    },
-    {
-      label: 'Mis grupos',
-      icon: 'groups',
-      route: '/app/grupos',
-      roles: ['estudiante', 'tutor']
-    },
-    {
-      label: 'Crear grupo',
-      icon: 'add',
-      route: '/app/grupos/crear',
-      roles: ['estudiante', 'tutor']
-    },
-    {
-      label: 'Recomendaciones IA',
-      icon: 'auto_awesome',
-      route: '/app/recomendaciones',
-      roles: ['estudiante']
-    },
-    {
-      label: 'Crear grupo con IA',
-      icon: 'auto_awesome',
-      route: '/app/grupos/crear-ia',
-      roles: ['tutor']
-    },
-    {
-      label: 'Solicitudes',
-      icon: 'person_add',
-      route: '/app/solicitudes',
-      roles: ['tutor']
-    },
-    {
-      label: 'Flashcards',
-      icon: 'style',
-      route: '/app/flashcards',
-      roles: ['estudiante', 'tutor']
-    }
-  ];
+  // Un menú por rol: cada uno muestra solo las funcionalidades que le corresponden.
+  // Las rutas con prefijo de rol conservan la vista al navegar.
+  private readonly menus: Record<UserRole, MenuItem[]> = {
+    estudiante: [
+      { label: 'Inicio', icon: 'home', route: '/app/inicio-estudiante', exact: true },
+      { label: 'Explorar grupos', icon: 'explore', route: '/app/explorar', exact: true },
+      { label: 'Mis grupos', icon: 'groups', route: '/app/estudiante/grupos', exact: false },
+      { label: 'Recomendaciones IA', icon: 'auto_awesome', route: '/app/recomendaciones', exact: true },
+      { label: 'Flashcards', icon: 'style', route: '/app/flashcards', exact: true },
+    ],
+    tutor: [
+      { label: 'Inicio', icon: 'home', route: '/app/inicio-tutor', exact: true },
+      { label: 'Mis grupos', icon: 'groups', route: '/app/tutor/grupos', exact: false },
+      { label: 'Crear grupo', icon: 'add', route: '/app/tutor/crear-grupo', exact: true },
+      { label: 'Crear grupo con IA', icon: 'auto_awesome', route: '/app/tutor/crear-grupo-ia', exact: true },
+      { label: 'Solicitudes', icon: 'person_add', route: '/app/tutor/solicitudes', exact: true },
+      { label: 'Flashcards', icon: 'style', route: '/app/flashcards', exact: true },
+    ],
+  };
 
-  get visibleItems(): MenuItem[] {
-    return this.items.filter(item => item.roles.includes(this.role))
-      .map(item => item.label === 'Inicio' ? { ...item, route: this.homeRoute } : item);
-  }
+  get visibleItems(): MenuItem[] { return this.menus[this.role]; }
 
   get homeRoute(): string { return this.role === 'estudiante' ? '/app/inicio-estudiante' : '/app/inicio-tutor'; }
 

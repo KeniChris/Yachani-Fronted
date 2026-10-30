@@ -1,64 +1,73 @@
 import { Routes } from '@angular/router';
-export const RECURSOS_ROUTES: Routes = [
+
+// Se montan como pestaña "Temas y materiales" del espacio del grupo (grupos.routes.ts):
+// /app/:rol/grupos/:grupoId/temas/... y /app/:rol/grupos/:grupoId/materiales/...
+const recursosGrupo = () =>
+  import('./pages/recursos-grupo/recursos-grupo').then((m) => m.RecursosGrupo);
+
+export const TEMAS_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./pages/recursos-grupo/recursos-grupo').then((m) => m.RecursosGrupo),
+    loadComponent: recursosGrupo,
     children: [
       {
-        path: 'flashcards',
-        loadChildren: () =>
-          import('../flashcards/flashcards-grupo.routes').then((m) => m.FLASHCARDS_GRUPO_ROUTES),
-      },
-      {
-        path: 'temas',
+        path: '',
         title: 'Temas y materiales | Yachani',
         loadComponent: () => import('./pages/temas/temas').then((m) => m.Temas),
       },
       {
-        path: 'temas/crear',
+        path: 'crear',
         title: 'Temas y materiales | Yachani',
         loadComponent: () =>
           import('./pages/tema-formulario/tema-formulario').then((m) => m.TemaFormulario),
       },
       {
-        path: 'materiales',
+        path: ':idTema/editar',
+        title: 'Temas y materiales | Yachani',
+        loadComponent: () =>
+          import('./pages/tema-formulario/tema-formulario').then((m) => m.TemaFormulario),
+      },
+      {
+        path: ':idTema/materiales',
+        title: 'Temas y materiales | Yachani',
+        loadComponent: () => import('./pages/materiales/materiales').then((m) => m.Materiales),
+      },
+    ],
+  },
+];
+
+export const MATERIALES_ROUTES: Routes = [
+  {
+    path: '',
+    loadComponent: recursosGrupo,
+    children: [
+      {
+        path: '',
         title: 'Temas y materiales | Yachani',
         loadComponent: () => import('./pages/materiales/materiales').then((m) => m.Materiales),
       },
       {
-        path: 'materiales/subir',
+        path: 'subir',
         title: 'Temas y materiales | Yachani',
         loadComponent: () =>
           import('./pages/subir-materiales/subir-materiales').then((m) => m.SubirMateriales),
       },
       {
-        path: 'materiales/:idMaterial/eliminar',
+        path: ':idMaterial/eliminar',
         title: 'Temas y materiales | Yachani',
         loadComponent: () =>
           import('./pages/eliminar-material/eliminar-material').then((m) => m.EliminarMaterial),
       },
       {
-        path: 'temas/:idTema/editar',
+        path: ':idMaterial/cambiar-tema',
         title: 'Temas y materiales | Yachani',
-        loadComponent: () =>
-          import('./pages/tema-formulario/tema-formulario').then((m) => m.TemaFormulario),
+        loadComponent: () => import('./pages/cambiar-tema/cambiar-tema').then((m) => m.CambiarTema),
       },
       {
-        path: 'temas/:idTema/materiales',
-        title: 'Temas y materiales | Yachani',
-        loadComponent: () => import('./pages/materiales/materiales').then((m) => m.Materiales),
-      },
-      {
-        path: 'materiales/:idMaterial',
+        path: ':idMaterial',
         title: 'Temas y materiales | Yachani',
         loadComponent: () =>
           import('./pages/material-detalle/material-detalle').then((m) => m.MaterialDetalle),
-      },
-      {
-        path: 'materiales/:idMaterial/cambiar-tema',
-        title: 'Temas y materiales | Yachani',
-        loadComponent: () => import('./pages/cambiar-tema/cambiar-tema').then((m) => m.CambiarTema),
       },
     ],
   },

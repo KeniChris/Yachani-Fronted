@@ -58,7 +58,7 @@
 >
 <div class="actions section-space">
   <a mat-stroked-button routerLink="/app/flashcards/1">Ver tarjetas del mazo</a
-  ><a mat-stroked-button routerLink="/app/grupos/1/flashcards/compartir/1">Compartir en un grupo</a>
+  ><a mat-stroked-button [routerLink]="flashcardsGrupo + '/compartir/1'">Compartir en un grupo</a>
 </div>
 
 <mat-card class="section-space"

@@ -1,0 +1,214 @@
+@if (store.modoPrevisualizacion) { <p class="preview-note" role="status">Vista previa con datos de demostración. Los cambios no se guardan.</p> }
+
+@if (sinPermiso) {
+  <section class="card empty-state" role="alert">
+    <span class="empty-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">lock</mat-icon></span>
+    <h1 class="state-title">No puedes editar este grupo</h1>
+    <p>Solo el tutor del grupo puede cambiar su información, o el grupo ya no existe.</p>
+    <a mat-flat-button routerLink="/app/tutor/grupos">Ver mis grupos</a>
+  </section>
+} @else if (creado(); as grupo) {
+  <section class="card success-card" role="status" aria-labelledby="success-title">
+    <span class="success-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">check</mat-icon></span>
+    <h1 id="success-title" class="state-title">¡{{ grupo.nombre }} está listo!</h1>
+    <p>Los estudiantes ya pueden encontrarlo y enviar solicitudes mientras haya cupos ({{ grupo.capacidadMaxima - 1 }} disponibles).</p>
+    <div class="form-actions centered">
+      <a mat-stroked-button routerLink="/app/tutor/grupos">Ver mis grupos</a>
+      <a mat-flat-button [routerLink]="rutaGrupo(grupo) + '/sesiones'">Programar primera sesión</a>
+    </div>
+  </section>
+} @else {
+  <div class="page-heading">
+    <p class="breadcrumb"><a routerLink="/app/tutor/grupos">Mis grupos</a><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon>
+      @if (grupoOriginal) { <a [routerLink]="rutaVolver">{{ grupoOriginal.nombre }}</a><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon> }
+      <span aria-current="page">{{ esEdicion ? 'Editar' : 'Crear grupo' }}</span></p>
+    <h1>{{ esEdicion ? 'Editar grupo' : 'Crear grupo de estudio' }}</h1>
+    <p>{{ esEdicion ? 'Actualiza la información que ven los integrantes y los estudiantes que exploran grupos.' : 'Define cómo será tu grupo. Podrás editar estos datos más adelante.' }}</p>
+  </div>
+
+  @if (borrador) {
+    <p class="alert alert-info page-alert" role="status"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">auto_awesome</mat-icon>Completamos el formulario con la propuesta de la IA. Revísalo y ajusta lo que necesites antes de crear el grupo.</p>
+  }
+
+  <div class="tab-grid">
+    <form class="card form-card main-form" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      @if (intentoGuardar() && form.invalid) {
+        <p class="alert alert-error" role="alert" tabindex="-1" #alerta><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">warning</mat-icon>Revisa los campos marcados para {{ esEdicion ? 'guardar los cambios' : 'crear el grupo' }}.</p>
+      }
+      @if (mensajeEdicion() && form.pristine) {
+        <p class="alert alert-success" role="status"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon><span>{{ mensajeEdicion() }} <a [routerLink]="rutaVolver">Volver al grupo</a></span></p>
+      }
+
+      <fieldset>
+        <legend><span class="step">1</span>Información del grupo</legend>
+        <div class="form-group">
+          <label for="grupo-nombre">Nombre del grupo <span class="required" aria-hidden="true">*</span></label>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <input matInput id="grupo-nombre" formControlName="nombre" placeholder="Ej. Dominando Cálculo" required />
+            @if (form.controls.nombre.hasError('required')) { <mat-error>Ingresa el nombre del grupo.</mat-error> }
+            @if (form.controls.nombre.hasError('maxlength')) { <mat-error>Usa como máximo 60 caracteres.</mat-error> }
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="grupo-curso">Curso <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput id="grupo-curso" formControlName="curso" placeholder="Ej. Cálculo I" required />
+              @if (form.controls.curso.invalid) { <mat-error>Ingresa el curso.</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <label for="grupo-tema">Tema principal <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput id="grupo-tema" formControlName="tema" placeholder="Ej. Límites y derivadas" required />
+              @if (form.controls.tema.invalid) { <mat-error>Ingresa el tema principal.</mat-error> }
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="grupo-descripcion">Descripción</label>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <textarea matInput id="grupo-descripcion" formControlName="descripcion" placeholder="Cuéntales a los estudiantes cómo trabajará el grupo"></textarea>
+            <mat-hint align="end">{{ form.controls.descripcion.value.length }}/300</mat-hint>
+            @if (form.controls.descripcion.invalid) { <mat-error>Usa como máximo 300 caracteres.</mat-error> }
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <span class="form-label" id="grupo-icono">Ícono</span>
+          <div class="icon-options" role="radiogroup" aria-labelledby="grupo-icono">
+            @for (opcion of iconos; track opcion.valor) {
+              <label class="icon-option" [class.is-selected]="form.controls.icono.value === opcion.valor" [title]="opcion.etiqueta">
+                <input type="radio" formControlName="icono" [value]="opcion.valor" />
+                <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">{{ opcion.valor }}</mat-icon>
+                <span class="sr-only">{{ opcion.etiqueta }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">2</span>Forma de estudio</legend>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="grupo-metodo">Método de estudio <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-select id="grupo-metodo" formControlName="metodo" placeholder="Elige un método" required>
+                @for (metodo of metodos; track metodo) { <mat-option [value]="metodo">{{ metodo }}</mat-option> }
+              </mat-select>
+              @if (form.controls.metodo.invalid) { <mat-error>Elige un método de estudio.</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <span class="form-label" id="grupo-modalidad">Modalidad <span class="required" aria-hidden="true">*</span></span>
+            <mat-button-toggle-group formControlName="modalidad" aria-labelledby="grupo-modalidad" hideSingleSelectionIndicator>
+              @for (modalidad of modalidades; track modalidad) { <mat-button-toggle [value]="modalidad">{{ modalidad }}</mat-button-toggle> }
+            </mat-button-toggle-group>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="grupo-capacidad">Capacidad máxima <span class="required" aria-hidden="true">*</span></label>
+          <div class="stepper">
+            <button class="step-button" type="button" aria-label="Disminuir capacidad" (click)="cambiarCapacidad(-1)"><mat-icon fontSet="material-symbols-rounded">remove</mat-icon></button>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="capacity-field">
+              <input matInput id="grupo-capacidad" type="number" formControlName="capacidadMaxima" [min]="capacidadMinima" [max]="capacidadMaxima" required />
+            </mat-form-field>
+            <button class="step-button" type="button" aria-label="Aumentar capacidad" (click)="cambiarCapacidad(1)"><mat-icon fontSet="material-symbols-rounded">add</mat-icon></button>
+            <span class="form-note">integrantes, incluido tú</span>
+          </div>
+          @if (form.controls.capacidadMaxima.touched && form.controls.capacidadMaxima.invalid) {
+            <p class="field-error" role="alert">
+              @if (esEdicion && form.controls.capacidadMaxima.value < integrantesActuales) { El límite no puede ser menor que los integrantes actuales ({{ integrantesActuales }}). }
+              @else { Ingresa un número entre {{ capacidadMinima }} y {{ capacidadMaxima }}. }
+            </p>
+          }
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3</span>Horario de las sesiones</legend>
+        <div class="form-group">
+          <span class="form-label" id="grupo-dias">Días <span class="required" aria-hidden="true">*</span></span>
+          <div class="day-options" role="group" aria-labelledby="grupo-dias">
+            @for (dia of dias; track dia.valor) {
+              <button type="button" class="day-option" [class.is-selected]="diaSeleccionado(dia.valor)" [attr.aria-pressed]="diaSeleccionado(dia.valor)" (click)="alternarDia(dia.valor)">
+                <span aria-hidden="true">{{ dia.corto }}</span><span class="sr-only">{{ dia.etiqueta }}</span>
+              </button>
+            }
+          </div>
+          @if (form.controls.dias.touched && form.controls.dias.invalid) { <p class="field-error" role="alert">Elige al menos un día.</p> }
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="grupo-inicio">Hora inicio <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput id="grupo-inicio" type="time" formControlName="horaInicio" required />
+              @if (form.controls.horaInicio.invalid) { <mat-error>Ingresa la hora de inicio.</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <label for="grupo-fin">Hora fin <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput id="grupo-fin" type="time" formControlName="horaFin" required />
+              @if (form.controls.horaFin.invalid) { <mat-error>Ingresa la hora de fin.</mat-error> }
+            </mat-form-field>
+            @if (form.hasError('horario') && form.controls.horaFin.touched) { <p class="field-error" role="alert">Debe ser posterior a la hora de inicio.</p> }
+          </div>
+        </div>
+      </fieldset>
+
+      @if (!esEdicion) {
+        <fieldset>
+          <legend><span class="step">4</span>Temas que van a repasar</legend>
+          <p class="form-note">Opcional. Podrás agregar más temas y materiales desde «Temas y materiales».</p>
+          <div class="topic-input">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput [formControl]="nuevoTema" placeholder="Ej. Límites laterales" aria-label="Nuevo tema" (keydown.enter)="agregarTemaConEnter($event)" />
+            </mat-form-field>
+            <button mat-stroked-button type="button" (click)="agregarTema()">Agregar</button>
+          </div>
+          @if (errorTema()) { <p class="field-error" role="alert">{{ errorTema() }}</p> }
+          @if (temas().length) {
+            <ol class="topic-list">
+              @for (tema of temas(); track tema; let i = $index) {
+                <li><span class="topic-number">{{ (i + 1).toString().padStart(2, '0') }}</span><span class="topic-name">{{ tema }}</span>
+                  <button class="icon-button" type="button" [attr.aria-label]="'Quitar ' + tema" (click)="quitarTema(tema)"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></li>
+              }
+            </ol>
+          }
+        </fieldset>
+      }
+
+      <div class="form-actions">
+        <a mat-stroked-button [routerLink]="rutaVolver">Cancelar</a>
+        <button mat-flat-button type="submit">{{ esEdicion ? 'Guardar cambios' : 'Crear grupo' }}</button>
+      </div>
+    </form>
+
+    <aside class="side-column" aria-label="Vista previa del grupo">
+      @let v = vista();
+      <section class="card preview-card" aria-labelledby="preview-title">
+        <p class="eyebrow" id="preview-title">Así verán tu grupo</p>
+        <div class="preview-hero">
+          <span class="preview-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">{{ v.icono }}</mat-icon></span>
+          <div><p class="preview-name">{{ v.nombre || 'Nombre del grupo' }}</p><p class="preview-meta">{{ v.curso || 'Curso' }} · {{ v.tema || 'Tema principal' }}</p></div>
+        </div>
+        <p class="preview-description">{{ v.descripcion || 'Agrega una descripción para que los estudiantes sepan qué esperar.' }}</p>
+        <dl class="preview-facts">
+          <div><dt>Método</dt><dd>{{ v.metodo || 'Por definir' }}</dd></div>
+          <div><dt>Modalidad</dt><dd>{{ v.modalidad }}</dd></div>
+          <div><dt>Cupos</dt><dd>{{ v.capacidadMaxima || '—' }} integrantes</dd></div>
+          <div><dt>Horario</dt><dd>{{ v.horario }}</dd></div>
+          @if (!esEdicion) { <div><dt>Temas</dt><dd>{{ temas().length ? temas().length + (temas().length === 1 ? ' tema' : ' temas') : 'Sin temas aún' }}</dd></div> }
+        </dl>
+      </section>
+      @if (!esEdicion) {
+        <section class="card ai-hint">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">auto_awesome</mat-icon>
+          <div><h2>¿Prefieres una propuesta?</h2><p>La IA puede sugerirte nombre, temas y horario a partir de lo que quieres enseñar.</p>
+            <a class="text-link" routerLink="/app/tutor/crear-grupo-ia">Crear con IA →</a></div>
+        </section>
+      }
+    </aside>
+  </div>
+}

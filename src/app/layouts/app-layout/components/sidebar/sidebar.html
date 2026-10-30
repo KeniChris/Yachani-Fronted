@@ -16,7 +16,7 @@
         class="menu-link"
         [routerLink]="item.route"
         routerLinkActive="is-active"
-        [routerLinkActiveOptions]="{ exact: item.route !== '/app/flashcards' }"
+        [routerLinkActiveOptions]="{ exact: item.exact }"
         ariaCurrentWhenActive="page"
       >
         <mat-icon fontSet="material-symbols-rounded">

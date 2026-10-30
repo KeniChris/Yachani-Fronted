@@ -1,7 +1,7 @@
 <mat-card class="form-card"
   ><div class="heading row">
     <h1>¿Eliminar este material?</h1>
-    <a mat-icon-button routerLink="/app/grupos/1/materiales/1" aria-label="Cerrar confirmación"
+    <a mat-icon-button [routerLink]="grupo + '/materiales/1'" aria-label="Cerrar confirmación"
       ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
     >
   </div>
@@ -11,7 +11,7 @@
     <p>Esta acción no se puede deshacer.</p>
   </div>
   <div class="actions">
-    <a mat-stroked-button routerLink="/app/grupos/1/materiales/1">Conservar material</a
-    ><a class="danger" mat-flat-button routerLink="/app/grupos/1/materiales">Eliminar material</a>
+    <a mat-stroked-button [routerLink]="grupo + '/materiales/1'">Conservar material</a
+    ><a class="danger" mat-flat-button [routerLink]="grupo + '/materiales'">Eliminar material</a>
   </div></mat-card
 >

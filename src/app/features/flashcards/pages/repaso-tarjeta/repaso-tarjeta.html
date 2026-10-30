@@ -1,7 +1,7 @@
 <div class="row section-bottom">
   <a
     mat-icon-button
-    routerLink="/app/grupos/1/flashcards/1/repaso/pausa"
+    [routerLink]="flashcardsGrupo + '/1/repaso/pausa'"
     aria-label="Pausar y salir del repaso"
     ><mat-icon fontSet="material-symbols-rounded">arrow_back</mat-icon></a
   >
@@ -18,7 +18,7 @@
   } @else {
     <p class="eyebrow">PREGUNTA</p>
     <h2>¿Cómo se aplica la regla de la cadena?</h2>
-    <a mat-flat-button routerLink="/app/grupos/1/flashcards/1/repaso/respuesta"
+    <a mat-flat-button [routerLink]="flashcardsGrupo + '/1/repaso/respuesta'"
       >Mostrar respuesta</a
     >
   }
@@ -26,8 +26,8 @@
 @if (mostrandoRespuesta) {
   <h2 class="section-space">¿Te la aprendiste?</h2>
   <div class="actions section-space">
-    <a mat-stroked-button routerLink="/app/grupos/1/flashcards/1/repaso/resultado">Aún no</a
-    ><a mat-flat-button routerLink="/app/grupos/1/flashcards/1/repaso/resultado">La aprendí</a>
+    <a mat-stroked-button [routerLink]="flashcardsGrupo + '/1/repaso/resultado'">Aún no</a
+    ><a mat-flat-button [routerLink]="flashcardsGrupo + '/1/repaso/resultado'">La aprendí</a>
   </div>
 }
 <p class="helper-text section-space">Tu avance se confirma después de guardar cada respuesta.</p>

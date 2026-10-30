@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaFlashcardsGrupo } from '../../flashcards-grupo.routes';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +22,7 @@ import { MatChipsModule } from '@angular/material/chips';
   styleUrls: ['../../../recursos/recursos.css', '../../flashcards.css', './mazo-detalle.css'],
 })
 export class MazoDetalle {
+  readonly flashcardsGrupo = rutaFlashcardsGrupo();
   readonly tarjetas = [
     {
       idTarjeta: 1,

@@ -1,0 +1,233 @@
+@if (store.modoPrevisualizacion) { <p class="preview-note" role="status">Vista previa: la propuesta se genera en el navegador con datos de demostración, no con el servicio de IA.</p> }
+<div class="page-heading">
+  <p class="breadcrumb"><a routerLink="/app/tutor/grupos">Mis grupos</a><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon><span aria-current="page">Asistente de creación</span></p>
+  <h1>Crear grupo con IA</h1>
+</div>
+
+<section class="hero" aria-label="Asistente Yachani">
+  <span class="hero-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">auto_awesome</mat-icon></span>
+  <div><p class="hero-title">Te ayudamos a diseñar tu grupo ideal</p><p>Cuéntanos qué quieres enseñar. La IA te propone nombre, temas y horario, y tú decides.</p></div>
+  <span class="hero-tag">Asistente Yachani</span>
+</section>
+
+@switch (paso()) {
+  @case ('formulario') {
+    <div class="tab-grid">
+      <form class="card form-card" [formGroup]="form" (ngSubmit)="generar()" novalidate>
+        <h2 #titulo tabindex="-1">¿Qué quieres que aprendan?</h2>
+        <p class="form-note">Mientras más detalle des, más útil será la propuesta.</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ia-curso">Curso <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput id="ia-curso" formControlName="curso" placeholder="Ej. Cálculo I" required />
+              @if (form.controls.curso.invalid) { <mat-error>Ingresa el curso.</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <label for="ia-metodo">Método de estudio</label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-select id="ia-metodo" formControlName="metodo">
+                <mat-option value="">Que la IA lo sugiera</mat-option>
+                @for (metodo of metodos; track metodo) { <mat-option [value]="metodo">{{ metodo }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ia-objetivo">Temas que quieres trabajar <span class="required" aria-hidden="true">*</span></label>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <textarea matInput id="ia-objetivo" formControlName="objetivo" placeholder="Ej. Límites, derivadas y reglas de derivación" required></textarea>
+            <mat-hint>Separa los temas con comas para obtener una lista más precisa.</mat-hint>
+            @if (form.controls.objetivo.hasError('required')) { <mat-error>Cuéntanos qué temas quieres trabajar.</mat-error> }
+            @if (form.controls.objetivo.hasError('maxlength')) { <mat-error>Usa como máximo 200 caracteres.</mat-error> }
+          </mat-form-field>
+        </div>
+        <div class="form-group">
+          <label for="ia-modalidad">Modalidad</label>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-select id="ia-modalidad" formControlName="modalidad">
+              @for (modalidad of modalidades; track modalidad) { <mat-option [value]="modalidad">{{ modalidad }}</mat-option> }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-head"><h3>¿Cuándo puedes dictar?</h3><span class="counter">Hora de Perú</span></div>
+        <ul class="slot-list">
+          @for (franja of franjas(); track $index; let i = $index) {
+            <li class="slot" [class.is-invalid]="franjaInvalida() === i">
+              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
+              <label class="sr-only" [for]="'franja-dia-' + i">Día de la franja {{ i + 1 }}</label>
+              <select class="slot-day" [id]="'franja-dia-' + i" [value]="franja.dia" (change)="actualizarFranja(i, 'dia', $event)">
+                @for (dia of dias; track dia.valor) { <option [value]="dia.valor" [selected]="dia.valor === franja.dia">{{ dia.etiqueta }}</option> }
+              </select>
+              <label class="sr-only" [for]="'franja-inicio-' + i">Inicio de la franja {{ i + 1 }}</label>
+              <input class="slot-time" type="time" [id]="'franja-inicio-' + i" [value]="franja.inicio" (change)="actualizarFranja(i, 'inicio', $event)" />
+              <span aria-hidden="true">–</span>
+              <label class="sr-only" [for]="'franja-fin-' + i">Fin de la franja {{ i + 1 }}</label>
+              <input class="slot-time" type="time" [id]="'franja-fin-' + i" [value]="franja.fin" [attr.aria-invalid]="franjaInvalida() === i" (change)="actualizarFranja(i, 'fin', $event)" />
+              @if (franjas().length > 1) {
+                <button class="icon-button" type="button" [attr.aria-label]="'Quitar franja ' + (i + 1)" (click)="quitarFranja(i)"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button>
+              }
+              @if (franjaInvalida() === i) { <p class="slot-error" role="alert">La hora de fin debe ser posterior a la de inicio.</p> }
+            </li>
+          }
+        </ul>
+        @if (franjas().length < maxFranjas) {
+          <button class="add-slot" type="button" (click)="agregarFranja()"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">add</mat-icon>Añadir otra franja</button>
+        }
+
+        <div class="divider"></div>
+        <fieldset class="size-field">
+          <legend>Tamaño del grupo</legend>
+          <div class="size-options">
+            @for (tamano of tamanos; track tamano.valor) {
+              <label class="size-option" [class.is-selected]="form.controls.tamano.value === tamano.valor">
+                <input type="radio" formControlName="tamano" [value]="tamano.valor" />
+                <strong>{{ tamano.etiqueta }}</strong><span>{{ tamano.detalle }}</span>
+              </label>
+            }
+          </div>
+        </fieldset>
+        <div class="form-actions spaced">
+          <span class="form-note">Podrás revisar y editar la propuesta antes de crear el grupo.</span>
+          <button mat-flat-button type="submit"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">auto_awesome</mat-icon>Generar propuesta</button>
+        </div>
+      </form>
+      <aside class="side-column" aria-label="Cómo funciona">
+        <section class="card dark-card">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">auto_awesome</mat-icon>
+          <h2>Menos coordinación.<br />Más tiempo para enseñar.</h2>
+          <p>La IA usa lo que nos cuentas para proponerte un grupo listo para publicar.</p>
+          <ol class="how-list">
+            <li><span>1</span><div><strong>Tu objetivo</strong><small>El curso y los temas que quieres trabajar.</small></div></li>
+            <li><span>2</span><div><strong>Tu forma de enseñar</strong><small>Método, modalidad y tamaño del grupo.</small></div></li>
+            <li><span>3</span><div><strong>Tu disponibilidad</strong><small>Las franjas en las que puedes dictar.</small></div></li>
+          </ol>
+        </section>
+        <section class="card soft-card">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">verified_user</mat-icon>
+          <div><h3>Tú tienes la última palabra</h3><p>Nada se publica hasta que revises y aceptes la propuesta.</p></div>
+        </section>
+      </aside>
+    </div>
+  }
+
+  @case ('generando') {
+    <section class="card state-card" aria-busy="true" aria-labelledby="generando-title">
+      <span class="state-icon is-pulse" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">auto_awesome</mat-icon></span>
+      <span class="badge">Preparando tu propuesta</span>
+      <h2 id="generando-title" #titulo tabindex="-1">Diseñando tu grupo de estudio</h2>
+      <p>Estamos organizando tus temas y horarios para proponerte un grupo listo para publicar.</p>
+      <ol class="progress-steps">
+        @for (paso of pasosGeneracion; track paso; let i = $index) {
+          <li [class.is-done]="progreso() > i" [class.is-current]="progreso() === i">
+            <span class="step-mark" aria-hidden="true">@if (progreso() > i) { <mat-icon fontSet="material-symbols-rounded">check</mat-icon> } @else { {{ i + 1 }} }</span>
+            {{ paso }}<span class="sr-only">{{ progreso() > i ? ': listo' : progreso() === i ? ': en curso' : '' }}</span>
+          </li>
+        }
+      </ol>
+      <mat-progress-bar mode="determinate" [value]="progreso() / pasosGeneracion.length * 100" aria-label="Progreso de la propuesta" />
+      <p class="form-note" role="status">Un momento, estamos preparando opciones para ti.</p>
+      <div class="form-actions centered"><button mat-stroked-button type="button" (click)="cancelarGeneracion()">Cancelar</button></div>
+    </section>
+  }
+
+  @case ('franja-invalida') {
+    <div class="tab-grid">
+      <section class="card state-card" role="alert" aria-labelledby="franja-title">
+        <span class="state-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">event_busy</mat-icon></span>
+        <span class="badge badge-warning">Revisa tus horarios</span>
+        <h2 id="franja-title" #titulo tabindex="-1">Necesitamos una franja de tiempo válida</h2>
+        @if (franjaInvalida() !== null && franjas()[franjaInvalida()!]; as franja) {
+          <p>El {{ etiquetaDia(franja.dia).toLowerCase() }} seleccionaste las {{ franja.inicio || '—' }} como inicio y las {{ franja.fin || '—' }} como fin. La hora de fin debe ser posterior a la de inicio.</p>
+          <p class="slot-chip"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">schedule</mat-icon>{{ etiquetaDia(franja.dia) }} · {{ franja.inicio || '—' }} – {{ franja.fin || '—' }} <span class="badge badge-error">Revisar</span></p>
+        }
+        <button mat-flat-button type="button" (click)="corregirDisponibilidad()"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">edit</mat-icon>Corregir disponibilidad</button>
+        <p class="form-note">Después de corregirla, podremos preparar tu propuesta.</p>
+      </section>
+      <aside class="side-column">
+        <section class="card soft-card">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">info</mat-icon>
+          <div><h3>Elige franjas sin superposiciones</h3><p>Comprueba el inicio y el fin de cada bloque antes de continuar.</p></div>
+        </section>
+      </aside>
+    </div>
+  }
+
+  @case ('propuesta') {
+    @if (propuesta(); as propuesta) {
+      <p class="alert alert-success page-alert" role="status"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon><span><strong>Tenemos una propuesta para tu grupo.</strong> Revisa el nombre, los temas y el horario antes de crearlo.</span></p>
+      <div class="tab-grid">
+        <section class="card proposal-card" aria-labelledby="propuesta-title">
+          <div class="proposal-head">
+            <div class="section-head"><span class="badge">Propuesta de la IA</span><span class="badge badge-success">{{ propuesta.datos.capacidadMaxima }} cupos</span></div>
+            <h2 id="propuesta-title" #titulo tabindex="-1" class="sr-only">Revisión de la propuesta</h2>
+            <label class="form-label" for="propuesta-nombre">Nombre del grupo</label>
+            <input class="inline-input title-input" id="propuesta-nombre" [value]="propuesta.datos.nombre" maxlength="60" (input)="editarCampo('nombre', $event)" [attr.aria-invalid]="!propuesta.datos.nombre.trim()" />
+            @if (!propuesta.datos.nombre.trim()) { <p class="slot-error" role="alert">Ingresa un nombre para el grupo.</p> }
+            <label class="form-label" for="propuesta-descripcion">Descripción</label>
+            <textarea class="inline-input" id="propuesta-descripcion" rows="2" maxlength="300" [value]="propuesta.datos.descripcion" (input)="editarCampo('descripcion', $event)"></textarea>
+          </div>
+          <ul class="match-chips">
+            <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon>{{ propuesta.datos.curso }}</li>
+            <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon>{{ propuesta.datos.metodo }}</li>
+            <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon>{{ propuesta.datos.modalidad }}</li>
+          </ul>
+          <h3>Temas que van a repasar</h3>
+          <ol class="topic-list">
+            @for (tema of propuesta.temas; track tema; let i = $index) {
+              <li><span class="topic-number">{{ (i + 1).toString().padStart(2, '0') }}</span><span class="topic-name">{{ tema }}</span>
+                <button class="icon-button" type="button" [attr.aria-label]="'Quitar ' + tema" (click)="quitarTema(tema)"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></li>
+            } @empty { <li class="form-note">Sin temas. Agrega al menos uno o créalos después en «Temas y materiales».</li> }
+          </ol>
+          <div class="topic-input">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput [formControl]="nuevoTema" placeholder="Agregar otro tema" aria-label="Agregar otro tema" (keydown.enter)="agregarTema($event)" />
+            </mat-form-field>
+            <button mat-stroked-button type="button" (click)="agregarTema()">Agregar</button>
+          </div>
+          <p class="schedule"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon><span><strong>{{ formatearHorario(propuesta.datos.horario) }}</strong><small>Sesiones {{ propuesta.datos.modalidad.toLowerCase() }} · Hora de Perú</small></span></p>
+          <div class="proposal-actions">
+            <button mat-flat-button type="button" [disabled]="!propuestaValida()" (click)="crear()"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">add</mat-icon>Crear grupo</button>
+            <button mat-stroked-button type="button" (click)="revisarEnFormulario()">Editar todos los datos</button>
+            <button mat-button type="button" (click)="otraPropuesta()"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">refresh</mat-icon>Generar otra</button>
+          </div>
+          <p class="form-note">La propuesta no se publica hasta que la aceptes.</p>
+        </section>
+        <aside class="side-column" aria-label="Resumen de tu solicitud">
+          <section class="card">
+            <h2>Tu solicitud</h2>
+            <dl class="summary">
+              <div><dt>Curso</dt><dd>{{ form.controls.curso.value }}</dd></div>
+              <div><dt>Temas</dt><dd>{{ form.controls.objetivo.value }}</dd></div>
+              <div><dt>Disponibilidad</dt><dd>@for (franja of franjas(); track $index) { <span>{{ etiquetaDia(franja.dia) }} {{ franja.inicio }} – {{ franja.fin }}</span> }</dd></div>
+              <div><dt>Tamaño del grupo</dt><dd>{{ tamanoEtiqueta(form.controls.tamano.value) }}</dd></div>
+              <div><dt>Modalidad y método</dt><dd>{{ form.controls.modalidad.value }} · {{ form.controls.metodo.value || 'Sugerido por la IA' }}</dd></div>
+            </dl>
+            <button mat-stroked-button type="button" class="full" (click)="ajustarDatos()"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">edit</mat-icon>Ajustar datos</button>
+          </section>
+          <section class="card">
+            <h2>¿Por qué esta propuesta?</h2>
+            <ul class="reasons">@for (motivo of propuesta.motivos; track motivo) { <li>{{ motivo }}</li> }</ul>
+          </section>
+        </aside>
+      </div>
+    }
+  }
+
+  @case ('creado') {
+    @if (creado(); as grupo) {
+      <section class="card state-card" role="status" aria-labelledby="creado-title">
+        <span class="state-icon is-success" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">check</mat-icon></span>
+        <h2 id="creado-title" #titulo tabindex="-1">¡{{ grupo.nombre }} está listo!</h2>
+        <p>Creamos el grupo con la propuesta que revisaste. Los estudiantes ya pueden enviar solicitudes.</p>
+        <div class="form-actions centered">
+          <a mat-stroked-button routerLink="/app/tutor/grupos">Ver mis grupos</a>
+          <a mat-flat-button [routerLink]="rutaGrupo(grupo, 'sesiones')">Programar primera sesión</a>
+        </div>
+      </section>
+    }
+  }
+}

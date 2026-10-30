@@ -3,7 +3,7 @@
     <h1>¿Salir del repaso?</h1>
     <a
       mat-icon-button
-      routerLink="/app/grupos/1/flashcards/1/repaso/respuesta"
+      [routerLink]="flashcardsGrupo + '/1/repaso/respuesta'"
       aria-label="Seguir repasando"
       ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
     >
@@ -11,7 +11,7 @@
   <p class="muted">Puedes volver después y continuar desde la primera tarjeta pendiente.</p>
   <p>Tu avance confirmado: 3 de 4 tarjetas revisadas.</p>
   <div class="actions">
-    <a mat-flat-button routerLink="/app/grupos/1/flashcards/1/repaso/respuesta">Seguir repasando</a
-    ><a mat-stroked-button routerLink="/app/grupos/1/flashcards">Salir al grupo</a>
+    <a mat-flat-button [routerLink]="flashcardsGrupo + '/1/repaso/respuesta'">Seguir repasando</a
+    ><a mat-stroked-button [routerLink]="flashcardsGrupo">Salir al grupo</a>
   </div></mat-card
 >

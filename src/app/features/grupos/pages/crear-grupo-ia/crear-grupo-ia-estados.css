@@ -1,0 +1,26 @@
+/* Generación, error de franja, revisión de la propuesta y grupo creado. */
+.state-card { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 24px; text-align: center; }.state-card > p { max-width: 460px; margin: 0; color: var(--color-text-muted); font-size: 14px; line-height: 22px; }
+.state-card h2 { font-size: 22px; line-height: 30px; }
+.state-icon { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 26px; background: var(--color-selection); color: var(--color-primary); }.state-icon mat-icon { width: 36px; height: 36px; font-size: 36px; }.state-icon.is-success { border-radius: 50%; background: var(--color-success-background); color: var(--color-success); }
+@media (prefers-reduced-motion: no-preference) { .is-pulse { animation: pulso 1.6s ease-in-out infinite; } @keyframes pulso { 50% { transform: scale(1.06); } } }
+.progress-steps { display: flex; flex-direction: column; gap: 12px; width: min(100%, 360px); margin: 8px 0; padding: 0; list-style: none; color: var(--color-text-muted); font-size: 14px; text-align: left; }
+.progress-steps li { display: flex; align-items: center; gap: 12px; }.progress-steps .is-current { color: var(--color-primary); font-weight: 700; }
+.step-mark { display: grid; place-items: center; flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--color-background); font-size: 12px; }.step-mark mat-icon { width: 16px; height: 16px; font-size: 16px; }
+.is-done .step-mark { background: var(--color-success-background); color: var(--color-success); }.is-current .step-mark { background: var(--color-selection); }
+mat-progress-bar { width: min(100%, 360px); border-radius: 5px; --mat-progress-bar-active-indicator-height: 6px; --mat-progress-bar-track-height: 6px; --mat-progress-bar-track-color: var(--color-card-border); }
+.centered { justify-content: center; }
+.slot-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--color-card-border); border-radius: var(--radius-control); color: var(--color-text) !important; font-weight: 700; }.slot-chip mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--color-primary); }
+.proposal-card { display: flex; flex-direction: column; gap: 14px; padding-top: 0; border-color: var(--color-accent); overflow: hidden; }
+.proposal-head { display: flex; flex-direction: column; gap: 6px; margin: 0 -20px; padding: 20px; border-bottom: 1px solid var(--color-card-border); background: color-mix(in srgb, var(--color-selection) 60%, var(--color-surface)); }
+.proposal-head .form-label { margin: 6px 0 0; color: var(--color-text-muted); font-size: 11px; }
+.inline-input { width: 100%; padding: 6px 10px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--color-text); font-size: 14px; line-height: 20px; resize: vertical; }.inline-input:hover { border-color: var(--color-card-border); background: var(--color-surface); }.inline-input:focus { border-color: var(--color-primary); outline: 0; background: var(--color-surface); }
+.title-input { font-size: 22px; line-height: 30px; font-weight: 700; }
+.match-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.match-chips li { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 8px 12px; border: 1px solid var(--color-card-border); border-radius: var(--radius-control); background: color-mix(in srgb, var(--color-selection) 40%, var(--color-surface)); color: var(--color-text-muted); font-size: 12px; overflow-wrap: anywhere; }.match-chips mat-icon { width: 16px; height: 16px; font-size: 16px; color: var(--color-primary); }
+.proposal-card h3 { font-size: 16px; line-height: 22px; }
+.schedule { display: flex; align-items: center; gap: 12px; margin: 0; padding: 12px 14px; border: 1px solid var(--color-card-border); border-radius: var(--radius-card); }.schedule mat-icon { color: var(--color-primary); }.schedule span { display: flex; flex-direction: column; }.schedule strong { font-size: 14px; }.schedule small { color: var(--color-text-muted); font-size: 12px; }
+.proposal-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.summary { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 16px; padding-bottom: 16px; border-bottom: 1px solid var(--color-card-border); font-size: 13px; line-height: 20px; }.summary dt { color: var(--color-text-muted); font-size: 11px; }.summary dd { display: flex; flex-direction: column; margin: 0; overflow-wrap: anywhere; }
+.full { width: 100%; }
+.reasons { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 0; padding-left: 18px; color: var(--color-text-muted); font-size: 13px; line-height: 20px; }
+@media (max-width: 650px) { .match-chips { grid-template-columns: minmax(0, 1fr); }.proposal-actions button { flex: 1 1 100%; } }

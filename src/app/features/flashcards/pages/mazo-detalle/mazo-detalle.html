@@ -11,8 +11,8 @@
 >
 <div class="actions section-space">
   <a mat-stroked-button routerLink="/app/flashcards/1/tarjetas/agregar">Agregar tarjeta</a
-  ><a mat-flat-button routerLink="/app/grupos/1/flashcards/1">Practicar</a
-  ><a mat-stroked-button routerLink="/app/grupos/1/flashcards/compartir/1">Compartir en un grupo</a
+  ><a mat-flat-button [routerLink]="flashcardsGrupo + '/1'">Practicar</a
+  ><a mat-stroked-button [routerLink]="flashcardsGrupo + '/compartir/1'">Compartir en un grupo</a
   ><a class="danger" mat-button routerLink="/app/flashcards/1/retirar-publicacion"
     >Retirar publicación</a
   >

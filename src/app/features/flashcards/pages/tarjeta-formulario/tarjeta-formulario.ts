@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { rutaFlashcardsGrupo } from '../../flashcards-grupo.routes';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
   styleUrls: ['../../../recursos/recursos.css', '../../flashcards.css', './tarjeta-formulario.css'],
 })
 export class TarjetaFormulario {
+  readonly flashcardsGrupo = rutaFlashcardsGrupo();
   readonly listaTarjetas = [
     {
       idTarjeta: 1,

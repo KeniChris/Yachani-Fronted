@@ -24,7 +24,7 @@
       }
     </section>
     <section class="card" aria-labelledby="my-groups-title" [attr.aria-busy]="datos.grupos.estado === 'cargando'">
-      <div class="section-head"><h2 id="my-groups-title">Mis grupos</h2><button class="section-action" type="button" disabled title="La página de grupos aún no está disponible">Ver todos →</button></div>
+      <div class="section-head"><h2 id="my-groups-title">Mis grupos</h2><a class="section-action" routerLink="/app/estudiante/grupos">Ver todos →</a></div>
       @if (datos.grupos.estado === 'listo' && datos.grupos.datos.length) {
         <div class="group-grid">
           @for (grupo of datos.grupos.datos; track grupo.id) {
@@ -61,7 +61,7 @@
       } @else { <ng-container [ngTemplateOutlet]="estadoSeccion" [ngTemplateOutletContext]="{ estado: datos.avisos.estado, vacio: 'No tienes avisos recientes.', error: 'No pudimos cargar tus avisos.' }" /> }
     </section>
     <section class="card" aria-labelledby="flashcards-title" [attr.aria-busy]="datos.flashcards.estado === 'cargando'">
-      <div class="section-head"><h2 id="flashcards-title">Continúa repasando</h2><button class="section-action" type="button" disabled title="Las flashcards aún no están disponibles">Flashcards →</button></div>
+      <div class="section-head"><h2 id="flashcards-title">Continúa repasando</h2><a class="section-action" routerLink="/app/flashcards">Flashcards →</a></div>
       @if (datos.flashcards.estado === 'listo' && datos.flashcards.datos.length) {
         <ul class="flash-list">
           @for (mazo of datos.flashcards.datos; track mazo.id) {

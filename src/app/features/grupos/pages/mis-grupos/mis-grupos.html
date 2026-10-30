@@ -1,0 +1,70 @@
+@if (store.modoPrevisualizacion) { <p class="preview-note" role="status">Vista previa con datos de demostración. Los cambios no se guardan.</p> }
+<div class="page-heading">
+  <div>
+    <h1>Mis grupos</h1>
+    <p>{{ esTutor ? 'Gestiona los grupos que diriges, sus sesiones y sus integrantes.' : 'Entra a tus grupos para conversar, revisar sesiones y avisos.' }}</p>
+  </div>
+  <div class="heading-actions">
+    @if (esTutor) {
+      <a mat-stroked-button routerLink="/app/tutor/crear-grupo-ia"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">auto_awesome</mat-icon>Crear con IA</a>
+      <a mat-flat-button routerLink="/app/tutor/crear-grupo"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">add</mat-icon>Crear grupo</a>
+    } @else if (explorarDisponible) {
+      <a mat-flat-button routerLink="/app/explorar"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">explore</mat-icon>Explorar grupos</a>
+    }
+  </div>
+</div>
+
+@if (grupos().length) {
+  <div class="toolbar">
+    <span class="counter">{{ grupos().length }} {{ grupos().length === 1 ? 'grupo' : 'grupos' }}</span>
+    <label class="search">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">search</mat-icon>
+      <span class="sr-only">Buscar grupo</span>
+      <input type="search" placeholder="Buscar por nombre o curso" [value]="busqueda()" (input)="buscar($event)" />
+    </label>
+  </div>
+  <div class="group-grid">
+    @for (grupo of filtrados(); track grupo.id) {
+      <article class="card group-card" [attr.aria-labelledby]="'grupo-' + grupo.id">
+        <div class="group-top">
+          <span class="group-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">{{ grupo.icono }}</mat-icon></span>
+          <div class="group-badges">
+            @if (esTutor && pendientes(grupo)) { <a class="badge badge-warning" [routerLink]="ruta(grupo, 'solicitudes')">{{ pendientes(grupo) }} {{ pendientes(grupo) === 1 ? 'solicitud' : 'solicitudes' }}</a> }
+            <span class="badge badge-muted">{{ grupo.modalidad }}</span>
+          </div>
+        </div>
+        <h2 [id]="'grupo-' + grupo.id">{{ grupo.nombre }}</h2>
+        <p class="group-meta">{{ grupo.curso }} · {{ grupo.tema }}</p>
+        @if (!esTutor) { <p class="group-meta">Tutor: {{ tutor(grupo) }}</p> }
+        <ul class="group-facts">
+          <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">bolt</mat-icon>{{ grupo.metodo }}</li>
+          <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>{{ formatearHorario(grupo.horario) }}</li>
+          @if (proxima(grupo); as proxima) { <li class="is-highlight"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">event</mat-icon>Próxima sesión: {{ proxima }}</li> }
+        </ul>
+        <div class="group-members">
+          <span class="avatar-stack" aria-hidden="true">@for (item of integrantes(grupo).slice(0, 4); track item.usuarioId) { <span>{{ iniciales(item.nombre) }}</span> }</span>
+          <span>{{ integrantes(grupo).length }}/{{ grupo.capacidadMaxima }} integrantes</span>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="ocupacion(grupo)" [attr.aria-label]="'Ocupación de ' + grupo.nombre" />
+        <div class="group-actions">
+          @if (esTutor) { <a mat-stroked-button [routerLink]="rutaEditar(grupo)">Editar<span class="sr-only"> {{ grupo.nombre }}</span></a> }
+          <a mat-flat-button [routerLink]="ruta(grupo)">Abrir grupo<span class="sr-only"> {{ grupo.nombre }}</span></a>
+        </div>
+      </article>
+    } @empty {
+      <section class="card empty-state no-results" role="status"><p>No encontramos grupos con «{{ busqueda() }}».</p></section>
+    }
+  </div>
+} @else {
+  <section class="card empty-state" role="status">
+    <span class="empty-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">groups</mat-icon></span>
+    <h2>{{ esTutor ? 'Aún no diriges ningún grupo' : 'Aún no formas parte de ningún grupo' }}</h2>
+    <p>{{ esTutor ? 'Crea tu primer grupo o deja que la IA te proponga uno a partir de lo que quieres enseñar.' : 'Explora grupos de tu curso y solicita unirte al que mejor encaje contigo.' }}</p>
+    @if (esTutor) {
+      <div class="heading-actions">
+        <a mat-stroked-button routerLink="/app/tutor/crear-grupo-ia">Crear con IA</a>
+        <a mat-flat-button routerLink="/app/tutor/crear-grupo">Crear grupo</a>
+      </div>
+    }
+  </section>
+}

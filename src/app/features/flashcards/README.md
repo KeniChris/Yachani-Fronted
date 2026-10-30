@@ -30,16 +30,16 @@ Servidor: `npm start -- --host 127.0.0.1`. Se reutilizó el servidor activo en e
 | Agregar tarjeta | http://127.0.0.1:4200/app/flashcards/1/tarjetas/agregar |
 | Editar tarjeta | http://127.0.0.1:4200/app/flashcards/1/tarjetas/1/editar |
 | Confirmar eliminación | http://127.0.0.1:4200/app/flashcards/1/tarjetas/1/eliminar |
-| Mazos del grupo | http://127.0.0.1:4200/app/grupos/1/flashcards |
-| Elegir mazo propio | http://127.0.0.1:4200/app/grupos/1/flashcards/elegir |
-| Seleccionar grupo y tema | http://127.0.0.1:4200/app/grupos/1/flashcards/compartir/1 |
-| Confirmar retirada del grupo | http://127.0.0.1:4200/app/grupos/1/flashcards/1/retirar |
+| Mazos del grupo | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards |
+| Elegir mazo propio | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/elegir |
+| Seleccionar grupo y tema | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/compartir/1 |
+| Confirmar retirada del grupo | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/1/retirar |
 | Confirmar retirada de publicación | http://127.0.0.1:4200/app/flashcards/1/retirar-publicacion |
-| Detalle grupal / reanudar | http://127.0.0.1:4200/app/grupos/1/flashcards/1 |
-| Pregunta | http://127.0.0.1:4200/app/grupos/1/flashcards/1/repaso/pregunta |
-| Respuesta | http://127.0.0.1:4200/app/grupos/1/flashcards/1/repaso/respuesta |
-| Pausa / salida | http://127.0.0.1:4200/app/grupos/1/flashcards/1/repaso/pausa |
-| Resultado | http://127.0.0.1:4200/app/grupos/1/flashcards/1/repaso/resultado |
+| Detalle grupal / reanudar | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/1 |
+| Pregunta | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/1/repaso/pregunta |
+| Respuesta | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/1/repaso/respuesta |
+| Pausa / salida | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/1/repaso/pausa |
+| Resultado | http://127.0.0.1:4200/app/estudiante/grupos/dominando-calculo/flashcards/1/repaso/resultado |
 
 Las tarjetas 2, 3 y 4 tienen los mismos formularios reutilizados con su pregunta y respuesta literal al sustituir el ID de tarjeta en editar/eliminar. No son componentes ni rutas distintos por registro. Los enlaces de esta entrega usan el mazo 1 y el grupo 1 de referencia.
 
