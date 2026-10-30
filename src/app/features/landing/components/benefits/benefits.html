@@ -1,0 +1,35 @@
+<section
+  id="que-ofrecemos"
+  class="benefits"
+  aria-labelledby="benefits-title"
+>
+  <div class="benefits-container">
+    <div class="section-heading">
+      <span class="section-tag">Beneficios</span>
+
+      <h2 id="benefits-title">
+        Todo lo que necesitas para estudiar en grupo
+      </h2>
+
+      <p>
+        Herramientas pensadas para que estudiar con otros sea fácil,
+        ordenado y motivador.
+      </p>
+    </div>
+
+    <div class="benefits-grid">
+      @for (benefit of benefits; track benefit.title) {
+        <article class="benefit-card">
+          <span class="icon-box" aria-hidden="true">
+            <mat-icon fontSet="material-symbols-rounded">
+              {{ benefit.icon }}
+            </mat-icon>
+          </span>
+
+          <h3>{{ benefit.title }}</h3>
+          <p>{{ benefit.description }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>

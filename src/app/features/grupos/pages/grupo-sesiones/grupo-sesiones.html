@@ -1,0 +1,151 @@
+<div class="tab-grid" [class.single]="!ctx.esTutor">
+  <section class="main-column" aria-labelledby="sessions-title">
+    <div class="section-head">
+      <h2 id="sessions-title">Próximas sesiones</h2>
+      <div class="filter" role="group" aria-label="Filtrar sesiones">
+        <button type="button" [class.is-active]="filtro() === 'semana'" [attr.aria-pressed]="filtro() === 'semana'" (click)="filtro.set('semana')">Esta semana</button>
+        <button type="button" [class.is-active]="filtro() === 'todas'" [attr.aria-pressed]="filtro() === 'todas'" (click)="filtro.set('todas')">Todas</button>
+      </div>
+    </div>
+    @if (mensaje()) {
+      <p class="alert alert-success" role="status"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon><span>{{ mensaje() }}</span>
+        <button class="alert-dismiss" type="button" aria-label="Cerrar mensaje" (click)="mensaje.set('')"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></p>
+    }
+
+    @for (sesion of sesionesVisibles(); track sesion.id) {
+      @let cancelada = sesion.estado === 'cancelada';
+      <article class="card session-card" [class.is-edited]="sesion.estado === 'modificada'" [class.is-cancelled]="cancelada" [class.is-editing]="editandoId() === sesion.id" [attr.aria-labelledby]="'sesion-' + sesion.id">
+        <span class="date-box" aria-hidden="true"><span>{{ diaSemana(sesion.inicio) }}</span><strong>{{ sesion.inicio.getDate() }}</strong></span>
+        <div class="session-body">
+          <div class="session-title"><h3 [id]="'sesion-' + sesion.id">{{ sesion.titulo }}</h3>
+            @if (sesion.estado === 'modificada') { <span class="badge">Editada</span> }
+            @if (cancelada) { <span class="badge badge-muted">Cancelada</span> }
+          </div>
+          @if (cancelada) {
+            <p class="session-meta">Cancelada por el tutor · {{ dia(sesion.inicio) }}, {{ hora(sesion.inicio) }}</p>
+          } @else if (sesion.estado === 'modificada' && sesion.anterior; as anterior) {
+            <p class="session-meta"><s><span class="sr-only">Antes: </span>{{ dia(anterior.inicio) }} · {{ hora(anterior.inicio) }}</s>
+              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">arrow_forward</mat-icon>
+              <strong><span class="sr-only">Ahora: </span>{{ dia(sesion.inicio) }} · {{ rango(sesion) }}</strong> · {{ modalidad(sesion) }}</p>
+          } @else {
+            <p class="session-meta">{{ dia(sesion.inicio) }} · {{ rango(sesion) }} · {{ modalidad(sesion) }}</p>
+          }
+          <div class="chips">
+            @if (nombreTema(sesion.temaId); as tema) { <span class="chip"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">menu_book</mat-icon>{{ tema }}</span> }
+            @if (!cancelada) { <span class="chip"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>Recordatorio {{ sesion.recordatorioMinutos }} min antes</span> }
+          </div>
+          @if (cancelada) { <p class="session-note">No se enviarán recordatorios de esta sesión.</p> }
+          @else if (sesion.estado === 'modificada') { <p class="session-note"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon>Cambios guardados con «Guardar y notificar». Se avisó a los integrantes.</p> }
+          @if (detallesAbiertos() === sesion.id) {
+            <dl class="session-details">
+              <div><dt>{{ sesion.modalidad === 'virtual' ? 'Enlace' : 'Lugar' }}</dt><dd>{{ sesion.enlaceLugar || 'Por confirmar' }}</dd></div>
+              @if (sesion.descripcion) { <div><dt>Descripción</dt><dd>{{ sesion.descripcion }}</dd></div> }
+            </dl>
+          }
+        </div>
+        @if (!cancelada) {
+          <div class="session-actions">
+            @if (puedeUnirse(sesion)) { <a mat-flat-button [href]="enlace(sesion)" target="_blank" rel="noopener">Unirse<span class="sr-only"> a {{ sesion.titulo }} (se abre en otra pestaña)</span></a> }
+            @if (ctx.esTutor) {
+              <button mat-stroked-button type="button" (click)="editar(sesion)">Editar<span class="sr-only"> {{ sesion.titulo }}</span></button>
+              <button mat-button type="button" class="danger-text" (click)="cancelarSesion(sesion)">Cancelar sesión<span class="sr-only"> {{ sesion.titulo }}</span></button>
+            } @else if (!puedeUnirse(sesion)) {
+              <button mat-stroked-button type="button" [attr.aria-expanded]="detallesAbiertos() === sesion.id" (click)="alternarDetalles(sesion.id)">{{ detallesAbiertos() === sesion.id ? 'Ocultar detalles' : 'Ver detalles' }}</button>
+            }
+          </div>
+        }
+      </article>
+    } @empty {
+      <section class="card empty-state" role="status">
+        <span class="empty-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">event_available</mat-icon></span>
+        <h3>{{ filtro() === 'semana' && sesiones().length ? 'No hay sesiones esta semana' : 'Aún no hay sesiones programadas' }}</h3>
+        <p>@if (ctx.esTutor) { Programa la primera sesión con el formulario. } @else { Cuando el tutor programe una sesión, la verás aquí y recibirás un recordatorio. }</p>
+        @if (filtro() === 'semana' && sesiones().length) { <button mat-stroked-button type="button" (click)="filtro.set('todas')">Ver todas</button> }
+      </section>
+    }
+  </section>
+
+  @if (ctx.esTutor) {
+    <aside class="side-column" aria-label="Formulario de sesión">
+      <section class="card form-card" aria-labelledby="session-form-title">
+        <h2 id="session-form-title" #tituloFormulario tabindex="-1">{{ editandoId() ? 'Editar sesión' : 'Programar sesión' }}</h2>
+        <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+          @if (datosInvalidos()) {
+            <p class="alert alert-error" role="alert"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">warning</mat-icon>Datos inválidos. Corrige los campos marcados para {{ editandoId() ? 'guardar los cambios' : 'crear la sesión' }}.</p>
+          }
+          <div class="form-group">
+            <label for="sesion-titulo">Título <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput id="sesion-titulo" formControlName="titulo" placeholder="Ej. Repaso de derivadas" required />
+              @if (form.controls.titulo.hasError('required')) { <mat-error>Ingresa un título para la sesión.</mat-error> }
+              @if (form.controls.titulo.hasError('maxlength')) { <mat-error>Usa como máximo 80 caracteres.</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <label for="sesion-tema">Tema de la sesión <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-select id="sesion-tema" formControlName="temaId" placeholder="Elige un tema del grupo" required>
+                @for (tema of ctx.temas(); track tema.id) { <mat-option [value]="tema.id">{{ tema.nombre }}</mat-option> }
+              </mat-select>
+              @if (form.controls.temaId.invalid) { <mat-error>Elige el tema que se trabajará.</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sesion-fecha">Fecha <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="sesion-fecha" type="date" formControlName="fecha" required />
+                @if (form.controls.fecha.hasError('required')) { <mat-error>Ingresa la fecha.</mat-error> }
+                @if (form.controls.fecha.hasError('pasada')) { <mat-error>La fecha ya pasó.</mat-error> }
+              </mat-form-field>
+            </div>
+            <div class="form-group">
+              <label for="sesion-modalidad">Modalidad <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-select id="sesion-modalidad" formControlName="modalidad" required>
+                  <mat-option value="virtual">Virtual</mat-option>
+                  <mat-option value="presencial">Presencial</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sesion-inicio">Hora inicio <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="sesion-inicio" type="time" formControlName="horaInicio" required />
+                @if (form.controls.horaInicio.invalid) { <mat-error>Ingresa la hora de inicio.</mat-error> }
+              </mat-form-field>
+            </div>
+            <div class="form-group">
+              <label for="sesion-fin">Hora fin <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="sesion-fin" type="time" formControlName="horaFin" required />
+                @if (form.controls.horaFin.hasError('required')) { <mat-error>Ingresa la hora de fin.</mat-error> }
+                @if (form.controls.horaFin.hasError('antesDeInicio')) { <mat-error>Debe ser posterior al inicio.</mat-error> }
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sesion-lugar">{{ form.controls.modalidad.value === 'virtual' ? 'Enlace' : 'Lugar' }}</label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <input matInput id="sesion-lugar" formControlName="enlaceLugar" [placeholder]="form.controls.modalidad.value === 'virtual' ? 'meet.google.com/abc-defg-hij' : 'Ej. Biblioteca UPC, sala 3'" />
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <label for="sesion-descripcion">Descripción</label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <textarea matInput id="sesion-descripcion" formControlName="descripcion" placeholder="¿Qué se trabajará en la sesión?"></textarea>
+              @if (form.controls.descripcion.invalid) { <mat-error>Usa como máximo 300 caracteres.</mat-error> }
+            </mat-form-field>
+          </div>
+          @if (editandoId()) { <p class="form-note">Al guardar se notificará a los {{ ctx.integrantesANotificar() }} integrantes y se actualizarán sus recordatorios.</p> }
+          <div class="form-actions">
+            <button mat-stroked-button type="button" (click)="cancelarEdicion()">Cancelar</button>
+            <button mat-flat-button type="submit">{{ editandoId() ? 'Guardar y notificar' : 'Crear sesión' }}</button>
+          </div>
+        </form>
+      </section>
+    </aside>
+  }
+</div>

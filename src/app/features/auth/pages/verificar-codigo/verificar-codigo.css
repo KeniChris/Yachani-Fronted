@@ -1,0 +1,10 @@
+:host { max-width: 458px; }
+.code-card { padding: 50px; text-align: center; }
+.code-card .description { margin-bottom: 12px; }
+.email { margin: 0 0 26px; font-size: 14px; font-weight: 700; }
+.code-inputs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-bottom: 18px; }
+.code-inputs input { width: 100%; min-width: 0; height: 50px; padding: 0; text-align: center; border: 1px solid var(--color-card-border); border-radius: var(--radius-control); background: #3a23490d; color: var(--color-text); font-size: 23px; font-weight: 700; }
+.code-inputs input[aria-invalid="true"] { border-color: var(--color-error); }
+.code-error { margin: 0 0 16px; color: var(--color-error); font-size: 13px; line-height: 20px; overflow-wrap: anywhere; }
+@media (max-width: 360px) { .code-inputs { gap: 4px; }.code-inputs input { height: 44px; border-radius: 8px; } }
+@media (max-width: 500px) { .code-card { padding: 28px 20px; } }

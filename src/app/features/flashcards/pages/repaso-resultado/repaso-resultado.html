@@ -1,0 +1,22 @@
+<mat-card class="result-card"
+  ><mat-icon class="success-icon" fontSet="material-symbols-rounded">check_circle</mat-icon>
+  <h1 class="page-title">¡Repaso completado!</h1>
+  <p>Fórmulas de derivadas · Dominando Cálculo</p>
+  <mat-chip-set aria-label="Revisión completada"
+    ><mat-chip class="success-chip">4 de 4 revisadas · 100 %</mat-chip></mat-chip-set
+  ><strong class="result-percent">75 %</strong>
+  <p>de tarjetas aprendidas</p>
+  <div class="stats">
+    <div><strong>4</strong><span>Revisadas</span></div>
+    <div><strong>3</strong><span>Aprendidas</span></div>
+    <div><strong>1</strong><span>Por repasar</span></div>
+  </div>
+  <div class="actions">
+    <a mat-flat-button [routerLink]="flashcardsGrupo + '/1/repaso/pregunta'"
+      >Repasar la pendiente</a
+    ><a mat-stroked-button [routerLink]="flashcardsGrupo + '/1/repaso/pregunta'"
+      >Repasar de nuevo</a
+    ><a mat-stroked-button [routerLink]="flashcardsGrupo">Volver al grupo</a>
+  </div>
+  <p class="helper-text">Tu progreso se conserva al volver al grupo.</p></mat-card
+>

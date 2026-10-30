@@ -1,0 +1,43 @@
+<div class="sidebar">
+  <a class="brand" [routerLink]="homeRoute" aria-label="Yachani, inicio">
+    <span class="brand-symbol">
+      <mat-icon fontSet="material-symbols-rounded">school</mat-icon>
+    </span>
+
+    <span>Yachani</span>
+  </a>
+
+  <p class="menu-heading">MENÚ PRINCIPAL</p>
+
+  <nav aria-label="Navegación de la plataforma">
+    @for (item of visibleItems; track item.route) {
+      @if (rutaDisponible(item.route)) {
+      <a
+        class="menu-link"
+        [routerLink]="item.route"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: item.exact }"
+        ariaCurrentWhenActive="page"
+      >
+        <mat-icon fontSet="material-symbols-rounded">
+          {{ item.icon }}
+        </mat-icon>
+
+        <span>{{ item.label }}</span>
+      </a>
+      } @else {
+        <span class="menu-link is-pending" role="link" aria-disabled="true" [title]="item.label + ': disponible próximamente'">
+          <mat-icon fontSet="material-symbols-rounded">{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </span>
+      }
+    }
+  </nav>
+
+  <div class="help-box">
+    <strong>¿Necesitas ayuda?</strong>
+    <p>
+      Consulta nuestras preguntas frecuentes o comunícate con soporte.
+    </p>
+  </div>
+</div>

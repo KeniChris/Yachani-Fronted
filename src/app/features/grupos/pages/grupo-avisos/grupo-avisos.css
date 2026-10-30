@@ -1,0 +1,8 @@
+.notice-card.is-pinned { border-color: var(--color-accent); }
+.notice-head { display: flex; align-items: flex-start; gap: 12px; }.notice-title { flex: 1; min-width: 0; }
+.title-line { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }.title-line h3 { font-size: 15px; line-height: 22px; }
+.notice-meta { margin: 2px 0 0; color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
+.notice-body { margin: 12px 0 0; font-size: 14px; line-height: 22px; white-space: pre-wrap; }
+.notice-edited { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 12px; line-height: 18px; font-weight: 500; }.notice-edited mat-icon { width: 16px; height: 16px; font-size: 16px; }
+mat-button-toggle-group { --mat-standard-button-toggle-shape: 999px; --mat-standard-button-toggle-selected-state-background-color: var(--color-selection); --mat-standard-button-toggle-selected-state-text-color: var(--color-primary); --mat-standard-button-toggle-divider-color: var(--color-card-border); border-color: var(--color-card-border); font-size: 13px; }
+.form-note { display: flex; align-items: center; gap: 6px; }.form-note mat-icon { width: 16px; height: 16px; font-size: 16px; color: var(--color-primary); }

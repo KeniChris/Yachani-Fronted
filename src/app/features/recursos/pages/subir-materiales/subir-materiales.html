@@ -1,0 +1,65 @@
+<mat-card class="form-card"
+  ><div class="heading row">
+    <h1>Subir materiales</h1>
+    <a mat-icon-button [routerLink]="grupo + '/materiales'" aria-label="Cerrar subida"
+      ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
+    >
+  </div>
+  <p class="muted">Comparte archivos para estudiar con tu grupo.</p>
+  <form [formGroup]="formulario">
+    <mat-form-field appearance="outline"
+      ><mat-label>Tema (opcional)</mat-label
+      ><mat-select formControlName="idTema"
+        ><mat-option value="sin-tema">Sin tema</mat-option
+        ><mat-option value="1">Límites y continuidad</mat-option
+        ><mat-option value="2">Reglas de derivación</mat-option
+        ><mat-option value="3">Aplicaciones de la derivada</mat-option></mat-select
+      ><mat-hint>Puedes elegir “Sin tema”.</mat-hint
+      ><mat-error>Elige un tema del grupo o “Sin tema”.</mat-error></mat-form-field
+    >
+    <div class="upload">
+      <mat-icon fontSet="material-symbols-rounded">upload</mat-icon>
+      <h2>Selecciona los archivos</h2>
+      <p class="helper-text">
+        PDF, DOCX, PPTX, XLSX, PNG, JPG o JPEG. Máximo 5 archivos de 10 MB cada uno.
+      </p>
+      <button
+        mat-stroked-button
+        type="button"
+        title="Selección de archivos pendiente de integración"
+      >
+        Elegir archivos
+      </button>
+    </div>
+    <div class="list">
+      @for (material of materiales; track material.idMaterial) {
+        <div class="file selected-file">
+          <mat-icon fontSet="material-symbols-rounded">{{ material.icono }}</mat-icon>
+          <div class="grow">
+            <span class="file-name">{{ material.nombre }}</span>
+            <p>{{ material.tamano }}</p>
+          </div>
+          <button
+            type="button"
+            mat-icon-button
+            [attr.aria-label]="'Quitar ' + material.nombre"
+            title="Acción pendiente de integración"
+          >
+            <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+    <div class="actions">
+      <a mat-stroked-button [routerLink]="grupo + '/materiales'">Cancelar</a
+      ><button
+        mat-flat-button
+        type="button"
+        [disabled]="formulario.invalid"
+        [routerLink]="grupo + '/materiales'"
+      >
+        Publicar 3 archivos
+      </button>
+    </div>
+  </form></mat-card
+>

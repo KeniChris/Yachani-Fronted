@@ -1,0 +1,37 @@
+<mat-card class="form-card"
+  ><div class="heading row">
+    <h1>{{ publicacion ? '¿Retirar la publicación?' : '¿Retirar el mazo de este grupo?' }}</h1>
+    <a
+      mat-icon-button
+      [routerLink]="publicacion ? '/app/flashcards/1' : flashcardsGrupo + '/1'"
+      aria-label="Cerrar confirmación"
+      ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
+    >
+  </div>
+  @if (publicacion) {
+    <p>
+      Fórmulas de derivadas volverá a borrador y dejará de estar disponible en todos sus grupos.
+    </p>
+    <p class="muted">Conservas tus tarjetas, las asociaciones y tu progreso.</p>
+  } @else {
+    <p>Fórmulas de derivadas dejará de estar disponible en Dominando Cálculo.</p>
+    <p class="muted">El mazo personal, los demás grupos y el progreso se conservan.</p>
+    @if (esAdministrador && !esAutor) {
+      <p class="muted">
+        Como administrador, puedes retirar este mazo del grupo. Su contenido pertenece al autor.
+      </p>
+    }
+  }
+  <div class="actions">
+    <a
+      mat-stroked-button
+      [routerLink]="publicacion ? '/app/flashcards/1' : flashcardsGrupo + '/1'"
+      >Cancelar</a
+    ><a
+      mat-flat-button
+      class="danger"
+      [routerLink]="publicacion ? '/app/flashcards/1' : flashcardsGrupo"
+      >{{ publicacion ? 'Retirar publicación' : 'Retirar de este grupo' }}</a
+    >
+  </div></mat-card
+>

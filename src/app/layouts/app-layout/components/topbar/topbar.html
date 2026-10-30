@@ -1,0 +1,91 @@
+<div class="topbar">
+  @if (showMenuButton) {
+    <button
+      mat-icon-button
+      class="menu-toggle"
+      type="button"
+      aria-label="Abrir menú principal"
+      aria-controls="app-navigation"
+      [attr.aria-expanded]="menuOpen"
+      (click)="menuToggle.emit()"
+    >
+      <mat-icon fontSet="material-symbols-rounded">
+        menu
+      </mat-icon>
+    </button>
+  }
+
+  <button
+    mat-icon-button
+    class="bell"
+    type="button"
+    [attr.aria-label]="store.notificacionesSinLeer() ? 'Abrir notificaciones, ' + store.notificacionesSinLeer() + ' sin leer' : 'Abrir notificaciones'"
+    [matMenuTriggerFor]="notificationsMenu"
+  >
+    <mat-icon fontSet="material-symbols-rounded">
+      notifications
+    </mat-icon>
+    @if (store.notificacionesSinLeer()) { <span class="bell-count" aria-hidden="true">{{ store.notificacionesSinLeer() }}</span> }
+  </button>
+
+  <mat-menu #notificationsMenu="matMenu" class="notifications-menu" xPosition="before">
+    <div class="notifications-panel">
+      <div class="panel-head">
+        <span class="panel-title">Notificaciones</span>
+        @if (store.notificacionesSinLeer()) {
+          <button class="text-action" type="button" (click)="$event.stopPropagation(); store.marcarNotificacionesLeidas()">Marcar como leídas</button>
+        }
+      </div>
+      @if (store.recordatorios()[0]; as sesion) {
+        <div class="reminder">
+          <p class="eyebrow">Recordatorio · {{ store.recordatorioActivo()?.id === sesion.id ? 'en ' + minutos(sesion) + ' min' : dia(sesion) }}</p>
+          <p class="reminder-title">{{ curso(sesion) }} — {{ sesion.titulo }}</p>
+          <ul class="reminder-details">
+            <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>{{ fecha(sesion) }}</li>
+            <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">schedule</mat-icon>{{ rango(sesion) }}</li>
+            <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">group</mat-icon>Grupo: {{ grupo(sesion) }}</li>
+            <li><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">menu_book</mat-icon>Tema: {{ tema(sesion) }}</li>
+          </ul>
+          @if (rutaSesion(sesion.id); as ruta) { <a mat-flat-button class="reminder-action" [routerLink]="ruta">Ver sesión</a> }
+        </div>
+      }
+      @for (item of recientes(); track item.id) {
+        <a class="notification" mat-menu-item [class.is-unread]="!item.leida" [routerLink]="rutaSesion(item.sesionId)">
+          <span class="notification-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">{{ iconos[item.tipo] }}</mat-icon></span>
+          <span class="notification-text"><strong>{{ item.texto }}</strong><small>{{ hace(item.fecha) }}</small></span>
+          @if (!item.leida) { <span class="unread-dot"><span class="sr-only">Sin leer</span></span> }
+        </a>
+      } @empty {
+        @if (!store.recordatorios().length) { <p class="notifications-empty">No tienes notificaciones nuevas.</p> }
+      }
+      <a class="see-all" mat-menu-item [routerLink]="rutaNotificaciones">Ver todas las notificaciones <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">arrow_forward</mat-icon></a>
+    </div>
+  </mat-menu>
+
+  @if (userName) {
+    <div class="user-info">
+      <span class="avatar" aria-hidden="true">
+        {{ initials }}
+      </span>
+
+      <div class="user-details">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">
+          {{ role === 'tutor' ? 'Tutor' : 'Estudiante' }}
+        </span>
+      </div>
+    </div>
+  }
+</div>
+
+@if (avisoFlotante(); as sesion) {
+  <div class="reminder-toast" role="status">
+    <span class="toast-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">notifications_active</mat-icon></span>
+    <div class="toast-text">
+      <strong>Tu sesión empieza en {{ minutos(sesion) }} minutos</strong>
+      <span>{{ curso(sesion) }} · {{ dia(sesion) }}, {{ rango(sesion) }} · {{ grupo(sesion) }}</span>
+      @if (rutaSesion(sesion.id); as ruta) { <a [routerLink]="ruta" (click)="store.descartarRecordatorio(sesion.id)">Ver sesión</a> }
+    </div>
+    <button class="toast-close" type="button" aria-label="Cerrar recordatorio" (click)="store.descartarRecordatorio(sesion.id)"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button>
+  </div>
+}

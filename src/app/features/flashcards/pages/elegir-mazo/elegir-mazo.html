@@ -1,0 +1,27 @@
+<mat-card class="form-card"
+  ><div class="heading row">
+    <h1>Compartir un mazo</h1>
+    <a mat-icon-button [routerLink]="flashcardsGrupo" aria-label="Cerrar confirmación"
+      ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
+    >
+  </div>
+  <p class="muted">Elige uno de tus mazos personales o crea uno nuevo.</p>
+  <mat-card
+    ><div class="deck-strip">
+      <mat-icon fontSet="material-symbols-rounded">style</mat-icon><span>4 tarjetas</span>
+    </div>
+    <h2>Fórmulas de derivadas</h2>
+    <p class="muted">Reglas y ejemplos para tu próximo repaso.</p>
+    <p class="helper-text">Creado por ti · Publicado</p>
+    <p class="helper-text">3 de 4 revisadas · 75 %</p>
+    <mat-progress-bar mode="determinate" [value]="75" aria-label="75 % revisado" /><a
+      mat-stroked-button
+      routerLink="/app/flashcards/1"
+      >Ver mazo</a
+    ></mat-card
+  >
+  <div class="actions">
+    <a mat-stroked-button routerLink="/app/flashcards/crear">Crear uno nuevo</a
+    ><a mat-flat-button [routerLink]="flashcardsGrupo + '/compartir/1'">Elegir este mazo</a>
+  </div></mat-card
+>

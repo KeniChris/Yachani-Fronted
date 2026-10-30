@@ -1,0 +1,71 @@
+<header class="landing-header" (keydown.escape)="closeMenu()">
+  <div class="navbar">
+    <a
+  class="brand"
+  routerLink="/"
+  aria-label="Yachani, inicio"
+  (click)="closeMenu()"
+>
+  <span class="brand-symbol">
+    <mat-icon fontSet="material-symbols-rounded">
+      school
+    </mat-icon>
+  </span>
+
+  <span>Yachani</span>
+</a>
+    <button
+      mat-icon-button
+      class="mobile-toggle"
+      type="button"
+      [attr.aria-label]="menuOpen ? 'Cerrar menú' : 'Abrir menú'"
+      [attr.aria-expanded]="menuOpen"
+      aria-controls="landing-navigation"
+      (click)="menuOpen = !menuOpen"
+    >
+      <mat-icon fontSet="material-symbols-rounded">
+        {{ menuOpen ? 'close' : 'menu' }}
+      </mat-icon>
+    </button>
+
+    <div
+      id="landing-navigation"
+      class="navigation"
+      [class.is-open]="menuOpen"
+    >
+      <nav aria-label="Navegación del landing">
+        <a href="#inicio" (click)="closeMenu()">Inicio</a>
+        <a href="#quienes-somos" (click)="closeMenu()">
+          Quiénes somos
+        </a>
+        <a href="#que-ofrecemos" (click)="closeMenu()">
+          Qué ofrecemos
+        </a>
+        <a href="#como-funciona" (click)="closeMenu()">
+          Cómo funciona
+        </a>
+        <a href="#contacto" (click)="closeMenu()">Contáctanos</a>
+      </nav>
+
+      <div class="auth-actions">
+        <a
+          mat-stroked-button
+          class="login-button"
+          routerLink="/login"
+          (click)="closeMenu()"
+        >
+          Iniciar sesión
+        </a>
+
+        <a
+          mat-flat-button
+          class="register-button"
+          routerLink="/registro"
+          (click)="closeMenu()"
+        >
+          Registrarse
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

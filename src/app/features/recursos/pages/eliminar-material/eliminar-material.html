@@ -1,0 +1,17 @@
+<mat-card class="form-card"
+  ><div class="heading row">
+    <h1>¿Eliminar este material?</h1>
+    <a mat-icon-button [routerLink]="grupo + '/materiales/1'" aria-label="Cerrar confirmación"
+      ><mat-icon fontSet="material-symbols-rounded">close</mat-icon></a
+    >
+  </div>
+  <p class="muted">Guía de derivadas.pdf dejará de estar disponible en este grupo.</p>
+  <div class="warning">
+    <mat-icon fontSet="material-symbols-rounded">delete</mat-icon>
+    <p>Esta acción no se puede deshacer.</p>
+  </div>
+  <div class="actions">
+    <a mat-stroked-button [routerLink]="grupo + '/materiales/1'">Conservar material</a
+    ><a class="danger" mat-flat-button [routerLink]="grupo + '/materiales'">Eliminar material</a>
+  </div></mat-card
+>

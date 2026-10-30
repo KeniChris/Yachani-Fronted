@@ -1,0 +1,152 @@
+:host {
+  display: block;
+}
+
+.video-section {
+  padding: 88px 24px;
+  background-color: #24112e;
+  color: #f8fafc;
+}
+
+.video-container {
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.section-heading {
+  text-align: center;
+}
+
+.section-tag {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 24px;
+  background-color: #fce7f3;
+  color: #2e183b;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+}
+
+.section-heading h2 {
+  margin: 20px 0 16px;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.section-heading p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.video-frame {
+  margin-top: 48px;
+  overflow: hidden;
+  border: 1px solid #684179;
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at center, #9333ea30, transparent 65%),
+    linear-gradient(135deg, #3a2045, #190d21);
+}
+
+.video-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #190d21;
+}
+
+.video-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  aspect-ratio: 16 / 9;
+  padding: 32px;
+  text-align: center;
+}
+
+.video-symbol {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 24px;
+  border-radius: 50%;
+  background-color: #a855f7;
+  box-shadow: 0 0 0 16px #a855f726;
+}
+
+.video-symbol mat-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+}
+
+.video-placeholder h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.video-placeholder p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.video-topics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.video-topics li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border: 1px solid #573866;
+  border-radius: 32px;
+  background-color: #3a2045;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.video-topics span {
+  color: #d8b4fe;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .video-section {
+    padding: 56px 16px;
+  }
+
+  .section-heading p {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .video-frame {
+    margin-top: 32px;
+  }
+
+  .video-placeholder {
+    min-height: 280px;
+    padding: 24px;
+  }
+
+  .video-topics {
+    gap: 8px;
+  }
+}

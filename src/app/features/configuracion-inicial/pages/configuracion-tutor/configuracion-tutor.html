@@ -1,0 +1,97 @@
+@if (modoPrevisualizacion) {
+  <p class="preview-note" role="status">Vista previa: no se guardan datos reales.</p>
+}
+@if (estado === 'exito') {
+  <section class="card success-card" aria-labelledby="success-title" role="status">
+    <div class="success-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">check</mat-icon></div>
+    <h1 id="success-title">¡Tu perfil está listo!</h1>
+    <p>Los estudiantes ya podrán conocer tu presentación y método de enseñanza.</p>
+    @if (rutaInicioTutor) {
+      <a mat-flat-button class="primary-button" [routerLink]="rutaInicioTutor">Ir al inicio</a>
+    } @else {
+      <button mat-flat-button class="primary-button" type="button" disabled aria-describedby="pending-home">Ir al inicio</button>
+      <p class="pending-home" id="pending-home">El acceso al inicio del tutor aún no está disponible.</p>
+    }
+  </section>
+} @else {
+  <div class="intro">
+    <h1>Completa tu perfil de tutor</h1>
+    <p>{{ paso === 1 ? 'Ayuda a los estudiantes a conocer tu forma de enseñar antes de unirse a tus grupos.' : 'Ayuda a los estudiantes a conocer tu formación y forma de enseñar.' }}</p>
+  </div>
+  <ol class="steps" aria-label="Progreso de la configuración">
+    <li class="step active" [class.done]="paso === 2" [attr.aria-current]="paso === 1 ? 'step' : null">
+      <span class="step-dot" aria-hidden="true">@if (paso === 2) { <mat-icon fontSet="material-symbols-rounded">check</mat-icon> } @else { 1 }</span>
+      <span>Información académica</span>
+      @if (paso === 2) { <span class="sr-only">Completado</span> }
+    </li>
+    <li class="step" [class.active]="paso === 2" [attr.aria-current]="paso === 2 ? 'step' : null">
+      <span class="step-dot" aria-hidden="true">2</span><span>Perfil del tutor</span>
+    </li>
+  </ol>
+  <section class="card" [attr.aria-busy]="estado === 'guardando'">
+    @if (paso === 1) {
+      <form [formGroup]="informacionAcademica" (ngSubmit)="siguiente()">
+        <div class="card-content academic-content">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">account_balance</mat-icon></span>
+            <div><h2 #tituloPaso tabindex="-1">Información académica</h2><p>Estos datos son compartidos por estudiantes y tutores dentro de Yachani.</p></div>
+          </div>
+          <div class="academic-grid">
+            <div class="form-group">
+              <label for="tutor-university">Universidad <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="tutor-university" formControlName="universidad" autocomplete="organization" placeholder="Universidad Peruana de Ciencias Aplicadas" required />
+                @if (informacionAcademica.controls.universidad.invalid) { <mat-error>Ingresa tu universidad.</mat-error> }
+              </mat-form-field>
+            </div>
+            <div class="form-group">
+              <label for="tutor-career">Carrera <span class="required" aria-hidden="true">*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput id="tutor-career" formControlName="carrera" placeholder="Ej. Ingeniería de Software" required />
+                @if (informacionAcademica.controls.carrera.invalid) { <mat-error>Ingresa tu carrera.</mat-error> }
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="card-actions first-actions"><button mat-flat-button class="primary-button" type="submit">Siguiente</button></div>
+      </form>
+    } @else {
+      <form [formGroup]="perfilTutor" (ngSubmit)="finalizar()">
+        <div class="card-content profile-content">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">person</mat-icon></span>
+            <div><h2 #tituloPaso tabindex="-1">Presentación y enseñanza</h2><p>Esta información aparecerá en tu perfil y podrá ser consultada por los estudiantes.</p></div>
+          </div>
+          <div class="form-group presentation-group">
+            <label for="tutor-presentation">Presentación <span class="required" aria-hidden="true">*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <textarea matInput id="tutor-presentation" formControlName="presentacion" rows="5" placeholder="Cuéntales brevemente a los estudiantes sobre ti, tu experiencia y cómo puedes ayudarlos." [readonly]="estado === 'guardando'" required></textarea>
+              <mat-hint align="end">{{ caracteres }}/500 caracteres</mat-hint>
+              @if (perfilTutor.controls.presentacion.hasError('required')) { <mat-error>La presentación es obligatoria</mat-error> }
+              @else if (perfilTutor.controls.presentacion.hasError('maxlength')) { <mat-error>La presentación no debe superar los 500 caracteres.</mat-error> }
+            </mat-form-field>
+            @if (perfilTutor.controls.presentacion.invalid && perfilTutor.controls.presentacion.touched) { <p class="error-counter">{{ caracteres }}/500 caracteres</p> }
+          </div>
+          <fieldset [disabled]="estado === 'guardando'" [attr.aria-describedby]="errorMetodo ? 'method-error' : null">
+            <legend>Método de enseñanza <span class="required" aria-hidden="true">*</span></legend>
+            <div class="methods">
+              @for (metodo of metodos; track metodo) {
+                <label class="method" [class.selected]="perfilTutor.controls.metodo.value === metodo">
+                  <input type="radio" formControlName="metodo" [value]="metodo" (blur)="perfilTutor.controls.metodo.markAsTouched()" [attr.aria-invalid]="errorMetodo" />
+                  <span>{{ metodo }}</span>
+                </label>
+              }
+            </div>
+            @if (errorMetodo) { <p class="field-error" id="method-error">Selecciona un método de enseñanza.</p> }
+          </fieldset>
+          @if (estado === 'error') { <p class="feedback error" role="alert">{{ mensajeError }}</p> }
+          @if (mensaje) { <p class="feedback info" role="status">{{ mensaje }}</p> }
+        </div>
+        <div class="card-actions">
+          <button mat-stroked-button class="secondary-button" type="button" (click)="atras()" [disabled]="estado === 'guardando'">Atrás</button>
+          <button mat-flat-button class="primary-button" type="submit" [disabled]="estado === 'guardando'">{{ estado === 'guardando' ? 'Guardando…' : 'Finalizar configuración' }}</button>
+        </div>
+      </form>
+    }
+  </section>
+}

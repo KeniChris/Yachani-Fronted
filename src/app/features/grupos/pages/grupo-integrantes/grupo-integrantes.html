@@ -1,0 +1,63 @@
+<div class="tab-grid">
+  <section class="card members-card" aria-labelledby="members-title">
+    <div class="section-head">
+      <div class="title-group"><h2 id="members-title">Integrantes</h2><span class="badge">{{ ctx.integrantes().length }}/{{ ctx.grupo()?.capacidadMaxima }}</span></div>
+      <label class="search">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">search</mat-icon>
+        <span class="sr-only">Buscar integrante</span>
+        <input type="search" placeholder="Buscar integrante" [value]="busqueda()" (input)="buscar($event)" />
+      </label>
+    </div>
+    <table class="members-table">
+      <caption class="sr-only">Integrantes del grupo, su rol, carrera y fecha de ingreso</caption>
+      <thead><tr><th scope="col">Nombre</th><th scope="col">Rol</th><th scope="col">Carrera</th><th scope="col">Se unió</th></tr></thead>
+      <tbody>
+        @for (item of filtrados(); track item.usuarioId) {
+          <tr [class.is-new]="esNuevo(item)">
+            <th scope="row"><span class="member"><span class="avatar" aria-hidden="true">{{ iniciales(item.nombre) }}</span><span class="member-name">{{ item.nombre }}@if (esPropio(item)) { (tú) }</span>@if (esNuevo(item)) { <span class="badge">Nuevo</span> }</span></th>
+            <td><span class="badge" [class.badge-muted]="item.rol !== 'tutor'">{{ item.rol === 'tutor' ? 'Tutor' : 'Estudiante' }}</span></td>
+            <td class="muted">{{ carrera(item) }}</td>
+            <td class="muted">{{ ingreso(item) }}</td>
+          </tr>
+        } @empty {
+          <tr><td class="no-results" colspan="4">@if (busqueda().trim()) { No encontramos integrantes con «{{ busqueda() }}». } @else { Aún no hay integrantes en este grupo. }</td></tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <aside class="side-column" aria-label="Cupos y detalles del grupo">
+    <section class="card" aria-labelledby="slots-title">
+      <h2 id="slots-title">Cupos del grupo</h2>
+      <p class="slots-count"><strong>{{ ctx.integrantes().length }}</strong> / {{ ctx.grupo()?.capacidadMaxima }} integrantes</p>
+      <mat-progress-bar mode="determinate" [value]="ocupacion()" aria-label="Ocupación del grupo" />
+      <p class="form-note slots-free">{{ ctx.cuposDisponibles() === 1 ? '1 cupo disponible' : ctx.cuposDisponibles() + ' cupos disponibles' }}</p>
+
+      @if (ctx.esTutor) {
+        <div class="limit-editor" [class.has-error]="error()">
+          <span class="form-label" id="limit-label">Editar límite de integrantes</span>
+          <div class="stepper" role="group" aria-labelledby="limit-label">
+            <button class="step-button" type="button" aria-label="Disminuir límite" [disabled]="limite() <= 1" (click)="cambiarLimite(-1)"><mat-icon fontSet="material-symbols-rounded">remove</mat-icon></button>
+            <output class="limit-value" aria-live="polite">{{ limite() }}</output>
+            <button class="step-button" type="button" aria-label="Aumentar límite" (click)="cambiarLimite(1)"><mat-icon fontSet="material-symbols-rounded">add</mat-icon></button>
+          </div>
+          @if (error()) { <p class="alert alert-error" role="alert"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">warning</mat-icon>{{ error() }}</p> }
+          @else if (mensaje()) { <p class="alert alert-info" role="status"><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">info</mat-icon>{{ mensaje() }}</p> }
+          <button mat-flat-button type="button" class="save-limit" [disabled]="limiteInvalido() || sinCambios()" (click)="guardarLimite()">Guardar límite</button>
+        </div>
+      }
+    </section>
+
+    @if (ctx.grupo(); as grupo) {
+      <section class="card" aria-labelledby="details-title">
+        <h2 id="details-title">Detalles del grupo</h2>
+        <dl class="details">
+          <div><dt>Curso</dt><dd>{{ grupo.curso }}</dd></div>
+          <div><dt>Tema</dt><dd>{{ grupo.tema }}</dd></div>
+          <div><dt>Método de estudio</dt><dd>{{ grupo.metodo }}</dd></div>
+          <div><dt>Modalidad</dt><dd>{{ grupo.modalidad }}</dd></div>
+        </dl>
+      </section>
+    }
+  </aside>
+</div>

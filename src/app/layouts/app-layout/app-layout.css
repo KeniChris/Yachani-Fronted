@@ -1,0 +1,37 @@
+:host {
+  display: block;
+}
+
+.app-shell {
+  height: 100dvh;
+  background-color: var(--color-background);
+}
+
+.app-sidebar {
+  width: 244px;
+  border: 0;
+  border-radius: 0;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.app-topbar {
+  min-height: 64px;
+  background-color: var(--color-background);
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-8);
+}
+
+@media (max-width: 768px) {
+  .app-content {
+    padding: var(--space-4);
+  }
+}

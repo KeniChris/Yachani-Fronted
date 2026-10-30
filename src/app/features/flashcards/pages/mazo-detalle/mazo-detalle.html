@@ -1,0 +1,46 @@
+<a mat-stroked-button routerLink="/app/flashcards">Volver a mis mazos</a>
+<div class="heading detail-heading">
+  <div>
+    <h1 class="page-title">Fórmulas de derivadas</h1>
+    <p>Reglas y ejemplos para preparar tu próximo repaso.</p>
+  </div>
+  <a mat-flat-button routerLink="/app/flashcards/1/editar">Editar datos</a>
+</div>
+<mat-chip-set aria-label="Estado del mazo"
+  ><mat-chip class="success-chip">Publicado</mat-chip><mat-chip>4 tarjetas</mat-chip></mat-chip-set
+>
+<div class="actions section-space">
+  <a mat-stroked-button routerLink="/app/flashcards/1/tarjetas/agregar">Agregar tarjeta</a
+  ><a mat-flat-button [routerLink]="flashcardsGrupo + '/1'">Practicar</a
+  ><a mat-stroked-button [routerLink]="flashcardsGrupo + '/compartir/1'">Compartir en un grupo</a
+  ><a class="danger" mat-button routerLink="/app/flashcards/1/retirar-publicacion"
+    >Retirar publicación</a
+  >
+</div>
+<button mat-stroked-button disabled>Ver dónde se comparte</button>
+<mat-card class="section-space"
+  ><h2>Tarjetas</h2>
+  <div class="list">
+    @for (tarjeta of tarjetas; track tarjeta.idTarjeta) {
+      <article class="study-item">
+        <div class="row">
+          <span class="eyebrow grow">{{ tarjeta.etiqueta }}</span
+          ><a
+            mat-icon-button
+            [routerLink]="tarjeta.editar"
+            [attr.aria-label]="'Editar ' + tarjeta.etiqueta"
+            ><mat-icon fontSet="material-symbols-rounded">edit</mat-icon></a
+          ><a
+            mat-icon-button
+            class="danger"
+            [routerLink]="tarjeta.eliminar"
+            [attr.aria-label]="'Eliminar ' + tarjeta.etiqueta"
+            ><mat-icon fontSet="material-symbols-rounded">delete</mat-icon></a
+          >
+        </div>
+        <h3 class="question-text">{{ tarjeta.pregunta }}</h3>
+        <p class="muted">{{ tarjeta.respuesta }}</p>
+      </article>
+    }
+  </div></mat-card
+>

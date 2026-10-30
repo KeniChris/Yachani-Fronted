@@ -1,0 +1,14 @@
+<!-- El nombre del grupo y sus pestañas los muestra el espacio del grupo (EspacioGrupo). -->
+<nav class="resource-tabs" aria-label="Recursos del grupo">
+  <a mat-stroked-button [routerLink]="grupo + '/temas'" routerLinkActive="active" ariaCurrentWhenActive="page"
+    >Temas</a
+  >
+  <a
+    mat-stroked-button
+    [routerLink]="grupo + '/materiales'"
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page"
+    >Materiales</a
+  >
+</nav>
+<router-outlet />
