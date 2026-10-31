@@ -1,0 +1,22 @@
+<header class="group-header">
+  @if (nombreGrupo) {
+    <h1>{{ nombreGrupo }}</h1>
+  }
+  <ng-content select="[grupo-acciones]" />
+</header>
+<nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Secciones del grupo">
+  @for (tab of tabs; track tab.path) {
+    <a
+      mat-tab-link
+      [routerLink]="tab.path"
+      queryParamsHandling="preserve"
+      routerLinkActive
+      #active="routerLinkActive"
+      [active]="active.isActive"
+      ariaCurrentWhenActive="page"
+      ><mat-icon fontSet="material-symbols-rounded">{{ tab.icon }}</mat-icon
+      >{{ tab.label }}</a
+    >
+  }
+</nav>
+<mat-tab-nav-panel #panel><router-outlet /></mat-tab-nav-panel>

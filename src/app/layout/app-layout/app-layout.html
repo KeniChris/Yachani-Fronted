@@ -1,0 +1,186 @@
+<a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
+<ng-template #accountIdentity>
+  <span class="avatar" aria-hidden="true">{{ rol === 'tutor' ? 'CR' : 'LC' }}</span>
+  <span class="identity"
+    ><span class="user-name">
+      @if (rol === 'tutor') {
+        Carlos R&#237;os
+      } @else {
+        Leicy Cahuana
+      }</span
+    ><span class="user-role">{{ rol === 'tutor' ? 'Tutor' : 'Estudiante' }}</span></span
+  >
+</ng-template>
+<ng-template #navigationContent>
+  <a
+    class="brand-link"
+    routerLink="/"
+    aria-label="Yachani, p&#225;gina principal"
+    (click)="menu.close()"
+    ><app-brand
+  /></a>
+  <nav class="main-navigation" aria-label="Navegaci&#243;n principal">
+    <p class="menu-label">MEN&#218; PRINCIPAL</p>
+    <mat-nav-list>
+      @for (item of navigation[rol === 'tutor' ? 'tutor' : 'estudiante']; track item.path) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          queryParamsHandling="preserve"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="menu.close()"
+        >
+          <span class="nav-row"
+            ><mat-icon
+              ><img
+                [src]="'/icons/sidebar/' + item.icon + '.svg'"
+                alt=""
+                width="24"
+                height="24" /></mat-icon
+            ><span class="nav-label">{{ item.label }}</span></span
+          >
+        </a>
+      }
+    </mat-nav-list>
+  </nav>
+  <div class="sidebar-footer">
+    <section class="help-card" aria-label="Ayuda">
+      <h2>&#191;Necesitas ayuda?</h2>
+      <p>Revisa las preguntas frecuentes o cont&#225;ctanos.</p>
+    </section>
+    <a
+      class="profile-link"
+      routerLink="/perfiles"
+      queryParamsHandling="preserve"
+      (click)="menu.close()"
+      aria-label="Abrir mi perfil"
+      ><ng-container [ngTemplateOutlet]="accountIdentity"
+    /></a>
+  </div>
+</ng-template>
+<ng-template #routeTitle>
+  @if (ruta) {
+    <span>{{ ruta }}</span>
+  } @else {
+    @for (item of navigation[rol === 'tutor' ? 'tutor' : 'estudiante']; track item.path) {
+      <a
+        class="route-label"
+        [routerLink]="item.path"
+        queryParamsHandling="preserve"
+        routerLinkActive="current-route"
+        >{{ item.label }}</a
+      >
+    }
+    <a
+      class="route-label"
+      routerLink="/perfiles"
+      queryParamsHandling="preserve"
+      routerLinkActive="current-route"
+      >Mi perfil</a
+    >
+    <a
+      class="route-label"
+      routerLink="/notificaciones"
+      queryParamsHandling="preserve"
+      routerLinkActive="current-route"
+      >Notificaciones</a
+    >
+    <a
+      class="route-label"
+      routerLink="/recursos"
+      queryParamsHandling="preserve"
+      routerLinkActive="current-route"
+      >Recursos</a
+    >
+    <a
+      class="route-label"
+      routerLink="/grupos"
+      queryParamsHandling="preserve"
+      routerLinkActive="current-route"
+      [routerLinkActiveOptions]="{ exact: true }"
+      >Mis grupos</a
+    >
+  }
+</ng-template>
+<aside class="sidebar yachani-dark" aria-label="Barra lateral">
+  <ng-container [ngTemplateOutlet]="navigationContent" />
+</aside>
+<mat-sidenav-container class="shell">
+  <mat-sidenav
+    #menu
+    class="mobile-menu yachani-dark"
+    mode="over"
+    [fixedInViewport]="true"
+    aria-label="Men&#250; completo"
+  >
+    <div class="mobile-menu-content"><ng-container [ngTemplateOutlet]="navigationContent" /></div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar class="topbar">
+      <button
+        mat-icon-button
+        class="open-menu"
+        (click)="menu.toggle()"
+        aria-label="Abrir navegaci&#243;n"
+        [attr.aria-expanded]="menu.opened"
+      >
+        <mat-icon><img src="/icons/mobile/menu.svg" alt="" width="24" height="24" /></mat-icon>
+      </button>
+      <div class="route-title"><ng-container [ngTemplateOutlet]="routeTitle" /></div>
+      <a
+        mat-icon-button
+        class="notification-link"
+        routerLink="/notificaciones"
+        queryParamsHandling="preserve"
+        aria-label="Notificaciones"
+      >
+        <mat-icon class="desktop-notification"
+          ><img src="/icons/topbar/notifications.svg" alt="" width="24" height="24"
+        /></mat-icon>
+        <mat-icon class="mobile-notification"
+          ><img src="/icons/mobile/notifications.svg" alt="" width="24" height="24"
+        /></mat-icon>
+      </a>
+      <a
+        class="topbar-profile"
+        routerLink="/perfiles"
+        queryParamsHandling="preserve"
+        aria-label="Abrir mi perfil"
+        ><ng-container [ngTemplateOutlet]="accountIdentity"
+      /></a>
+    </mat-toolbar>
+    <main id="contenido-principal" tabindex="-1"><router-outlet /></main>
+    <nav class="mobile-navigation" aria-label="Navegaci&#243;n m&#243;vil">
+      @for (item of mobileNavigation[rol === 'tutor' ? 'tutor' : 'estudiante']; track item.path) {
+        <a
+          mat-button
+          [routerLink]="item.path"
+          queryParamsHandling="preserve"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          ><span class="mobile-item"
+            ><mat-icon
+              ><img
+                [src]="'/icons/mobile/' + item.icon + '.svg'"
+                alt=""
+                width="24"
+                height="24" /></mat-icon
+            ><span>{{ item.short }}</span></span
+          ></a
+        >
+      }
+      <button
+        mat-button
+        (click)="menu.toggle()"
+        aria-label="M&#225;s opciones, abrir men&#250; completo"
+        [attr.aria-expanded]="menu.opened"
+      >
+        <span class="mobile-item"
+          ><mat-icon><img src="/icons/mobile/menu.svg" alt="" width="24" height="24" /></mat-icon
+          ><span>M&#225;s</span></span
+        >
+      </button>
+    </nav>
+  </mat-sidenav-content>
+</mat-sidenav-container>
