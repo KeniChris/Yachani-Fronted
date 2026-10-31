@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  // Reserva de la landing: sin componente hasta que se solicite su implementación.
-  { path: '', pathMatch: 'full', children: [] },
+  { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },
   {
     path: 'auth',
     loadComponent: () => import('./layout/auth-layout/auth-layout').then((m) => m.AuthLayout),
