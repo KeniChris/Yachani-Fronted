@@ -5,11 +5,17 @@ Documento común para construir las pantallas de Yachani con Codex o Claude Code
 ## Datos
 
 - Proyecto: Angular standalone, TypeScript, HTML, CSS y Angular Material. Conservar las versiones instaladas.
-- Repositorio: https://github.com/KeniChris/Yachani-Fronted/tree/develop
-- Figma: https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani
-- Guía visual: [Yachani-guia-estilos-detallado · 1440×1024px](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=1-497).
-- Pantallas de la app: [Diagrama de flujo keni](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=6-321). Secciones 01–05 para Recursos y Flashcards; 07–14 para Inicio, Perfiles, Descubrimiento/IA, Grupos, Chat, Sesiones y Notificaciones/Avisos.
-- Acceso y configuración inicial: hoja [Web App](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=1-4217).
+- Repositorio: [Yachani-Fronted · develop](https://github.com/KeniChris/Yachani-Fronted/tree/develop).
+- Figma: [Yachani](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani).
+- Guía visual: frame **Yachani-guia-estilos-detallado · 1440×1024px**, ubicado en la [página de la guía](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=0-1).
+- Pantallas y flujos: hoja [Diagrama de flujo keni](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=6-321):
+  - 01–05: temas, materiales, mazos, tarjetas, compartir, repaso y progreso.
+  - 07–14: inicio, perfiles, resúmenes, reseñas, descubrimiento/IA, grupos, chat, sesiones y notificaciones/avisos.
+  - 15: inicio de sesión.
+  - 16: registro.
+  - 17: recuperación de contraseña.
+  - 18: configuración inicial de estudiante y tutor.
+- Componentes compartidos: secciones **00 · Recursos · Componentes** y **06 · App compartidos · Componentes**, en esa misma hoja. Utilizar las variantes de estudiante/tutor y escritorio/móvil correspondientes.
 - Landing: [Web](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=1-30827) y [Móvil](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=1-31312).
 - Referencias técnicas: [Angular Material](https://material.angular.dev/components/categories), [Reactive Forms](https://angular.dev/guide/forms/reactive-forms) y [Control flow](https://angular.dev/guide/templates/control-flow).
 
@@ -126,9 +132,10 @@ Construir las interfaces asignadas y su navegación. Figma define contenido, cam
 - **Estilos:** seguir la guía visual, centralizar las variables en `styles.css` y el tema Material en `material-theme.scss`. Usar Roboto y Material Symbols Rounded.
 - **Responsive:** una misma página se adapta a escritorio y móvil, con etiquetas, foco visible y sin desbordes horizontales.
 - **Recursos gráficos:** utilizar los logos, imágenes e iconos aprobados en Figma y guardar los archivos necesarios en `public/`, evitando enlaces temporales. Reconstruir las pantallas con HTML y Material; no utilizar capturas completas del frame como interfaz.
-- **Roles y permisos:** representar las variantes previstas en Figma mediante datos de ejemplo y acciones visibles según el contexto. Reutilizar las pantallas comunes. En esta fase no implementar autenticación ni comprobaciones reales de permisos.
+- **Roles y permisos:** representar las variantes previstas en Figma mediante datos de ejemplo y acciones visibles según el contexto. Reutilizar las pantallas comunes. En esta fase no implementar autenticación ni comprobaciones reales de permisos. Siempre debes decirme que files agregaste o modificaste.
 - **Librerías:** instalar con npm únicamente las necesarias que falten, en versiones compatibles. Si se solicita un gráfico, dejar el bloque «Aquí irá un gráfico», sin programarlo.
 - **Diseño incompleto:** si falta una referencia o hay una ambigüedad, consultar. No inventar pantallas, campos ni contenido.
+- **Fidelidad de los elementos compartidos:** reproducir los componentes aprobados de las secciones 00 y 06 de Figma, con sus variantes por rol y dispositivo. Respetar dimensiones, tipografía, iconos, espaciados, textos y estados. Incluir todos sus elementos, como ayuda y datos del usuario; no sustituirlos por versiones simplificadas.
 
 ## Forma de trabajo
 

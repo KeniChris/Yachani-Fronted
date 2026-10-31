@@ -1,0 +1,31 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.group-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+h1 {
+  overflow-wrap: anywhere;
+  font: var(--font-page-title);
+}
+mat-tab-nav-panel {
+  display: block;
+  padding-top: var(--space-6);
+}
+
+nav {
+  max-width: 100%;
+}
+a[mat-tab-link] {
+  flex: 0 0 auto;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+a[mat-tab-link].mdc-tab--active {
+  background: var(--color-active);
+}
