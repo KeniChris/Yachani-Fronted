@@ -1,0 +1,546 @@
+@let tutor = audience.controls.rol.value === 'tutor';
+<a class="skip-link" href="#contenido-home">Saltar al contenido</a>
+<header class="navbar" id="inicio">
+  <div class="container nav-row">
+    <a class="landing-brand" href="#inicio" aria-label="Yachani, ir al inicio"
+      ><picture
+        ><source media="(max-width: 767px)" srcset="/landing/mobile-brand.svg" />
+        <img src="/landing/brand.svg" alt="" /></picture
+      ><span>Yachani</span></a
+    >
+    <nav class="desktop-nav" aria-label="Navegación de la página">
+      @for (link of navigation; track link.anchor) {
+        <a mat-button [href]="'#' + link.anchor"
+          ><span [class.nav-current]="$first">{{ link.label }}</span></a
+        >
+      }
+    </nav>
+    <a
+      mat-stroked-button
+      class="login"
+      routerLink="/auth"
+      [queryParams]="{ rol: audience.controls.rol.value }"
+      ><span class="desktop-text">Iniciar sesión</span><span class="mobile-text">Entrar</span
+      ><picture
+        ><source media="(max-width: 767px)" srcset="/landing/mobile-login.svg" />
+        <img src="/landing/login.svg" alt="" /></picture
+    ></a>
+    <button
+      mat-icon-button
+      class="mobile-menu"
+      [matMenuTriggerFor]="mobileMenu"
+      aria-label="Abrir menú"
+    >
+      <img src="/landing/mobile-menu.svg" alt="" />
+    </button>
+    <mat-menu #mobileMenu="matMenu">
+      @for (link of navigation; track link.anchor) {
+        <a mat-menu-item [href]="'#' + link.anchor">{{ link.label }}</a>
+      }
+    </mat-menu>
+  </div>
+</header>
+<main id="contenido-home" tabindex="-1">
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div [formGroup]="audience">
+          <mat-button-toggle-group
+            formControlName="rol"
+            aria-label="Elige cómo quieres conocer Yachani"
+            hideSingleSelectionIndicator
+          >
+            <mat-button-toggle value="estudiante"
+              ><picture
+                ><source media="(max-width: 767px)" srcset="/landing/mobile-student.svg" />
+                <img src="/landing/student.svg" alt="" /></picture
+              >Estudiante</mat-button-toggle
+            >
+            <mat-button-toggle value="tutor"
+              ><picture
+                ><source media="(max-width: 767px)" srcset="/landing/mobile-tutor.svg" />
+                <img src="/landing/tutor.svg" alt="" /></picture
+              >Estudiante tutor</mat-button-toggle
+            >
+          </mat-button-toggle-group>
+        </div>
+        <p class="eyebrow">
+          {{
+            tutor ? 'LO QUE SABES PUEDE AYUDAR A ALGUIEN MÁS' : 'UN BUEN GRUPO CAMBIA CÓMO APRENDES'
+          }}
+        </p>
+        <h1 id="hero-title">
+          {{ tutor ? 'Enseña a tu ritmo.' : 'Aprende a tu ritmo.'
+          }}<span>{{ tutor ? 'Crece en equipo.' : 'Avanza en equipo.' }}</span>
+        </h1>
+        <p class="hero-description">
+          {{
+            tutor
+              ? 'Crea tu grupo de estudio, organiza tus sesiones y acompaña a otros estudiantes con tu propia forma de enseñar. Tu conocimiento también puede abrir caminos.'
+              : 'Encuentra tu grupo por curso o tema, comparte materiales y resuelve dudas con compañeros y tutores que entienden lo que estás aprendiendo.'
+          }}
+        </p>
+        <div class="hero-actions">
+          <a
+            mat-flat-button
+            [routerLink]="tutor ? '/grupos/crear' : '/grupos/descubrimiento'"
+            [queryParams]="{ rol: audience.controls.rol.value }"
+            >{{ tutor ? 'Empezar como tutor' : 'Encontrar mi grupo'
+            }}<img src="/landing/arrow.svg" alt="" /></a
+          ><a mat-stroked-button href="#como-funciona"
+            ><img src="/landing/play-outline.svg" alt="" />Ver cómo funciona</a
+          >
+        </div>
+        <p class="hero-note">Tu próximo paso empieza en la app web de Yachani.</p>
+        <ul class="hero-values">
+          @if (tutor) {
+            <li><strong>Guía</strong><span>con tu propio estilo</span></li>
+            <li><strong>Organiza</strong><span>tus grupos de estudio</span></li>
+            <li><strong>Comparte</strong><span>tu conocimiento</span></li>
+          } @else {
+            <li><strong>Conecta</strong><span>con tus compañeros</span></li>
+            <li><strong>Comparte</strong><span>lo que aprendes</span></li>
+            <li><strong>Avanza</strong><span>con tu comunidad</span></li>
+          }
+        </ul>
+      </div>
+      <figure class="scene" aria-label="Ejemplo ilustrativo de un grupo de estudio">
+        <div class="scene-stage">
+          <p class="scene-heading">
+            {{ tutor ? 'TU CONOCIMIENTO PUEDE SUMAR.' : 'UN TEMA EN COMÚN. MÁS IDEAS.' }}
+          </p>
+          <div class="group-card">
+            <div class="group-top">
+              <span class="course-tag"
+                ><img src="/landing/course.svg" alt="" />INGENIERÍA DE SOFTWARE</span
+              ><span class="group-symbol"><img src="/landing/scene-groups.svg" alt="" /></span>
+            </div>
+            <h2>
+              {{
+                tutor
+                  ? 'Una explicación puede cambiarlo todo.'
+                  : 'Las dudas se resuelven mejor juntos.'
+              }}
+            </h2>
+            <p>
+              {{
+                tutor
+                  ? 'Guía el repaso y ayuda a tu grupo a conectar las ideas, paso a paso.'
+                  : 'Un espacio para repasar, preguntar y compartir distintas formas de entender.'
+              }}
+            </p>
+            <div class="topic-tags">
+              <span>Diagramas UML</span><span>Casos de uso</span><span>Buenas prácticas</span>
+            </div>
+            <div class="community">
+              <div class="scene-avatars">
+                @for (initials of ['AH', 'LR', 'DF', 'CM']; track initials) {
+                  <span>{{ initials }}</span>
+                }
+              </div>
+              <span>{{
+                tutor ? 'Una comunidad que aprende contigo' : 'Compañeros que aprenden contigo'
+              }}</span>
+            </div>
+          </div>
+          <div class="scene-bottom">
+            <div class="chat-card">
+              <picture
+                ><source media="(max-width: 767px)" srcset="/landing/mobile-scene-chat.svg" />
+                <img src="/landing/scene-chat.svg" alt="" /></picture
+              ><small>{{
+                tutor ? 'Tú propones. El grupo participa.' : 'Una pregunta abre la conversación'
+              }}</small>
+              <p>
+                {{
+                  tutor
+                    ? 'Hoy practicamos diagramas de clases. ¿Empezamos?'
+                    : '¿Repasamos los diagramas de clases hoy?'
+                }}
+              </p>
+            </div>
+            <div class="flash-card">
+              <picture
+                ><source media="(max-width: 767px)" srcset="/landing/mobile-scene-flashcards.svg" />
+                <img src="/landing/scene-flashcards.svg" alt="" /></picture
+              ><small>{{ tutor ? 'REFUERZA LO QUE ENSEÑAS' : 'UN CONCEPTO A LA VEZ' }}</small>
+              <p>
+                {{ tutor ? 'Explicar. Practicar. Acompañar.' : 'Entender. Practicar. Recordar.' }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="ai-chip">
+          <span
+            ><picture
+              ><source media="(max-width: 767px)" srcset="/landing/mobile-ai.svg" />
+              <img src="/landing/ai.svg" alt="" /></picture
+          ></span>
+          <div>
+            <strong>{{
+              tutor ? 'Organiza ideas con ayuda de IA' : 'Conexiones con ayuda de IA'
+            }}</strong
+            ><small>{{
+              tutor ? 'Da forma al próximo repaso' : 'Encuentra afinidad para estudiar'
+            }}</small>
+          </div>
+        </div>
+        <figcaption>Una muestra de cómo se vive el aprendizaje en comunidad.</figcaption>
+      </figure>
+    </div>
+    <a class="scroll-hint" href="#quienes-somos">Conoce lo que nos mueve</a>
+  </section>
+  <section class="about section" id="quienes-somos" aria-labelledby="about-title">
+    <div class="container flow">
+      <div class="about-intro">
+        <div>
+          <span class="outline-badge">Quiénes somos</span>
+          <h2 id="about-title">Hecho por estudiantes,<br /><span>para estudiantes</span></h2>
+          <p>
+            Somos un equipo de estudiantes de la UPC. Vivimos lo difícil que es coordinar grupos de
+            estudio por WhatsApp, con horarios que chocan y materiales perdidos.<br />Por eso
+            creamos Yachani.
+          </p>
+        </div>
+        <dl class="stats">
+          <div>
+            <dt>+1 200</dt>
+            <dd>estudiantes</dd>
+          </div>
+          <div>
+            <dt>350</dt>
+            <dd>grupos activos</dd>
+          </div>
+          <div>
+            <dt>40</dt>
+            <dd>cursos</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="grid two">
+        <mat-card class="panel" id="mision"
+          ><span class="icon-box"><img src="/landing/mission.svg" alt="" /></span>
+          <h3>Misión</h3>
+          <p>
+            Facilitar el aprendizaje colaborativo entre universitarios, conectándolos con compañeros
+            y tutores compatibles en un espacio organizado y seguro.
+          </p></mat-card
+        ><mat-card class="panel"
+          ><span class="icon-box"><img src="/landing/vision.svg" alt="" /></span>
+          <h3>Visión</h3>
+          <p>
+            Ser la plataforma de referencia en el Perú para estudiar en grupo y aprender entre
+            pares, ayudando a reducir la deserción universitaria.
+          </p></mat-card
+        >
+      </div>
+      <h3 class="center">Nuestros valores</h3>
+      <div class="grid four">
+        @for (value of values; track value.title) {
+          <mat-card class="panel"
+            ><span class="icon-box"><img [src]="'/landing/' + value.icon + '.svg'" alt="" /></span>
+            <h3>{{ value.title }}</h3>
+            <p>{{ value.text }}</p></mat-card
+          >
+        }
+      </div>
+      <div class="team-panel">
+        <div class="team-heading">
+          <h3>Nuestro equipo</h3>
+          <p>Nombre del equipo · Ingeniería de Software · UPC</p>
+        </div>
+        <div class="grid four">
+          @for (member of team; track member.name) {
+            <div class="team-member">
+              <span class="avatar">{{ member.initials }}</span>
+              <div>
+                <strong>{{ member.name }}</strong
+                ><small>Integrante</small>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section alternate" id="beneficios" aria-labelledby="benefits-title">
+    <div class="container flow">
+      <header class="section-heading">
+        <span class="badge">Beneficios</span>
+        <h2 id="benefits-title">Todo lo que necesitas para estudiar en grupo</h2>
+        <p>
+          <span class="desktop-text"
+            >Herramientas pensadas para que estudiar con otros sea fácil, ordenado y
+            motivador.</span
+          ><span class="mobile-text"
+            >Herramientas para que estudiar con otros sea fácil y motivador.</span
+          >
+        </p>
+      </header>
+      <div class="grid four">
+        @for (benefit of benefits; track benefit.title) {
+          <mat-card class="panel"
+            ><span class="icon-box"
+              ><img [src]="'/landing/' + benefit.icon + '.svg'" alt=""
+            /></span>
+            <h3>{{ benefit.title }}</h3>
+            <p>{{ benefit.text }}</p></mat-card
+          >
+        }
+      </div>
+    </div>
+  </section>
+  <section class="section" id="como-funciona" aria-labelledby="steps-title">
+    <div class="container flow">
+      <header class="section-heading">
+        <span class="badge">Cómo funciona</span>
+        <h2 id="steps-title">
+          <span class="desktop-text">Empieza a estudiar en tres pasos</span
+          ><span class="mobile-text">Empieza en tres pasos</span>
+        </h2>
+        <p class="desktop-text">Sin complicaciones: crea tu cuenta, encuentra un grupo y súmate.</p>
+      </header>
+      <div class="grid three">
+        @for (step of steps; track step.number) {
+          <mat-card class="panel"
+            ><div class="step-icon">
+              <span class="icon-box"><img [src]="'/landing/' + step.icon + '.svg'" alt="" /></span
+              ><span class="step-number">{{ step.number }}</span>
+            </div>
+            <h3>{{ step.title }}</h3>
+            <p>
+              <span class="desktop-text">{{ step.text }}</span
+              ><span class="mobile-text">{{ step.mobile }}</span>
+            </p></mat-card
+          >
+        }
+      </div>
+      <div class="grid two">
+        @for (role of roleBenefits; track role.title) {
+          <mat-card class="panel"
+            ><h3>{{ role.title }}</h3>
+            <ul class="check-list">
+              @for (item of role.items; track item.text) {
+                <li>
+                  <span><img src="/landing/check.svg" alt="" /></span>
+                  <p>
+                    <span class="desktop-text">{{ item.text }}</span
+                    ><span class="mobile-text">{{ item.mobile }}</span>
+                  </p>
+                </li>
+              }
+            </ul></mat-card
+          >
+        }
+      </div>
+    </div>
+  </section>
+  <section class="section alternate" id="tutorial" aria-labelledby="video-title">
+    <div class="container flow">
+      <header class="section-heading">
+        <span class="badge">Video</span>
+        <h2 id="video-title">Mira cómo funciona Yachani</h2>
+        <p>En menos de 2 minutos te mostramos cómo encontrar tu grupo y empezar a estudiar.</p>
+      </header>
+      <!-- Vista previa del frame. Figma no incluye un archivo de video reproducible. -->
+      <figure
+        class="video-preview"
+        aria-label="Vista previa del tutorial, duración 1 minuto y 45 segundos"
+      >
+        <picture class="video-glow"
+          ><source media="(max-width: 767px)" srcset="/landing/mobile-video-glow.svg" />
+          <img src="/landing/video-glow.svg" alt=""
+        /></picture>
+        <picture class="play-halo"
+          ><source media="(max-width: 767px)" srcset="/landing/mobile-play-halo.svg" />
+          <img src="/landing/play-halo.svg" alt=""
+        /></picture>
+        <picture class="play-button"
+          ><source media="(max-width: 767px)" srcset="/landing/mobile-play-button.svg" />
+          <img src="/landing/play-button.svg" alt=""
+        /></picture>
+        <picture class="play-icon"
+          ><source media="(max-width: 767px)" srcset="/landing/mobile-play-icon.svg" />
+          <img src="/landing/play-icon.svg" alt=""
+        /></picture>
+        <figcaption>Tutorial · 1:45 min</figcaption>
+        <div class="video-controls">
+          <img class="desktop-text" src="/landing/play-small.svg" alt="" /><span
+            class="video-progress"
+            ><span></span></span
+          ><span class="desktop-text">0:00 / 1:45</span>
+        </div>
+      </figure>
+      <ol class="chapters">
+        @for (chapter of chapters; track chapter.time) {
+          <li>
+            <strong>{{ chapter.time }}</strong
+            >{{ chapter.label }}
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+  <section class="section" id="para-quien" aria-labelledby="audiences-title">
+    <div class="container flow">
+      <header class="section-heading">
+        <span class="badge">Para quién es</span>
+        <h2 id="audiences-title">¿Para quién es Yachani?</h2>
+        <p>
+          Para universitarios que quieren aprender en comunidad, y para quienes disfrutan enseñar.
+        </p>
+      </header>
+      <div class="grid three">
+        @for (item of audiences; track item.title) {
+          <mat-card class="panel"
+            ><span class="icon-box"><img [src]="'/landing/' + item.icon + '.svg'" alt="" /></span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.text }}</p></mat-card
+          >
+        }
+      </div>
+      <h3 class="center">Lo que dicen nuestros usuarios</h3>
+      <div class="grid three">
+        @for (testimonial of testimonials; track testimonial.role) {
+          <mat-card class="panel testimonial"
+            ><div class="stars" aria-label="5 de 5 estrellas">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+                <img src="/landing/star.svg" alt="" />
+              }
+            </div>
+            <blockquote>{{ testimonial.text }}</blockquote>
+            <div class="testimonial-person">
+              <span class="avatar">NA</span>
+              <div>
+                <strong>Nombre Apellido</strong><small>{{ testimonial.role }}</small>
+              </div>
+            </div></mat-card
+          >
+        }
+      </div>
+    </div>
+  </section>
+  <section class="section" id="preguntas-frecuentes" aria-labelledby="faq-title">
+    <div class="container narrow flow">
+      <header class="faq-heading">
+        <div>
+          <span class="outline-badge">Centro de ayuda</span>
+          <h2 id="faq-title">Preguntas <span>frecuentes</span></h2>
+          <p>
+            Resolvemos las dudas más comunes para que puedas aprovechar Yachani y encontrar tu grupo
+            de estudio ideal.
+          </p>
+        </div>
+        <a mat-stroked-button href="#contacto">¿Necesitas más ayuda?</a>
+      </header>
+      <div class="faq-list">
+        @for (question of questions; track question) {
+          <mat-card class="faq-row"
+            ><h3>{{ question }}</h3>
+            <span aria-hidden="true">+</span></mat-card
+          >
+        }
+      </div>
+    </div>
+  </section>
+  <section class="section contact-section" id="contacto" aria-labelledby="contact-title">
+    <div class="container narrow contact-grid">
+      <div class="contact-copy">
+        <span class="outline-badge">Estamos para ayudarte</span>
+        <h2 id="contact-title">Contáctanos<span>.</span></h2>
+        <p>
+          ¿Tienes alguna duda o necesitas ayuda? Escríbenos y nuestro equipo se pondrá en contacto
+          contigo lo antes posible.
+        </p>
+        <dl class="contact-details">
+          @for (item of contact; track item.label) {
+            <div>
+              <span class="contact-icon"
+                ><img [src]="'/landing/' + item.icon + '.svg'" alt=""
+              /></span>
+              <div>
+                <dt>{{ item.label }}</dt>
+                <dd>
+                  @if (item.icon === 'email') {
+                    <a href="mailto:contacto@yachani.pe">{{ item.value }}</a>
+                  } @else {
+                    {{ item.value }}
+                  }
+                </dd>
+              </div>
+            </div>
+          }
+        </dl>
+      </div>
+      <form class="contact-card" [formGroup]="contactForm" aria-label="Formulario de contacto">
+        <div class="grid two">
+          <mat-form-field appearance="outline" hideRequiredMarker
+            ><mat-label>Nombre</mat-label
+            ><input matInput formControlName="nombre" autocomplete="name" />
+            @if (contactForm.controls.nombre.touched && contactForm.controls.nombre.invalid) {
+              <mat-error>Ingresa tu nombre.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" hideRequiredMarker
+            ><mat-label>Correo</mat-label
+            ><input matInput type="email" formControlName="correo" autocomplete="email" />
+            @if (contactForm.controls.correo.touched && contactForm.controls.correo.invalid) {
+              <mat-error>Ingresa un correo electrónico válido.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline" hideRequiredMarker
+          ><mat-label>Asunto</mat-label><input matInput formControlName="asunto" />
+          @if (contactForm.controls.asunto.touched && contactForm.controls.asunto.invalid) {
+            <mat-error>Ingresa el asunto.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" hideRequiredMarker
+          ><mat-label>Mensaje</mat-label
+          ><textarea matInput formControlName="mensaje" rows="5"></textarea>
+          @if (contactForm.controls.mensaje.touched && contactForm.controls.mensaje.invalid) {
+            <mat-error>Escribe tu mensaje.</mat-error>
+          }
+        </mat-form-field>
+        <button mat-flat-button type="button" [disabled]="contactForm.invalid">
+          Enviar mensaje
+        </button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="container narrow">
+    <div class="footer-grid">
+      <div>
+        <a class="footer-brand" href="#inicio"
+          ><span><img src="/landing/footer-brand.svg" alt="" /></span>Yachani</a
+        >
+        <p>Conectamos estudiantes y tutores<br />para aprender, colaborar y avanzar juntos.</p>
+        <div class="social-labels" aria-label="Redes sociales"><span>IG</span><span>FB</span></div>
+      </div>
+      <nav aria-label="Producto">
+        <h3>Producto</h3>
+        <a href="#como-funciona">Cómo funciona</a
+        ><a href="#preguntas-frecuentes">Preguntas frecuentes</a
+        ><a routerLink="/grupos/descubrimiento" [queryParams]="{ rol: audience.controls.rol.value }"
+          >Grupos de estudio</a
+        >
+      </nav>
+      <nav aria-label="Empresa">
+        <h3>Empresa</h3>
+        <a href="#quienes-somos">Quiénes somos</a><a href="#mision">Misión</a
+        ><a href="#contacto">Contáctanos</a>
+      </nav>
+      <div>
+        <h3>Legal</h3>
+        <p>Términos y condiciones</p>
+        <p>Política de privacidad</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Yachani. Todos los derechos reservados.</p>
+      <a href="#inicio">Volver arriba ↑</a>
+    </div>
+  </div>
+</footer>
