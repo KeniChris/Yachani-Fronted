@@ -1,6 +1,0 @@
-.request-card { display: flex; flex-direction: column; gap: 12px; }
-.request-head { display: flex; align-items: center; gap: 12px; }.request-person { flex: 1; min-width: 0; }.request-person h3 { font-size: 15px; line-height: 22px; }.request-person p { margin: 0; color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
-.request-group { display: flex; align-items: center; gap: 4px; margin-top: 2px !important; }.request-group mat-icon { width: 14px; height: 14px; font-size: 14px; color: var(--color-primary); }.request-group strong { color: var(--color-text); }
-.request-message { margin: 0; padding: 10px 14px; border-radius: var(--radius-control); background: var(--color-background); font-size: 13px; line-height: 20px; font-style: italic; overflow-wrap: anywhere; }
-.request-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }.request-actions button { min-width: 120px; }
-@media (max-width: 520px) { .request-head { flex-wrap: wrap; }.request-actions button { flex: 1; } }
