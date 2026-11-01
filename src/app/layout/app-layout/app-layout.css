@@ -181,6 +181,10 @@ main {
 .mobile-menu-content {
   min-height: 100dvh;
 }
+.close-menu {
+  align-self: flex-end;
+  flex: none;
+}
 @media (max-width: 767px) {
   .sidebar,
   .topbar-profile,
@@ -189,6 +193,12 @@ main {
   }
   .shell {
     margin-left: 0;
+    width: 100%;
+    min-width: 0;
+  }
+  mat-sidenav-content {
+    min-width: 0;
+    overflow-x: hidden;
   }
   .topbar {
     height: var(--mobile-topbar-height);

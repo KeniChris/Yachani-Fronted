@@ -29,6 +29,8 @@ import { Brand } from '../brand/brand';
 export class AppLayout {
   // Variante visual mediante datos de ruta o ?rol=tutor; sin autenticación.
   @Input() rol: 'estudiante' | 'tutor' = 'estudiante';
+  // La variante visual no proporciona identidad ni representa una sesión.
+  @Input() usuario: { nombre: string; iniciales?: string; rol?: string } | null = null;
   // Texto de cabecera para contextos de grupo; por defecto se muestra la ruta activa.
   @Input() ruta = '';
   readonly navigation = {

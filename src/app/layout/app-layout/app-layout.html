@@ -1,15 +1,16 @@
 <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
 <ng-template #accountIdentity>
-  <span class="avatar" aria-hidden="true">{{ rol === 'tutor' ? 'CR' : 'LC' }}</span>
-  <span class="identity"
-    ><span class="user-name">
-      @if (rol === 'tutor') {
-        Carlos R&#237;os
-      } @else {
-        Leicy Cahuana
-      }</span
-    ><span class="user-role">{{ rol === 'tutor' ? 'Tutor' : 'Estudiante' }}</span></span
-  >
+  @if (usuario?.nombre) {
+    @if (usuario?.iniciales) {
+      <span class="avatar" aria-hidden="true">{{ usuario?.iniciales }}</span>
+    }
+    <span class="identity"
+      ><span class="user-name">{{ usuario?.nombre }}</span>
+      @if (usuario?.rol) {
+        <span class="user-role">{{ usuario?.rol }}</span>
+      }
+    </span>
+  }
 </ng-template>
 <ng-template #navigationContent>
   <a
@@ -28,6 +29,12 @@
           [routerLink]="item.path"
           queryParamsHandling="preserve"
           routerLinkActive="active"
+          [routerLinkActiveOptions]="{
+            paths: item.path === '/inicio' ? 'exact' : 'subset',
+            queryParams: 'ignored',
+            matrixParams: 'ignored',
+            fragment: 'ignored',
+          }"
           ariaCurrentWhenActive="page"
           (click)="menu.close()"
         >
@@ -49,14 +56,16 @@
       <h2>&#191;Necesitas ayuda?</h2>
       <p>Revisa las preguntas frecuentes o cont&#225;ctanos.</p>
     </section>
-    <a
-      class="profile-link"
-      routerLink="/perfiles"
-      queryParamsHandling="preserve"
-      (click)="menu.close()"
-      aria-label="Abrir mi perfil"
-      ><ng-container [ngTemplateOutlet]="accountIdentity"
-    /></a>
+    @if (usuario?.nombre) {
+      <a
+        class="profile-link"
+        routerLink="/perfiles"
+        queryParamsHandling="preserve"
+        (click)="menu.close()"
+        aria-label="Abrir mi perfil"
+        ><ng-container [ngTemplateOutlet]="accountIdentity"
+      /></a>
+    }
   </div>
 </ng-template>
 <ng-template #routeTitle>
@@ -69,6 +78,12 @@
         [routerLink]="item.path"
         queryParamsHandling="preserve"
         routerLinkActive="current-route"
+        [routerLinkActiveOptions]="{
+          paths: item.path === '/inicio' ? 'exact' : 'subset',
+          queryParams: 'ignored',
+          matrixParams: 'ignored',
+          fragment: 'ignored',
+        }"
         >{{ item.label }}</a
       >
     }
@@ -106,22 +121,37 @@
 <aside class="sidebar yachani-dark" aria-label="Barra lateral">
   <ng-container [ngTemplateOutlet]="navigationContent" />
 </aside>
-<mat-sidenav-container class="shell">
+<mat-sidenav-container class="shell" [hasBackdrop]="true">
   <mat-sidenav
     #menu
+    id="mobile-menu"
     class="mobile-menu yachani-dark"
     mode="over"
     [fixedInViewport]="true"
+    [disableClose]="false"
     aria-label="Men&#250; completo"
   >
-    <div class="mobile-menu-content"><ng-container [ngTemplateOutlet]="navigationContent" /></div>
+    <div class="mobile-menu-content">
+      <button
+        mat-icon-button
+        class="close-menu"
+        type="button"
+        (click)="menu.close()"
+        aria-label="Cerrar menú"
+      >
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+      <ng-container [ngTemplateOutlet]="navigationContent" />
+    </div>
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar class="topbar">
       <button
         mat-icon-button
         class="open-menu"
-        (click)="menu.toggle()"
+        type="button"
+        (click)="menu.open()"
+        aria-controls="mobile-menu"
         aria-label="Abrir navegaci&#243;n"
         [attr.aria-expanded]="menu.opened"
       >
@@ -142,13 +172,15 @@
           ><img src="/icons/mobile/notifications.svg" alt="" width="24" height="24"
         /></mat-icon>
       </a>
-      <a
-        class="topbar-profile"
-        routerLink="/perfiles"
-        queryParamsHandling="preserve"
-        aria-label="Abrir mi perfil"
-        ><ng-container [ngTemplateOutlet]="accountIdentity"
-      /></a>
+      @if (usuario?.nombre) {
+        <a
+          class="topbar-profile"
+          routerLink="/perfiles"
+          queryParamsHandling="preserve"
+          aria-label="Abrir mi perfil"
+          ><ng-container [ngTemplateOutlet]="accountIdentity"
+        /></a>
+      }
     </mat-toolbar>
     <main id="contenido-principal" tabindex="-1"><router-outlet /></main>
     <nav class="mobile-navigation" aria-label="Navegaci&#243;n m&#243;vil">
@@ -158,6 +190,12 @@
           [routerLink]="item.path"
           queryParamsHandling="preserve"
           routerLinkActive="active"
+          [routerLinkActiveOptions]="{
+            paths: item.path === '/inicio' ? 'exact' : 'subset',
+            queryParams: 'ignored',
+            matrixParams: 'ignored',
+            fragment: 'ignored',
+          }"
           ariaCurrentWhenActive="page"
           ><span class="mobile-item"
             ><mat-icon
@@ -172,7 +210,9 @@
       }
       <button
         mat-button
-        (click)="menu.toggle()"
+        type="button"
+        (click)="menu.open()"
+        aria-controls="mobile-menu"
         aria-label="M&#225;s opciones, abrir men&#250; completo"
         [attr.aria-expanded]="menu.opened"
       >
