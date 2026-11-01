@@ -160,7 +160,9 @@
             [attr.aria-pressed]="mostrarContrasena"
             (click)="mostrarContrasena = !mostrarContrasena"
           >
-            <img src="/icons/auth/registro-visibility.svg" width="20" height="20" alt="" />
+            <mat-icon class="password-icon" fontSet="material-symbols-rounded" aria-hidden="true">{{
+              mostrarContrasena ? 'visibility_off' : 'visibility'
+            }}</mat-icon>
           </button>
           @if (
             form.controls.contrasena.invalid &&
@@ -190,15 +192,13 @@
             mat-icon-button
             matSuffix
             type="button"
-            [attr.aria-label]="
-              mostrarConfirmacion
-                ? 'Ocultar confirmación de contraseña'
-                : 'Mostrar confirmación de contraseña'
-            "
+            [attr.aria-label]="mostrarConfirmacion ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             [attr.aria-pressed]="mostrarConfirmacion"
             (click)="mostrarConfirmacion = !mostrarConfirmacion"
           >
-            <img src="/icons/auth/registro-visibility.svg" width="20" height="20" alt="" />
+            <mat-icon class="password-icon" fontSet="material-symbols-rounded" aria-hidden="true">{{
+              mostrarConfirmacion ? 'visibility_off' : 'visibility'
+            }}</mat-icon>
           </button>
           @if (
             (form.controls.confirmacion.invalid || form.hasError('contrasenasDiferentes')) &&

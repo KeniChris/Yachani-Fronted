@@ -60,16 +60,16 @@
           [attr.aria-pressed]="mostrarContrasena"
           (click)="mostrarContrasena = !mostrarContrasena"
         >
-          <img src="/icons/auth/visibility.svg" alt="" width="20" height="20" />
+          <mat-icon class="password-icon" fontSet="material-symbols-rounded" aria-hidden="true">{{
+            mostrarContrasena ? 'visibility_off' : 'visibility'
+          }}</mat-icon>
         </button>
         @if (form.controls.contrasena.touched && form.controls.contrasena.invalid) {
           <mat-error>La contraseña es obligatoria</mat-error>
         }
       </mat-form-field>
       <a class="recovery" routerLink="/auth/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
-      <button class="login-button" mat-flat-button type="submit">
-        Iniciar sesión
-      </button>
+      <button class="login-button" mat-flat-button type="submit">Iniciar sesión</button>
     </form>
     <p class="register">¿No tienes cuenta? <a routerLink="/auth/registro">Regístrate</a></p>
   </section>

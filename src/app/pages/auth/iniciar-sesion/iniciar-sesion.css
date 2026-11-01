@@ -4,6 +4,12 @@
   max-width: 475px;
   margin-inline: auto;
 }
+.password-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+}
 :host:has(.credentials-error) {
   max-width: 580px;
 }

@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { ErrorStateMatcher } from '@angular/material/core';
 
@@ -22,6 +23,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatIconModule,
     MatRadioModule,
   ],
   templateUrl: './registro.html',

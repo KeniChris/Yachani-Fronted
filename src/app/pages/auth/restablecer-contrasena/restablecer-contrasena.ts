@@ -9,6 +9,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ErrorStateMatcher } from '@angular/material/core';
 
@@ -16,7 +17,14 @@ import { ErrorStateMatcher } from '@angular/material/core';
   selector: 'app-restablecer-contrasena',
   standalone: true,
   host: { class: 'recovery-page' },
-  imports: [ReactiveFormsModule, RouterLink, MatButtonModule, MatInputModule, MatFormFieldModule],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatIconModule,
+  ],
   templateUrl: './restablecer-contrasena.html',
   styleUrl: './restablecer-contrasena.css',
 })
