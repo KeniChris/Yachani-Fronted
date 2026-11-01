@@ -1,0 +1,268 @@
+@if (previsualizacion && estado === 'confirmacion') {
+  <section class="card success" role="status" aria-labelledby="success-title">
+    <span class="success-icon" aria-hidden="true"
+      ><mat-icon fontSet="material-symbols-rounded">check</mat-icon></span
+    >
+    <h1 id="success-title">¡Tu perfil está listo!</h1>
+    <p>Ya podemos recomendarte grupos de estudio según tus preferencias.</p>
+    <a mat-flat-button class="primary" routerLink="/inicio" [queryParams]="{ rol: 'estudiante' }"
+      >Ir al inicio</a
+    >
+  </section>
+} @else {
+  <header class="intro">
+    <h1>Completa tu perfil de estudiante</h1>
+    <p>Esta información nos ayudará a recomendarte grupos compatibles contigo.</p>
+  </header>
+  <ol class="steps" aria-label="Pasos de configuración">
+    <li class="active" [class.done]="paso === 2" [attr.aria-current]="paso === 1 ? 'step' : null">
+      <span class="dot">
+        @if (paso === 2) {
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon>
+        } @else {
+          1
+        }</span
+      ><span class="step-label">Perfil académico</span>
+    </li>
+    <li [class.active]="paso === 2" [attr.aria-current]="paso === 2 ? 'step' : null">
+      <span class="dot">2</span><span class="step-label">Preferencias</span>
+    </li>
+  </ol>
+  <section
+    class="card"
+    [attr.aria-labelledby]="paso === 1 ? 'academic-title' : 'preferences-title'"
+  >
+    @if (paso === 1) {
+      <form [formGroup]="academico" (ngSubmit)="siguiente()">
+        <div class="content">
+          <header class="panel-head">
+            <span class="panel-icon" aria-hidden="true"
+              ><mat-icon fontSet="material-symbols-rounded">school</mat-icon></span
+            >
+            <div>
+              <h2 id="academic-title">Perfil académico</h2>
+              <p>Cuéntanos qué estudias y cuál es tu nivel en cada curso.</p>
+            </div>
+          </header>
+          <div class="academic-grid">
+            <div class="field">
+              <label for="university">Universidad <span>*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                ><input
+                  matInput
+                  id="university"
+                  formControlName="universidad"
+                  [errorStateMatcher]="errorMatcher"
+                  required
+                />
+                @if (
+                  academico.controls.universidad.invalid &&
+                  (academico.controls.universidad.dirty || academico.controls.universidad.touched)
+                ) {
+                  <mat-error>La universidad es obligatoria</mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <div class="field">
+              <label for="career">Carrera <span>*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                ><input
+                  matInput
+                  id="career"
+                  formControlName="carrera"
+                  placeholder="Ej. Ingeniería de Software"
+                  [errorStateMatcher]="errorMatcher"
+                  required
+                />
+                @if (
+                  academico.controls.carrera.invalid &&
+                  (academico.controls.carrera.dirty || academico.controls.carrera.touched)
+                ) {
+                  <mat-error>La carrera es obligatoria</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+          <section class="courses-box" aria-labelledby="courses-title">
+            <div class="box-heading">
+              <h3 id="courses-title">Cursos y nivel de conocimiento</h3>
+              <button mat-stroked-button type="button" (click)="agregarCurso()">
+                <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">add</mat-icon>
+                Agregar curso
+              </button>
+            </div>
+            <div formArrayName="cursos">
+              @for (curso of cursos.controls; track curso; let i = $index) {
+                <div class="course-row" [formGroupName]="i">
+                  <div class="field course-name">
+                    <label [for]="'course-' + i">Curso</label>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                      ><input
+                        matInput
+                        [id]="'course-' + i"
+                        formControlName="nombre"
+                        placeholder="Ej. Base de datos"
+                        [errorStateMatcher]="cursoMatcher"
+                        required
+                      />
+                      @if (
+                        (curso.controls.nombre.invalid ||
+                          esDuplicado(curso.controls.nombre.value)) &&
+                        (curso.controls.nombre.dirty || curso.controls.nombre.touched)
+                      ) {
+                        <mat-error>{{
+                          curso.controls.nombre.invalid
+                            ? 'Ingresa el nombre del curso'
+                            : 'Este curso ya fue agregado'
+                        }}</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
+                  <div class="field course-level">
+                    <label [id]="'level-label-' + i">Nivel</label>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                      ><mat-select
+                        formControlName="nivel"
+                        placeholder="Seleccionar"
+                        [aria-labelledby]="'level-label-' + i"
+                        [errorStateMatcher]="errorMatcher"
+                        required
+                      >
+                        @for (nivel of niveles; track nivel) {
+                          <mat-option [value]="nivel">{{ nivel }}</mat-option>
+                        }
+                      </mat-select>
+                      @if (
+                        curso.controls.nivel.invalid &&
+                        (curso.controls.nivel.dirty || curso.controls.nivel.touched)
+                      ) {
+                        <mat-error>Selecciona un nivel de conocimiento</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
+                  <button
+                    mat-icon-button
+                    class="delete-course"
+                    type="button"
+                    [attr.aria-label]="'Eliminar curso ' + (i + 1)"
+                    (click)="eliminarCurso(i)"
+                  >
+                    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true"
+                      >delete</mat-icon
+                    >
+                  </button>
+                </div>
+              }
+            </div>
+            @if (cursos.hasError('sinCursos') && cursos.touched) {
+              <mat-error>Agrega al menos un curso completo</mat-error>
+            }
+          </section>
+        </div>
+        <footer class="actions first">
+          <button mat-flat-button class="primary" type="submit">Siguiente</button>
+        </footer>
+      </form>
+    } @else {
+      <form [formGroup]="preferencias" (ngSubmit)="finalizar()">
+        <div class="content">
+          <header class="panel-head">
+            <span class="panel-icon" aria-hidden="true"
+              ><mat-icon fontSet="material-symbols-rounded">psychology</mat-icon></span
+            >
+            <div>
+              <h2 id="preferences-title">Preferencias de estudio</h2>
+              <p>Elige cómo prefieres aprender para encontrar grupos más compatibles.</p>
+            </div>
+          </header>
+          <div class="preference-section">
+            <label id="modality-label">Modalidad preferida <span>*</span></label>
+            <mat-button-toggle-group
+              class="modalities"
+              formControlName="modalidad"
+              aria-labelledby="modality-label"
+              [hideSingleSelectionIndicator]="true"
+            >
+              @for (modalidad of modalidades; track modalidad) {
+                <mat-button-toggle [value]="modalidad">{{ modalidad }}</mat-button-toggle>
+              }
+            </mat-button-toggle-group>
+            @if (
+              preferencias.controls.modalidad.invalid &&
+              (preferencias.controls.modalidad.dirty || preferencias.controls.modalidad.touched)
+            ) {
+              <mat-error>Selecciona una modalidad</mat-error>
+            }
+          </div>
+          <div class="preference-section">
+            <label id="method-label">Método de estudio <span>*</span></label>
+            <mat-button-toggle-group
+              class="methods"
+              formControlName="metodo"
+              aria-labelledby="method-label"
+              [hideSingleSelectionIndicator]="true"
+            >
+              @for (metodo of metodos; track metodo) {
+                <mat-button-toggle [value]="metodo">{{ metodo }}</mat-button-toggle>
+              }
+            </mat-button-toggle-group>
+            @if (
+              preferencias.controls.metodo.invalid &&
+              (preferencias.controls.metodo.dirty || preferencias.controls.metodo.touched)
+            ) {
+              <mat-error>Selecciona un método de estudio</mat-error>
+            }
+          </div>
+          <div class="preference-section">
+            <label for="topic">Temas de interés</label>
+            <div class="topic-entry">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                ><input
+                  matInput
+                  id="topic"
+                  formControlName="tema"
+                  placeholder="Ej. Base de datos"
+                  [errorStateMatcher]="errorMatcher"
+                  (keydown.enter)="$event.preventDefault(); agregarTema()"
+                />
+                @if (
+                  preferencias.controls.tema.invalid &&
+                  (preferencias.controls.tema.dirty || preferencias.controls.tema.touched)
+                ) {
+                  <mat-error>{{
+                    preferencias.controls.tema.hasError('duplicado')
+                      ? 'Este tema ya fue agregado'
+                      : 'Ingresa un tema de interés'
+                  }}</mat-error>
+                }</mat-form-field
+              ><button mat-stroked-button type="button" (click)="agregarTema()">Agregar</button>
+            </div>
+            <mat-chip-set aria-label="Temas de interés agregados">
+              @for (tema of temas; track tema; let i = $index) {
+                <mat-chip (removed)="eliminarTema(i)"
+                  >{{ tema
+                  }}<button matChipRemove type="button" [attr.aria-label]="'Eliminar tema ' + tema">
+                    <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+                  </button></mat-chip
+                >
+              }
+            </mat-chip-set>
+          </div>
+        </div>
+        <footer class="actions">
+          <button mat-stroked-button type="button" (click)="paso = 1">Atrás</button
+          ><button mat-flat-button class="primary" type="submit">Finalizar</button>
+        </footer>
+      </form>
+    }
+  </section>
+}
+@if (previsualizacion) {
+  <nav class="preview" aria-label="Previsualización">
+    <span>Previsualización</span
+    ><button mat-button type="button" (click)="estado = 'formulario'; paso = 1">
+      Perfil académico</button
+    ><button mat-button type="button" (click)="estado = 'formulario'; paso = 2">Preferencias</button
+    ><button mat-button type="button" (click)="estado = 'confirmacion'">Confirmación</button>
+  </nav>
+}
