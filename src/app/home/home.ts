@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,7 +25,63 @@ import { MatMenuModule } from '@angular/material/menu';
   styleUrl: './home.css',
   host: { class: 'yachani-dark' },
 })
-export class Home {
+export class Home implements OnDestroy {
+  @ViewChild('pageNavigation') private pageNavigation?: ElementRef<HTMLElement>;
+  seccionActiva = 'inicio';
+  indicador = { izquierda: 0, arriba: 0, ancho: 0 };
+  private resizeObserver?: ResizeObserver;
+
+  constructor(private host: ElementRef<HTMLElement>, private changeDetector: ChangeDetectorRef) {
+    afterNextRender(() => {
+      this.actualizarSeccion();
+      this.resizeObserver = new ResizeObserver(() => this.actualizarIndicador());
+      const nav = this.pageNavigation?.nativeElement;
+      if (nav) {
+        this.resizeObserver.observe(nav);
+        nav.querySelectorAll('[data-anchor]').forEach((label) => this.resizeObserver!.observe(label));
+      }
+    });
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  actualizarSeccion(): void {
+    const limite = window.innerHeight * 0.3;
+    let activa = 'inicio';
+    for (const link of this.navigation) {
+      const section = this.host.nativeElement.querySelector<HTMLElement>('#' + link.anchor);
+      if (section && section.getBoundingClientRect().top <= limite) activa = link.anchor;
+    }
+    if (window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+      activa = 'contacto';
+    }
+    this.seccionActiva = activa;
+    this.actualizarIndicador();
+  }
+
+  irASeccion(event: MouseEvent, anchor: string): void {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const section = this.host.nativeElement.querySelector<HTMLElement>('#' + anchor);
+    if (!section) return;
+    event.preventDefault();
+    this.seccionActiva = anchor;
+    this.actualizarIndicador();
+    section.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+  }
+
+  private actualizarIndicador(): void {
+    const nav = this.pageNavigation?.nativeElement;
+    const label = nav?.querySelector<HTMLElement>('[data-anchor="' + this.seccionActiva + '"]');
+    if (!nav || !label) return;
+    const parent = nav.getBoundingClientRect();
+    const rect = label.getBoundingClientRect();
+    this.indicador = { izquierda: rect.left - parent.left, arriba: rect.bottom - parent.top + 6, ancho: rect.width };
+    this.changeDetector.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+  }
   readonly audience = new FormGroup({
     rol: new FormControl('estudiante', { nonNullable: true }),
   });
@@ -151,30 +207,30 @@ export class Home {
       text: 'Que desean guiar grupos, compartir guías y resolver dudas.',
     },
   ];
-  readonly testimonials = [
+  readonly questions: readonly { pregunta: string; respuesta: string }[] = [
     {
-      text: '“Antes coordinábamos todo por WhatsApp y se perdían los archivos. Con Yachani encontré un grupo de Cálculo y aprobé con 16.”',
-      role: 'Estudiante · Ing. de Sistemas, UPC',
+      pregunta: '¿Qué puedo hacer en Yachani?',
+      respuesta: 'Puedes encontrar grupos de estudio, compartir materiales, conversar con tus compañeros y repasar con flashcards.',
     },
     {
-      text: '“Las flashcards del grupo me salvaron en los parciales. Repasamos juntos todas las noches antes del examen.”',
-      role: 'Estudiante · Ing. de Software, UPC',
+      pregunta: '¿Quién puede ser tutor?',
+      respuesta: 'Los estudiantes que desean compartir sus conocimientos y acompañar a otros pueden registrarse como estudiantes tutores y organizar grupos de estudio.',
     },
     {
-      text: '“Como tutora puedo organizar mis sesiones, compartir guías y ver cómo avanza cada estudiante.”',
-      role: 'Tutora · Física I, UPC',
+      pregunta: '¿Cómo puedo unirme a un grupo de estudio?',
+      respuesta: 'Regístrate, busca un grupo por curso o tema y revisa sus detalles. Si tiene cupos disponibles, podrás unirte directamente o enviar una solicitud, según su configuración.',
     },
-  ];
-  // Los frames solo contienen los encabezados cerrados; no se inventan respuestas.
-  readonly questions = [
-    '¿Yachani es gratis?',
-    '¿Quién puede ser tutor?',
-    '¿Cómo puedo unirme a un grupo de estudio?',
-    '¿Cómo funciona la recomendación con IA?',
-    '¿Qué formatos de archivo puedo subir?',
+    {
+      pregunta: '¿Cómo funciona la recomendación con IA?',
+      respuesta: 'Yachani considera tus preferencias, temas de interés y método de estudio para recomendarte grupos que se adapten mejor a tu perfil.',
+    },
+    {
+      pregunta: '¿Qué formatos de archivo puedo subir?',
+      respuesta: 'Puedes compartir materiales y resúmenes en formatos permitidos por la plataforma, como PDF, DOCX, PNG y JPG.',
+    },
   ];
   readonly contact = [
-    { icon: 'email', label: 'Correo de contacto', value: 'contacto@yachani.pe' },
+    { icon: 'email', label: 'Correo de contacto', value: 'yachani.soporte@gmail.com' },
     { icon: 'location', label: 'Ubicación', value: 'Lima, Perú' },
     { icon: 'social', label: 'Redes sociales', value: '@yachani.pe' },
   ];
