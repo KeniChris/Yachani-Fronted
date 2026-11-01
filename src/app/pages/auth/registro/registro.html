@@ -1,0 +1,221 @@
+@if (previsualizacion === 'exito') {
+  <section class="success" role="status" aria-labelledby="registro-exito">
+    <span class="success-icon" aria-hidden="true"
+      ><img src="/icons/auth/success.svg" width="42" height="42" alt=""
+    /></span>
+    <p class="eyebrow">Bienvenido a Yachani</p>
+    <h1 id="registro-exito">¡Registro exitoso!</h1>
+    <p class="success-description">
+      Tu cuenta se creó correctamente. Ya puedes iniciar sesión y comenzar a aprender en comunidad.
+    </p>
+    <a mat-flat-button class="primary-button" routerLink="/auth/iniciar-sesion">Iniciar sesión</a>
+  </section>
+} @else {
+  <section aria-labelledby="registro-title">
+    <header>
+      <p class="eyebrow">
+        {{ previsualizacion === 'error' ? 'Únete a nuestra comunidad' : 'Bienvenido de nuevo' }}
+      </p>
+      <h1 id="registro-title">Crea tu cuenta</h1>
+      <p class="description">
+        Regístrate con tu correo institucional y comienza a aprender en grupo.
+      </p>
+    </header>
+    @if (previsualizacion === 'error') {
+      <div class="registration-alert" role="alert">
+        <strong>No pudimos completar tu registro</strong>
+        <p>Revisa los campos indicados. No se creó ninguna cuenta.</p>
+      </div>
+    }
+    <form [formGroup]="form" (ngSubmit)="registrarse()" aria-label="Registro">
+      <fieldset class="role-field">
+        <legend id="role-label">Selecciona tu tipo de usuario</legend>
+        <mat-radio-group
+          formControlName="rol"
+          aria-labelledby="role-label"
+          [attr.aria-invalid]="
+            form.controls.rol.invalid && (form.controls.rol.dirty || form.controls.rol.touched)
+          "
+          aria-describedby="role-error"
+        >
+          <mat-radio-button
+            value="estudiante"
+            [class.selected]="form.controls.rol.value === 'estudiante'"
+          >
+            <span class="role-content"
+              ><picture
+                ><source
+                  media="(max-width: 767px)"
+                  srcset="/icons/auth/registro-estudiante-mobile.svg" />
+                <img
+                  src="/icons/auth/registro-estudiante.svg"
+                  width="28"
+                  height="28"
+                  alt="" /></picture
+              ><span><strong>Estudiante</strong><small>Quiero encontrar grupos</small></span></span
+            >
+          </mat-radio-button>
+          <mat-radio-button value="tutor" [class.selected]="form.controls.rol.value === 'tutor'">
+            <span class="role-content"
+              ><picture
+                ><source
+                  media="(max-width: 767px)"
+                  srcset="/icons/auth/registro-tutor-mobile.svg" />
+                <img src="/icons/auth/registro-tutor.svg" width="28" height="28" alt="" /></picture
+              ><span><strong>Tutor</strong><small>Quiero orientar grupos</small></span></span
+            >
+          </mat-radio-button>
+        </mat-radio-group>
+        <div class="role-error" id="role-error">
+          @if (
+            form.controls.rol.invalid && (form.controls.rol.dirty || form.controls.rol.touched)
+          ) {
+            <mat-error>Selecciona tu tipo de usuario</mat-error>
+          }
+        </div>
+      </fieldset>
+      <div class="name-row">
+        <div class="field">
+          <label for="registro-nombres">Nombres</label>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <input
+              matInput
+              id="registro-nombres"
+              formControlName="nombres"
+              autocomplete="given-name"
+              [errorStateMatcher]="campoErrorMatcher"
+              required
+            />
+            @if (
+              form.controls.nombres.invalid &&
+              (form.controls.nombres.dirty || form.controls.nombres.touched)
+            ) {
+              <mat-error>Los nombres son obligatorios</mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div class="field">
+          <label for="registro-apellidos">Apellidos</label>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <input
+              matInput
+              id="registro-apellidos"
+              formControlName="apellidos"
+              autocomplete="family-name"
+              [errorStateMatcher]="campoErrorMatcher"
+              required
+            />
+            @if (
+              form.controls.apellidos.invalid &&
+              (form.controls.apellidos.dirty || form.controls.apellidos.touched)
+            ) {
+              <mat-error>Los apellidos son obligatorios</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="field">
+        <label for="registro-correo">Correo institucional UPC</label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <input
+            matInput
+            id="registro-correo"
+            type="email"
+            formControlName="correo"
+            autocomplete="username"
+            [errorStateMatcher]="campoErrorMatcher"
+            required
+          />
+          @if (
+            form.controls.correo.invalid &&
+            (form.controls.correo.dirty || form.controls.correo.touched)
+          ) {
+            <mat-error>{{
+              form.controls.correo.hasError('required')
+                ? 'El correo es obligatorio'
+                : form.controls.correo.hasError('email')
+                  ? 'Ingresa un correo válido'
+                  : 'El correo debe terminar en @upc.edu.pe'
+            }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <div class="field">
+        <label for="registro-contrasena">Contraseña</label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <input
+            matInput
+            id="registro-contrasena"
+            [type]="mostrarContrasena ? 'text' : 'password'"
+            formControlName="contrasena"
+            autocomplete="new-password"
+            [errorStateMatcher]="campoErrorMatcher"
+            required
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-pressed]="mostrarContrasena"
+            (click)="mostrarContrasena = !mostrarContrasena"
+          >
+            <img src="/icons/auth/registro-visibility.svg" width="20" height="20" alt="" />
+          </button>
+          @if (
+            form.controls.contrasena.invalid &&
+            (form.controls.contrasena.dirty || form.controls.contrasena.touched)
+          ) {
+            <mat-error>{{
+              form.controls.contrasena.hasError('required')
+                ? 'La contraseña es obligatoria'
+                : 'La contraseña debe tener al menos 8 caracteres.'
+            }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <div class="field">
+        <label for="registro-confirmacion">Confirmar contraseña</label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <input
+            matInput
+            id="registro-confirmacion"
+            [type]="mostrarConfirmacion ? 'text' : 'password'"
+            formControlName="confirmacion"
+            autocomplete="new-password"
+            [errorStateMatcher]="confirmacionErrorMatcher"
+            required
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="
+              mostrarConfirmacion
+                ? 'Ocultar confirmación de contraseña'
+                : 'Mostrar confirmación de contraseña'
+            "
+            [attr.aria-pressed]="mostrarConfirmacion"
+            (click)="mostrarConfirmacion = !mostrarConfirmacion"
+          >
+            <img src="/icons/auth/registro-visibility.svg" width="20" height="20" alt="" />
+          </button>
+          @if (
+            (form.controls.confirmacion.invalid || form.hasError('contrasenasDiferentes')) &&
+            (form.controls.confirmacion.dirty || form.controls.confirmacion.touched)
+          ) {
+            <mat-error>{{
+              form.controls.confirmacion.hasError('required')
+                ? 'Confirma tu contraseña'
+                : 'Las contraseñas no coinciden.'
+            }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <button mat-flat-button class="primary-button" type="submit">Registrarse</button>
+    </form>
+    <p class="login-link">
+      ¿Ya tienes cuenta? <a routerLink="/auth/iniciar-sesion">Inicia sesión</a>
+    </p>
+  </section>
+}

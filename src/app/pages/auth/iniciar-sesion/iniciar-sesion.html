@@ -1,0 +1,76 @@
+@if (estado === 'exito') {
+  <section class="success" role="status" aria-labelledby="success-title">
+    <span class="success-icon" aria-hidden="true"
+      ><img src="/icons/auth/success.svg" alt="" width="42" height="42"
+    /></span>
+    <h1 id="success-title">¡Inicio de sesión exitoso!</h1>
+    <p>Has ingresado correctamente a tu cuenta.</p>
+  </section>
+} @else {
+  <section aria-labelledby="login-title" [class.credentials-error]="estado === 'error'">
+    <header>
+      <p class="welcome">Bienvenido de nuevo</p>
+      <h1 id="login-title">Iniciar sesión</h1>
+      <p class="description">Ingresa con tu correo institucional para continuar.</p>
+    </header>
+    @if (estado === 'error') {
+      <div class="credentials-alert" role="alert">
+        <img src="/icons/auth/error.svg" alt="" width="20" height="20" />
+        <p>Correo o contraseña incorrectos. Verifica tus datos e inténtalo nuevamente.</p>
+      </div>
+    }
+    <form [formGroup]="form" (ngSubmit)="iniciarSesion()" aria-label="Inicio de sesión">
+      <label for="login-email">Correo institucional</label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input
+          matInput
+          id="login-email"
+          type="email"
+          autocomplete="username"
+          formControlName="correo"
+          placeholder="u20xxxxxx@upc.edu.pe"
+          required
+        />
+        @if (form.controls.correo.touched && form.controls.correo.invalid) {
+          <mat-error>{{
+            form.controls.correo.hasError('required')
+              ? 'El correo es obligatorio'
+              : form.controls.correo.hasError('email')
+                ? 'Ingresa un correo válido'
+                : 'El correo debe terminar en @upc.edu.pe'
+          }}</mat-error>
+        }
+      </mat-form-field>
+      <label for="login-password">Contraseña</label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input
+          matInput
+          id="login-password"
+          [type]="mostrarContrasena ? 'text' : 'password'"
+          autocomplete="current-password"
+          formControlName="contrasena"
+          placeholder="Ingresa tu contraseña"
+          required
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          [attr.aria-label]="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          [attr.aria-pressed]="mostrarContrasena"
+          (click)="mostrarContrasena = !mostrarContrasena"
+        >
+          <img src="/icons/auth/visibility.svg" alt="" width="20" height="20" />
+        </button>
+        @if (form.controls.contrasena.touched && form.controls.contrasena.invalid) {
+          <mat-error>La contraseña es obligatoria</mat-error>
+        }
+      </mat-form-field>
+      <a class="recovery" routerLink="/auth/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
+      <button class="login-button" mat-flat-button type="submit">
+        Iniciar sesión
+      </button>
+    </form>
+    <p class="register">¿No tienes cuenta? <a routerLink="/auth/registro">Regístrate</a></p>
+  </section>
+}
