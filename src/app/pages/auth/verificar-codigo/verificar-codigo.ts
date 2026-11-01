@@ -24,6 +24,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 export class VerificarCodigo implements OnChanges {
   @Input({ transform: booleanAttribute }) previsualizacion = false;
   @Input() estado = 'formulario';
+  // La integración deberá proporcionar el destinatario real explícitamente.
+  @Input({ transform: (valor: unknown) => (typeof valor === 'string' ? valor.trim() : '') })
+  destinatario = '';
   @ViewChildren('digit') casillas!: QueryList<ElementRef<HTMLInputElement>>;
   readonly indices = [0, 1, 2, 3, 4, 5];
   readonly form = new FormGroup(

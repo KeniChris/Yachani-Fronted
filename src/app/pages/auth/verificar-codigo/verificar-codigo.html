@@ -2,7 +2,9 @@
   <p class="eyebrow">Código enviado</p>
   <h1 id="code-title">Revisa tu correo</h1>
   <p class="description">Ingresa el código de seis dígitos que enviamos a:</p>
-  <p class="email-example">U2XXXXXXXX&#64;upc.edu.pe</p>
+  @if (destinatario) {
+    <p class="destinatario">{{ destinatario }}</p>
+  }
   <form [formGroup]="form" #codigoForm="ngForm" (ngSubmit)="verificar()">
     <div
       class="digits"

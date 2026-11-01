@@ -135,7 +135,7 @@ mat-error {
 .preview a {
   color: var(--color-link);
 }
-.email-example {
+.destinatario {
   margin-top: 16px;
   text-align: center;
   font: var(--font-control);
