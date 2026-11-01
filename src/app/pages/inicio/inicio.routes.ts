@@ -14,6 +14,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./inicio-estudiante/inicio-estudiante').then((m) => m.InicioEstudiante),
   },
-  // Reserva para el inicio del tutor, que todavía no tiene componente.
-  { path: '', pathMatch: 'full', children: [] },
+  {
+    path: '',
+    pathMatch: 'full',
+    canMatch: [
+      () => inject(Router).getCurrentNavigation()?.extractedUrl.queryParams['rol'] === 'tutor',
+    ],
+    loadComponent: () => import('./inicio-tutor/inicio-tutor').then((m) => m.InicioTutor),
+  },
 ];

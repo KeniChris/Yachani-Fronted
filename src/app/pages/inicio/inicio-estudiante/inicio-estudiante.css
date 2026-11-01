@@ -1,4 +1,4 @@
-﻿:host {
+:host {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -55,8 +55,40 @@ mat-icon {
 .next-step a {
   flex: none;
 }
-.groups-section,
-.session-section {
+.quick-actions h2 {
+  font: var(--font-card-title);
+}
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.quick-action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: var(--font-control);
+  text-decoration: none;
+}
+.quick-action span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.quick-action:hover {
+  background: var(--color-active);
+}
+.quick-action:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+.groups-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -68,8 +100,7 @@ mat-icon {
   justify-content: space-between;
   gap: var(--space-4);
 }
-.section-heading h2,
-.session-section > header h2 {
+.section-heading h2 {
   font: var(--font-page-title);
 }
 .group-grid {
@@ -123,6 +154,9 @@ mat-icon {
   }
 }
 @media (max-width: 767px) {
+  .quick-actions-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .group-grid {
     grid-template-columns: minmax(0, 1fr);
   }

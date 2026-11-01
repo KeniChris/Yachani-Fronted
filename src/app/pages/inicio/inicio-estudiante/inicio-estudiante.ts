@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './inicio-estudiante.css',
 })
 export class InicioEstudiante {
-  @Input({ transform: (valor: unknown) => Array.isArray(valor) ? valor : [] }) grupos: readonly {
+  @Input({ transform: (valor: unknown) => (Array.isArray(valor) ? valor : []) }) grupos: readonly {
     id: string;
     nombre: string;
     descripcion?: string;

@@ -1,4 +1,4 @@
-﻿<header class="page-heading">
+<header class="page-heading">
   <h1>Hola</h1>
   <p>Sigue aprendiendo con tu comunidad de estudio.</p>
 </header>
@@ -12,6 +12,26 @@
     >Explorar grupos</a
   >
 </section>
+<mat-card appearance="outlined" class="content-card quick-actions" aria-labelledby="quick-actions-title">
+  <h2 id="quick-actions-title">¿Qué quieres hacer hoy?</h2>
+  <nav class="quick-actions-grid" aria-label="Accesos rápidos del estudiante">
+    <a class="quick-action" routerLink="/perfiles" [queryParams]="{ rol: 'estudiante' }">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
+      <span>Mi perfil</span>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon>
+    </a>
+    <a class="quick-action" routerLink="/flashcards" [queryParams]="{ rol: 'estudiante' }">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">style</mat-icon>
+      <span>Mis flashcards</span>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon>
+    </a>
+    <a class="quick-action" routerLink="/grupos/recomendaciones" [queryParams]="{ rol: 'estudiante' }">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">auto_awesome</mat-icon>
+      <span>Recomendaciones IA</span>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon>
+    </a>
+  </nav>
+</mat-card>
 <section class="groups-section" aria-labelledby="groups-title">
   <header class="section-heading">
     <h2 id="groups-title">Tus grupos</h2>
@@ -36,6 +56,7 @@
           @if (grupo.detalle) {
             <p class="group-detail">{{ grupo.detalle }}</p>
           }
+
           <a
             mat-stroked-button
             class="group-action"
@@ -52,14 +73,4 @@
       <p>Aún no tienes grupos</p></mat-card
     >
   }
-</section>
-<section class="session-section" aria-labelledby="session-title">
-  <header class="page-heading">
-    <h2 id="session-title">Próxima sesión</h2>
-    <p>Consulta el horario y el enlace del encuentro.</p>
-  </header>
-  <mat-card appearance="outlined" class="content-card empty-state"
-    ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
-    <p>No tienes sesiones programadas</p></mat-card
-  >
 </section>
