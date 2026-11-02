@@ -1,4 +1,7 @@
 ﻿import { Routes } from '@angular/router';
 
-// Registrar aquí las pantallas del área cuando se implementen.
-export const routes: Routes = [{ path: '', children: [] }];
+export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'temas' },
+  { path: 'temas', loadComponent: () => import('./temas/temas').then(m => m.Temas) },
+  { path: 'materiales', loadComponent: () => import('./materiales/materiales').then(m => m.Materiales) },
+];

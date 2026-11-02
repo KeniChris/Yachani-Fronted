@@ -151,6 +151,11 @@ mat-icon img {
 }
 .topbar-profile {
   gap: var(--space-4);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
 }
 .topbar-profile .avatar {
   background: var(--color-active);
@@ -177,13 +182,18 @@ main {
   width: var(--sidebar-width);
   max-width: calc(100vw - var(--space-16));
   border-radius: 0;
+  background: var(--color-brand);
+  color: var(--color-on-primary);
 }
 .mobile-menu-content {
+  position: relative;
   min-height: 100dvh;
+  padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
 }
 .close-menu {
-  align-self: flex-end;
-  flex: none;
+  position: absolute;
+  top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
+  right: 0;
 }
 @media (max-width: 767px) {
   .sidebar,

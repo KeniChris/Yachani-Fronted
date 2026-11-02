@@ -1,0 +1,48 @@
+﻿<nav class="resource-tabs" aria-label="Recursos del grupo">
+  <a mat-flat-button routerLink="../temas" queryParamsHandling="preserve" aria-current="page">Temas</a>
+  <a mat-stroked-button routerLink="../materiales" queryParamsHandling="preserve">Materiales</a>
+</nav>
+<div class="page-heading">
+  <div><h1>Temas del grupo</h1><p>Organiza los recursos por lo que están estudiando.</p></div>
+  @if (rol === 'tutor' || contexto === 'estudiantes') {
+    <button mat-flat-button (click)="crearForm.setValue(contexto === 'estudiantes' ? {nombre: 'Requisitos de software', descripcion: 'Requisitos funcionales y criterios de aceptación.'} : {nombre: 'Integrales definidas', descripcion: 'Técnicas básicas, propiedades y ejercicios de integración.'}); dialog.open(temaDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: {form: crearForm, editar: false}})">Crear tema</button>
+  }
+</div>
+<p class="counter">3 de 30 temas</p>
+<div class="topic-grid">
+  @for (tema of contexto === 'estudiantes' ? temasEstudiantes : temas; track tema.nombre) {
+    <article class="topic-card">
+      <div class="topic-heading">
+        <mat-icon fontSet="material-symbols-rounded">folder</mat-icon><h2>{{ tema.nombre }}</h2>
+        @if (rol === 'tutor' || contexto === 'estudiantes') {
+          <button mat-icon-button [attr.aria-label]="'Editar ' + tema.nombre" (click)="editarForm.setValue({nombre: tema.nombre, descripcion: tema.descripcion}); dialog.open(temaDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: {form: editarForm, editar: true}})"><mat-icon fontSet="material-symbols-rounded">edit</mat-icon></button>
+        }
+      </div>
+      <p>{{ tema.descripcion }}</p>
+      <a mat-stroked-button routerLink="../materiales" [queryParams]="{tema: tema.nombre}" queryParamsHandling="merge">Ver materiales</a>
+    </article>
+  }
+</div>
+@if (rol === 'tutor' || permiso === 'administrador') {
+  <a class="settings" mat-stroked-button routerLink="/grupos/gestion" queryParamsHandling="preserve">Configuración del grupo</a>
+}
+
+<ng-template #temaDialog let-data let-ref="dialogRef">
+  <div class="resource-dialog">
+    <div class="dialog-heading"><h2>{{ data.editar ? 'Editar tema' : 'Crear tema' }}</h2><button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div>
+    <mat-dialog-content>
+      <p>Dale un nombre claro para que el grupo encuentre sus recursos.</p>
+      <form [formGroup]="data.form">
+        <mat-form-field appearance="outline"><mat-label>Nombre del tema</mat-label><input matInput formControlName="nombre" required maxlength="100"><mat-hint>Hasta 100 caracteres.</mat-hint>
+          @if (data.form.controls.nombre.touched && data.form.controls.nombre.invalid) {<mat-error>El nombre del tema es obligatorio y admite hasta 100 caracteres.</mat-error>}
+        </mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Descripción (opcional)</mat-label><textarea matInput formControlName="descripcion" rows="4" maxlength="300"></textarea><mat-hint>Hasta 300 caracteres.</mat-hint>
+          @if (data.form.controls.descripcion.touched && data.form.controls.descripcion.invalid) {<mat-error>La descripción admite hasta 300 caracteres.</mat-error>}
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions><button mat-stroked-button mat-dialog-close>Cancelar</button><button mat-flat-button [disabled]="data.form.invalid" mat-dialog-close>{{ data.editar ? 'Guardar cambios' : 'Crear tema' }}</button></mat-dialog-actions>
+  </div>
+</ng-template>
+
+
