@@ -1,0 +1,68 @@
+﻿<nav class="resource-tabs" aria-label="Recursos del grupo">
+  <a mat-stroked-button routerLink="../temas" queryParamsHandling="preserve">Temas</a>
+  <a mat-flat-button routerLink="../materiales" [queryParams]="{tema: null}" queryParamsHandling="merge" aria-current="page">Materiales</a>
+</nav>
+@if (tema) {<a class="breadcrumb" mat-button routerLink="../temas" [queryParams]="{tema: null}" queryParamsHandling="merge"><mat-icon fontSet="material-symbols-rounded">arrow_back</mat-icon>Temas / {{ tema }}</a>}
+<div class="page-heading"><div><h1>{{ tema || 'Materiales del grupo' }}</h1><p>{{ tema ? 'Archivos para practicar reglas y resolver ejercicios.' : 'Encuentra y descarga los archivos compartidos.' }}</p></div>
+  @if (rol === 'tutor' || publicaciones !== 'tutor' || contexto === 'estudiantes') {<button mat-flat-button (click)="subirForm.controls.tema.setValue(tema || 'Sin tema'); dialog.open(subirDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)'})">Subir materiales</button>}
+</div>
+@if (!tema) {
+  <form [formGroup]="filtroForm" class="filter"><mat-form-field appearance="outline"><mat-label>Tema</mat-label><mat-select formControlName="tema"><mat-option value="Todos los temas">Todos los temas</mat-option><mat-option value="Sin tema">Sin tema</mat-option>@for (nombre of contexto === 'estudiantes' ? temasEstudiantes : temas; track nombre) {<mat-option [value]="nombre">{{ nombre }}</mat-option>}</mat-select><mat-hint>Consulta todos los materiales o elige un tema.</mat-hint></mat-form-field></form>
+}
+<section class="files-panel" aria-labelledby="files-title">
+  <div class="files-heading"><h2 id="files-title">Materiales compartidos</h2><span class="badge">3 archivos</span></div>
+  @for (material of contexto === 'estudiantes' ? materialesEstudiantes : materiales; track material.nombre) {
+    <article class="file-row">
+      <mat-icon fontSet="material-symbols-rounded">{{ material.icono }}</mat-icon>
+      <button class="file-info" (click)="dialog.open(detalleDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: material})"><strong>{{ material.nombre }}</strong><span>{{ publicaciones === 'tutor' ? 'Carlos Ríos' : material.autor }} · {{ material.formato }} · {{ material.tamano }} · {{ material.fecha }}</span></button>
+      <button mat-icon-button [attr.aria-label]="'Descargar ' + material.nombre"><mat-icon fontSet="material-symbols-rounded">download</mat-icon></button>
+      <button mat-icon-button [matMenuTriggerFor]="opciones" [attr.aria-label]="'Opciones de ' + material.nombre"><mat-icon fontSet="material-symbols-rounded">more_vert</mat-icon></button>
+      <mat-menu #opciones="matMenu">
+        <button mat-menu-item (click)="dialog.open(detalleDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: material})">Ver detalle</button>
+        @if ((publicaciones !== 'tutor' && material.autor === (rol === 'tutor' ? 'Carlos Ríos' : 'Leicy Cahuana')) || (publicaciones === 'tutor' && rol === 'tutor')) {<button mat-menu-item (click)="cambiarForm.controls.tema.setValue(contexto === 'estudiantes' ? 'Pruebas de software' : 'Aplicaciones de la derivada'); dialog.open(cambiarDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: material})">Cambiar tema</button>}
+        @if (rol === 'tutor' || permiso === 'administrador' || (publicaciones !== 'tutor' && material.autor === 'Leicy Cahuana')) {<button mat-menu-item (click)="dialog.open(eliminarDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: material})">Eliminar material</button>}
+      </mat-menu>
+    </article>
+  }
+  <mat-paginator [length]="3" [pageSize]="3" [hidePageSize]="true" aria-label="Paginación de materiales" />
+</section>
+@if (tema && contexto !== 'estudiantes') {
+  <section class="deck-panel"><h2>Flashcards de este tema</h2><div><mat-icon fontSet="material-symbols-rounded">style</mat-icon><span><strong>Fórmulas de derivadas</strong><small>Leicy Cahuana · 4 tarjetas</small></span><a mat-stroked-button routerLink="/flashcards" queryParamsHandling="preserve">Ver mazo</a></div></section>
+}
+
+<ng-template #subirDialog>
+  <div class="resource-dialog"><div class="dialog-heading"><h2>Subir materiales</h2><button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div>
+    <mat-dialog-content><p>Comparte archivos para estudiar con tu grupo.</p>
+      <form [formGroup]="subirForm">
+        <mat-form-field appearance="outline"><mat-label>Tema (opcional)</mat-label><mat-select formControlName="tema"><mat-option value="Sin tema">Sin tema</mat-option>@for (nombre of contexto === 'estudiantes' ? temasEstudiantes : temas; track nombre) {<mat-option [value]="nombre">{{ nombre }}</mat-option>}</mat-select><mat-hint>Puedes elegir “Sin tema”.</mat-hint></mat-form-field>
+        <div class="upload-zone"><mat-icon fontSet="material-symbols-rounded">upload</mat-icon><strong>Selecciona los archivos</strong><small>PDF, DOCX, PPTX, XLSX, PNG, JPG o JPEG. Máximo 5 archivos de 10 MB cada uno.</small><label class="file-picker" for="resource-files">Elegir archivos</label><input id="resource-files" type="file" formControlName="archivos" multiple accept=".pdf,.docx,.pptx,.xlsx,.png,.jpg,.jpeg"></div>
+      </form>
+      @for (material of contexto === 'estudiantes' ? materialesEstudiantes : materiales; track material.nombre) {<div class="selected-file"><mat-icon fontSet="material-symbols-rounded">{{ material.icono }}</mat-icon><span><strong>{{ material.nombre }}</strong><small>{{ material.tamano }}</small></span><button mat-icon-button [attr.aria-label]="'Quitar ' + material.nombre"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div>}
+    </mat-dialog-content>
+    <mat-dialog-actions><button mat-stroked-button mat-dialog-close>Cancelar</button><button mat-flat-button [disabled]="subirForm.invalid" mat-dialog-close>Publicar 3 archivos</button></mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #detalleDialog let-material>
+  <div class="resource-dialog"><div class="dialog-heading"><h2>{{ material.nombre }}</h2><button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div>
+    <mat-dialog-content><p>Consulta los datos del archivo y sus opciones.</p><div class="file-metadata"><p>Tema: {{ tema || (contexto === 'estudiantes' ? 'Diagramas UML' : 'Reglas de derivación') }}</p><p>Autor: {{ publicaciones === 'tutor' ? 'Carlos Ríos' : material.autor }}</p><p>Formato: {{ material.formato }} · Tamaño: {{ material.tamano }}</p><p>Publicado: {{ material.fecha }}</p></div>
+      <div class="detail-actions"><button mat-flat-button>Descargar archivo</button>
+        @if ((publicaciones !== 'tutor' && material.autor === (rol === 'tutor' ? 'Carlos Ríos' : 'Leicy Cahuana')) || (publicaciones === 'tutor' && rol === 'tutor')) {<button mat-stroked-button mat-dialog-close (click)="cambiarForm.controls.tema.setValue(contexto === 'estudiantes' ? 'Pruebas de software' : 'Aplicaciones de la derivada'); dialog.open(cambiarDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: material})">Cambiar tema</button>}
+        @if (rol === 'tutor' || permiso === 'administrador' || (publicaciones !== 'tutor' && material.autor === 'Leicy Cahuana')) {<button mat-button class="danger-text" mat-dialog-close (click)="dialog.open(eliminarDialog, {width: '600px', maxWidth: 'calc(100vw - 32px)', data: material})">Eliminar material</button>}
+      </div>
+    </mat-dialog-content>
+  </div>
+</ng-template>
+<ng-template #cambiarDialog let-material>
+  <div class="resource-dialog"><div class="dialog-heading"><h2>Cambiar tema</h2><button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div>
+    <mat-dialog-content><p>{{ material.nombre }}</p><form [formGroup]="cambiarForm"><mat-form-field appearance="outline"><mat-label>Tema</mat-label><mat-select formControlName="tema"><mat-option value="Sin tema">Sin tema</mat-option>@for (nombre of contexto === 'estudiantes' ? temasEstudiantes : temas; track nombre) {<mat-option [value]="nombre">{{ nombre }}</mat-option>}</mat-select><mat-hint>Elige un tema del grupo o “Sin tema”.</mat-hint></mat-form-field></form></mat-dialog-content>
+    <mat-dialog-actions><button mat-stroked-button mat-dialog-close>Cancelar</button><button mat-flat-button [disabled]="cambiarForm.invalid" mat-dialog-close>Guardar cambios</button></mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #eliminarDialog let-material>
+  <div class="resource-dialog"><div class="dialog-heading"><h2>¿Eliminar este material?</h2><button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div>
+    <mat-dialog-content><p>{{ material.nombre }} dejará de estar disponible en este grupo.</p><mat-icon class="danger-text" fontSet="material-symbols-rounded">delete</mat-icon></mat-dialog-content>
+    <mat-dialog-actions><button mat-stroked-button mat-dialog-close>Conservar material</button><button mat-flat-button class="danger" mat-dialog-close>Eliminar material</button></mat-dialog-actions>
+  </div>
+</ng-template>
+
+

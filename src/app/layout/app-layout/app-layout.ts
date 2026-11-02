@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
 import { Brand } from '../brand/brand';
 
 @Component({
@@ -21,6 +22,7 @@ import { Brand } from '../brand/brand';
     MatListModule,
     MatSidenavModule,
     MatToolbarModule,
+    MatMenuModule,
     Brand,
   ],
   templateUrl: './app-layout.html',
@@ -29,8 +31,12 @@ import { Brand } from '../brand/brand';
 export class AppLayout {
   // Variante visual mediante datos de ruta o ?rol=tutor; sin autenticación.
   @Input() rol: 'estudiante' | 'tutor' = 'estudiante';
-  // La variante visual no proporciona identidad ni representa una sesión.
+  // Datos de ejemplo de estructura-base; no representan una sesión autenticada.
   @Input() usuario: { nombre: string; iniciales?: string; rol?: string } | null = null;
+  readonly usuariosEjemplo = {
+    estudiante: { nombre: 'Leicy Cahuana', iniciales: 'LC', rol: 'Estudiante' },
+    tutor: { nombre: 'Carlos Ríos', iniciales: 'CR', rol: 'Tutor' },
+  };
   // Texto de cabecera para contextos de grupo; por defecto se muestra la ruta activa.
   @Input() ruta = '';
   readonly navigation = {

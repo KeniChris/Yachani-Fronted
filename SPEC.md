@@ -6,9 +6,9 @@ Documento común para construir las pantallas de Yachani con Codex o Claude Code
 
 - Proyecto: Angular standalone, TypeScript, HTML, CSS y Angular Material. Conservar las versiones instaladas.
 - Repositorio: [Yachani-Fronted · develop](https://github.com/KeniChris/Yachani-Fronted/tree/develop).
-- Figma: [Yachani](https://www.figma.com/design/c7osPShS4l3A0vE8W6J3oD/Yachani?node-id=1-1006&t=D4F1ScOMwel0Mw6J-1).
-- Guía visual: frame **Yachani-guia-estilos-detallado · 1440×1024px**, ubicado en la [página de la guía](https://www.figma.com/design/c7osPShS4l3A0vE8W6J3oD/Yachani?node-id=293-51&t=D4F1ScOMwel0Mw6J-4).
-- Pantallas y flujos: hoja [Diagrama de flujo keni](https://www.figma.com/design/c7osPShS4l3A0vE8W6J3oD/Yachani?node-id=1-1006):
+- Figma: [Yachani](https://www.figma.com/design/c7osPShS4l3A0vE8W6J3oD/Yachani?node-id=0-1&t=GSLxHcOWQ7KVYtgr-1).
+- Guía visual: frame **Yachani-guia-estilos-detallado · 1440×1024px**, ubicado en la [página de la guía](https://www.figma.com/design/c7osPShS4l3A0vE8W6J3oD/Yachani?node-id=0-1&p=f&t=GSLxHcOWQ7KVYtgr-0).
+- Pantallas y flujos: hoja [Diagrama de flujo keni](https://www.figma.com/design/3Dl2ksR7TPkmonQWVzl3H2/Yachani?node-id=6-321&p=f&t=CZF21GTUc9uV0E8k-0):
   - 01–05: temas, materiales, mazos, tarjetas, compartir, repaso y progreso.
   - 07–14: inicio, perfiles, resúmenes, reseñas, descubrimiento/IA, grupos, chat, sesiones y notificaciones/avisos.
   - 15: inicio de sesión.

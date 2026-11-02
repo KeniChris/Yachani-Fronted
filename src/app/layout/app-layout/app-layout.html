@@ -1,16 +1,13 @@
 <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
 <ng-template #accountIdentity>
-  @if (usuario?.nombre) {
-    @if (usuario?.iniciales) {
-      <span class="avatar" aria-hidden="true">{{ usuario?.iniciales }}</span>
-    }
-    <span class="identity"
-      ><span class="user-name">{{ usuario?.nombre }}</span>
-      @if (usuario?.rol) {
-        <span class="user-role">{{ usuario?.rol }}</span>
-      }
-    </span>
-  }
+  @let cuenta = usuario || usuariosEjemplo[rol === 'tutor' ? 'tutor' : 'estudiante'];
+  <span class="avatar" aria-hidden="true">{{
+    cuenta.iniciales || usuariosEjemplo[rol === 'tutor' ? 'tutor' : 'estudiante'].iniciales
+  }}</span>
+  <span class="identity"
+    ><span class="user-name">{{ cuenta.nombre }}</span>
+    <span class="user-role">{{ cuenta.rol || (rol === 'tutor' ? 'Tutor' : 'Estudiante') }}</span>
+  </span>
 </ng-template>
 <ng-template #navigationContent>
   <a
@@ -56,16 +53,14 @@
       <h2>&#191;Necesitas ayuda?</h2>
       <p>Revisa las preguntas frecuentes o cont&#225;ctanos.</p>
     </section>
-    @if (usuario?.nombre) {
-      <a
-        class="profile-link"
-        routerLink="/perfiles"
-        queryParamsHandling="preserve"
-        (click)="menu.close()"
-        aria-label="Abrir mi perfil"
-        ><ng-container [ngTemplateOutlet]="accountIdentity"
-      /></a>
-    }
+    <a
+      class="profile-link"
+      routerLink="/perfiles"
+      queryParamsHandling="preserve"
+      (click)="menu.close()"
+      aria-label="Abrir mi perfil"
+      ><ng-container [ngTemplateOutlet]="accountIdentity"
+    /></a>
   </div>
 </ng-template>
 <ng-template #routeTitle>
@@ -172,15 +167,17 @@
           ><img src="/icons/mobile/notifications.svg" alt="" width="24" height="24"
         /></mat-icon>
       </a>
-      @if (usuario?.nombre) {
-        <a
-          class="topbar-profile"
-          routerLink="/perfiles"
-          queryParamsHandling="preserve"
-          aria-label="Abrir mi perfil"
-          ><ng-container [ngTemplateOutlet]="accountIdentity"
-        /></a>
-      }
+      <button
+        type="button"
+        class="topbar-profile"
+        [matMenuTriggerFor]="profileMenu"
+        aria-label="Abrir menú del perfil"
+      >
+        <ng-container [ngTemplateOutlet]="accountIdentity" />
+      </button>
+      <mat-menu #profileMenu="matMenu">
+        <a mat-menu-item routerLink="/perfiles" queryParamsHandling="preserve">Mi perfil</a>
+      </mat-menu>
     </mat-toolbar>
     <main id="contenido-principal" tabindex="-1"><router-outlet /></main>
     <nav class="mobile-navigation" aria-label="Navegaci&#243;n m&#243;vil">
