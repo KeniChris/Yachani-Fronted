@@ -1,19 +1,234 @@
-:host {
-  display: flex;
-  flex-direction: column;
+﻿:host {
+  display: grid;
+  grid-template-columns: 46% 54%;
+  position: relative;
   min-height: 100dvh;
 }
 .access-header {
-  padding: var(--space-4);
+  position: absolute;
+  top: 48px;
+  left: 56px;
+  z-index: 1;
 }
 .access-content {
-  width: min(100% - 2 * var(--space-4), var(--form-width));
-  margin: auto;
-  padding-block: var(--space-6);
+  min-width: 0;
+  padding: 80px 32px;
+  background: radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.1), transparent 30%);
 }
 
 .brand-link {
   display: inline-flex;
   color: inherit;
   text-decoration: none;
+}
+.access-banner {
+  position: relative;
+  overflow: hidden;
+  padding: 154px 56px 64px;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(192, 132, 252, 0.22), transparent 35%),
+    linear-gradient(150deg, #24122f, #321641 48%, #1a0c22);
+}
+.access-banner::before {
+  content: '';
+  position: absolute;
+  width: 342px;
+  height: 342px;
+  border: 1px solid rgba(192, 132, 252, 0.18);
+  border-radius: 50%;
+  top: 164px;
+  right: -150px;
+}
+.access-banner::after {
+  content: '';
+  position: absolute;
+  width: 470px;
+  height: 470px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.08);
+  left: -260px;
+  top: 734px;
+}
+.banner-label {
+  display: inline-block;
+  padding: 8px 13px;
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  border-radius: 24px;
+  background: rgba(168, 85, 247, 0.1);
+  color: var(--color-dark-link);
+  font: var(--font-help);
+}
+h2 {
+  max-width: 441px;
+  margin: 24px 0;
+  font:
+    700 62px/1.04 Roboto,
+    sans-serif;
+  letter-spacing: -2px;
+}
+h2 span {
+  color: var(--color-dark-link);
+}
+p {
+  max-width: 440px;
+  color: var(--color-dark-muted);
+  font:
+    400 17px/1.7 Roboto,
+    sans-serif;
+}
+.illustration {
+  position: relative;
+  width: 430px;
+  max-width: 100%;
+  height: 245px;
+  margin-top: 40px;
+}
+.main-card,
+.mini-card {
+  position: absolute;
+  border: 1px solid rgba(192, 132, 252, 0.24);
+  box-shadow: 0 20px 45px rgba(11, 4, 17, 0.22);
+}
+.main-card {
+  left: 28px;
+  top: 25px;
+  width: 310px;
+  height: 178px;
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(76, 49, 93, 0.68);
+  transform: rotate(-3deg);
+}
+.tag {
+  width: 88px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--color-category);
+  margin-bottom: 20px;
+}
+.line {
+  width: 88%;
+  height: 10px;
+  margin-bottom: 12px;
+  border-radius: 5px;
+  background: rgba(248, 250, 252, 0.18);
+}
+.medium {
+  width: 64%;
+}
+.progress {
+  height: 7px;
+  margin-top: 24px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--color-accent) 72%, rgba(248, 250, 252, 0.12) 72%);
+}
+.avatars {
+  display: flex;
+  margin-top: 17px;
+}
+.avatars span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-right: -6px;
+  border: 2px solid var(--color-dark-surface);
+  border-radius: 50%;
+  background: var(--color-accent);
+  font:
+    700 10px Roboto,
+    sans-serif;
+}
+.mini-card {
+  left: 265px;
+  top: 135px;
+  width: 165px;
+  height: 104px;
+  padding: 17px;
+  border-radius: 18px;
+  background: rgba(58, 35, 73, 0.92);
+  transform: rotate(6deg);
+}
+.recovery-intro {
+  display: none;
+}
+:host-context(body:has(.recovery-page)) {
+  background: var(--color-background);
+}
+:host-context(body:has(.recovery-page)) .access-content {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 197px;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+:host-context(body:has(.recovery-page)) .access-banner {
+  padding-top: 190px;
+  background: linear-gradient(145deg, #25102f, #3d2050 58%, #642d78);
+}
+:host-context(body:has(.recovery-page)) .access-banner > h2,
+:host-context(body:has(.recovery-page)) .access-banner > p,
+:host-context(body:has(.recovery-page)) .illustration {
+  display: none;
+}
+:host-context(body:has(.recovery-page)) .recovery-intro {
+  display: block;
+}
+:host-context(body:has(.recovery-page)) .recovery-intro h2 {
+  font-size: 57.6px;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+}
+:host-context(body:has(.recovery-page)) .access-banner::before {
+  top: -100px;
+  background: rgba(255, 255, 255, 0.07);
+  border: none;
+}
+.banner-footer {
+  margin-top: 40px;
+  font: var(--font-help);
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .access-banner {
+    padding-inline: 32px;
+  }
+  .access-header {
+    left: 32px;
+  }
+  h2 {
+    font-size: 48px;
+  }
+  .illustration {
+    transform: scale(0.75);
+    transform-origin: left top;
+  }
+}
+@media (max-width: 767px) {
+  :host-context(body:has(.recovery-page)) .access-header {
+    justify-content: flex-start;
+    max-width: 354px;
+    margin-inline: auto;
+    padding: 80px 6px 0;
+    color: var(--color-text);
+  }
+  :host-context(body:has(.recovery-page)) .access-content {
+    padding: 28px 18px 48px;
+  }
+  :host {
+    display: block;
+  }
+  .access-banner {
+    display: none;
+  }
+  .access-header {
+    position: relative;
+    top: auto;
+    left: auto;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 0;
+  }
+  .access-content {
+    padding: 42px 16px 48px;
+  }
 }

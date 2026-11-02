@@ -1,0 +1,101 @@
+<section class="card" aria-labelledby="reset-title">
+  <p class="eyebrow">Último paso</p>
+  <h1 id="reset-title">Crea una nueva contraseña</h1>
+  <p class="description">Elige una contraseña segura y diferente a la anterior.</p>
+  @if (previsualizacion && estado === 'confirmacion') {
+    <p class="confirmation" role="status">
+      Contraseña actualizada correctamente. Ya puedes volver a iniciar sesión.
+    </p>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <label for="reset-password">Nueva contraseña</label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input
+          matInput
+          id="reset-password"
+          formControlName="contrasena"
+          [type]="mostrarContrasena ? 'text' : 'password'"
+          autocomplete="new-password"
+          [errorStateMatcher]="errorMatcher"
+          required
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          [attr.aria-label]="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          [attr.aria-pressed]="mostrarContrasena"
+          (click)="mostrarContrasena = !mostrarContrasena"
+        >
+          <mat-icon class="password-icon" fontSet="material-symbols-rounded" aria-hidden="true">{{
+            mostrarContrasena ? 'visibility_off' : 'visibility'
+          }}</mat-icon>
+        </button>
+        @if (
+          form.controls.contrasena.invalid &&
+          (form.controls.contrasena.dirty || form.controls.contrasena.touched)
+        ) {
+          <mat-error>{{
+            form.controls.contrasena.hasError('required')
+              ? 'La contraseña es obligatoria'
+              : 'La contraseña debe tener al menos 8 caracteres.'
+          }}</mat-error>
+        }
+      </mat-form-field>
+      <label for="reset-confirm">Confirmar contraseña</label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <input
+          matInput
+          id="reset-confirm"
+          formControlName="confirmacion"
+          [type]="mostrarConfirmacion ? 'text' : 'password'"
+          autocomplete="new-password"
+          [errorStateMatcher]="confirmacionMatcher"
+          required
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          [attr.aria-label]="mostrarConfirmacion ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          [attr.aria-pressed]="mostrarConfirmacion"
+          (click)="mostrarConfirmacion = !mostrarConfirmacion"
+        >
+          <mat-icon class="password-icon" fontSet="material-symbols-rounded" aria-hidden="true">{{
+            mostrarConfirmacion ? 'visibility_off' : 'visibility'
+          }}</mat-icon>
+        </button>
+        @if (
+          (form.controls.confirmacion.invalid || form.hasError('diferentes')) &&
+          (form.controls.confirmacion.dirty || form.controls.confirmacion.touched)
+        ) {
+          <mat-error>{{
+            form.controls.confirmacion.hasError('required')
+              ? 'Confirma tu contraseña'
+              : 'Las contraseñas no coinciden.'
+          }}</mat-error>
+        }
+      </mat-form-field>
+      <p class="hint">Usa al menos 8 caracteres para proteger mejor tu cuenta.</p>
+      <button mat-flat-button class="primary" type="submit">Guardar contraseña</button>
+    </form>
+  }
+  <a class="back" routerLink="/auth/iniciar-sesion">← Volver a iniciar sesión</a>
+  @if (previsualizacion) {
+    <nav class="preview" aria-label="Previsualización del flujo">
+      <span>Previsualización</span
+      ><a routerLink="/auth/verificar-codigo" [queryParams]="{ previsualizacion: true }">Código</a
+      ><a
+        routerLink="/auth/restablecer-contrasena"
+        [queryParams]="{ previsualizacion: true, estado: 'error' }"
+        >Ver errores</a
+      ><a
+        routerLink="/auth/restablecer-contrasena"
+        [queryParams]="{ previsualizacion: true, estado: 'confirmacion' }"
+        >Confirmación</a
+      ><a routerLink="/auth/restablecer-contrasena" [queryParams]="{ previsualizacion: true }"
+        >Formulario</a
+      >
+    </nav>
+  }
+</section>

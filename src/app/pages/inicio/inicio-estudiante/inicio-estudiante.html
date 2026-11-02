@@ -1,0 +1,76 @@
+<header class="page-heading">
+  <h1>Hola</h1>
+  <p>Sigue aprendiendo con tu comunidad de estudio.</p>
+</header>
+<section class="next-step" aria-labelledby="next-step-title">
+  <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">menu_book</mat-icon>
+  <div class="next-step-copy">
+    <h2 id="next-step-title">Encuentra con quién estudiar</h2>
+    <p>Elige un curso o tema y empieza a construir tu comunidad.</p>
+  </div>
+  <a mat-flat-button routerLink="/grupos/descubrimiento" [queryParams]="{ rol: 'estudiante' }"
+    >Explorar grupos</a
+  >
+</section>
+<mat-card appearance="outlined" class="content-card quick-actions" aria-labelledby="quick-actions-title">
+  <h2 id="quick-actions-title">¿Qué quieres hacer hoy?</h2>
+  <nav class="quick-actions-grid" aria-label="Accesos rápidos del estudiante">
+    <a class="quick-action" routerLink="/perfiles" [queryParams]="{ rol: 'estudiante' }">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
+      <span>Mi perfil</span>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon>
+    </a>
+    <a class="quick-action" routerLink="/flashcards" [queryParams]="{ rol: 'estudiante' }">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">style</mat-icon>
+      <span>Mis flashcards</span>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon>
+    </a>
+    <a class="quick-action" routerLink="/grupos/recomendaciones" [queryParams]="{ rol: 'estudiante' }">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">auto_awesome</mat-icon>
+      <span>Recomendaciones IA</span>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chevron_right</mat-icon>
+    </a>
+  </nav>
+</mat-card>
+<section class="groups-section" aria-labelledby="groups-title">
+  <header class="section-heading">
+    <h2 id="groups-title">Tus grupos</h2>
+    <a mat-button routerLink="/grupos/gestion" [queryParams]="{ rol: 'estudiante' }"
+      >Ver mis grupos</a
+    >
+  </header>
+  @if (grupos.length) {
+    <div class="group-grid">
+      @for (grupo of grupos; track grupo.id) {
+        <mat-card appearance="outlined" class="content-card">
+          <div class="card-heading">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+            <h3>{{ grupo.nombre }}</h3>
+          </div>
+          @if (grupo.descripcion) {
+            <p class="group-description">{{ grupo.descripcion }}</p>
+          }
+          @if (grupo.responsable) {
+            <p class="group-responsible">{{ grupo.responsable }}</p>
+          }
+          @if (grupo.detalle) {
+            <p class="group-detail">{{ grupo.detalle }}</p>
+          }
+
+          <a
+            mat-stroked-button
+            class="group-action"
+            [routerLink]="['/grupos', grupo.id]"
+            [queryParams]="{ rol: 'estudiante' }"
+            >Ver grupo</a
+          >
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <mat-card appearance="outlined" class="content-card empty-state"
+      ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+      <p>Aún no tienes grupos</p></mat-card
+    >
+  }
+</section>

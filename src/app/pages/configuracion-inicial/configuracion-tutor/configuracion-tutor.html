@@ -1,0 +1,169 @@
+﻿@if (previsualizacion && estado === 'confirmacion') {
+  <section class="card success" role="status" aria-labelledby="success-title">
+    <span class="success-icon" aria-hidden="true"
+      ><mat-icon fontSet="material-symbols-rounded">check</mat-icon></span
+    >
+    <h1 id="success-title">¡Tu perfil está listo!</h1>
+    <p>Los estudiantes ya podrán conocer tu presentación y método de enseñanza.</p>
+    <a mat-flat-button class="primary" routerLink="/inicio" [queryParams]="{ rol: 'tutor' }"
+      >Ir al inicio</a
+    >
+  </section>
+} @else {
+  <header class="intro">
+    <h1>Completa tu perfil de tutor</h1>
+    <p>Ayuda a los estudiantes a conocer tu forma de enseñar antes de unirse a tus grupos.</p>
+  </header>
+  <ol class="steps" aria-label="Pasos de configuración">
+    <li class="active" [class.done]="paso === 2" [attr.aria-current]="paso === 1 ? 'step' : null">
+      <span class="dot">
+        @if (paso === 2) {
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check</mat-icon>
+        } @else {
+          1
+        }</span
+      ><span class="step-label">Información académica</span>
+    </li>
+    <li [class.active]="paso === 2" [attr.aria-current]="paso === 2 ? 'step' : null">
+      <span class="dot">2</span><span class="step-label">Perfil del tutor</span>
+    </li>
+  </ol>
+  <section class="card" [attr.aria-labelledby]="paso === 1 ? 'academic-title' : 'teaching-title'">
+    @if (paso === 1) {
+      <form [formGroup]="academico" (ngSubmit)="siguiente()">
+        <div class="content">
+          <header class="panel-head">
+            <span class="panel-icon" aria-hidden="true"
+              ><mat-icon fontSet="material-symbols-rounded">school</mat-icon></span
+            >
+            <div>
+              <h2 id="academic-title">Información académica</h2>
+              <p>Estos datos son compartidos por estudiantes y tutores dentro de Yachani.</p>
+            </div>
+          </header>
+          <div class="academic-grid">
+            <div class="field">
+              <label for="university">Universidad <span>*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                ><input
+                  matInput
+                  id="university"
+                  formControlName="universidad"
+                  [errorStateMatcher]="errorMatcher"
+                  required
+                />
+                @if (
+                  academico.controls.universidad.invalid &&
+                  (academico.controls.universidad.dirty || academico.controls.universidad.touched)
+                ) {
+                  <mat-error>La universidad es obligatoria</mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <div class="field">
+              <label for="career">Carrera <span>*</span></label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                ><input
+                  matInput
+                  id="career"
+                  formControlName="carrera"
+                  placeholder="Ej. Ingeniería de Software"
+                  [errorStateMatcher]="errorMatcher"
+                  required
+                />
+                @if (
+                  academico.controls.carrera.invalid &&
+                  (academico.controls.carrera.dirty || academico.controls.carrera.touched)
+                ) {
+                  <mat-error>La carrera es obligatoria</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <footer class="actions first">
+          <button mat-flat-button class="primary" type="submit">Siguiente</button>
+        </footer>
+      </form>
+    } @else {
+      <form [formGroup]="perfil" (ngSubmit)="finalizar()">
+        <div class="content">
+          <header class="panel-head">
+            <span class="panel-icon" aria-hidden="true"
+              ><mat-icon fontSet="material-symbols-rounded">person</mat-icon></span
+            >
+            <div>
+              <h2 id="teaching-title">Presentación y enseñanza</h2>
+              <p>
+                Esta información aparecerá en tu perfil y podrá ser consultada por los estudiantes.
+              </p>
+            </div>
+          </header>
+          <div class="presentation">
+            <label for="presentation">Presentación <span>*</span></label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <textarea
+                matInput
+                id="presentation"
+                formControlName="presentacion"
+                rows="5"
+                maxlength="500"
+                placeholder="Cuéntales brevemente a los estudiantes sobre ti, tu experiencia y cómo puedes ayudarlos."
+                [errorStateMatcher]="errorMatcher"
+                required
+              ></textarea>
+              <mat-hint align="end"
+                >{{ perfil.controls.presentacion.value.length }}/500 caracteres</mat-hint
+              >
+              @if (
+                perfil.controls.presentacion.invalid &&
+                (perfil.controls.presentacion.dirty || perfil.controls.presentacion.touched)
+              ) {
+                <mat-error>{{
+                  perfil.controls.presentacion.hasError('maxlength')
+                    ? 'La presentación admite hasta 500 caracteres'
+                    : 'La presentación es obligatoria'
+                }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div>
+            <label id="teaching-method-label">Método de enseñanza <span>*</span></label>
+            <mat-button-toggle-group
+              class="teaching-methods"
+              formControlName="metodo"
+              aria-labelledby="teaching-method-label"
+              [hideSingleSelectionIndicator]="true"
+            >
+              @for (metodo of metodos; track metodo) {
+                <mat-button-toggle [value]="metodo"
+                  ><span class="method-text">{{ metodo }}</span></mat-button-toggle
+                >
+              }
+            </mat-button-toggle-group>
+            @if (
+              perfil.controls.metodo.invalid &&
+              (perfil.controls.metodo.dirty || perfil.controls.metodo.touched)
+            ) {
+              <mat-error>Selecciona un método de enseñanza</mat-error>
+            }
+          </div>
+        </div>
+        <footer class="actions">
+          <button mat-stroked-button type="button" (click)="paso = 1">Atrás</button
+          ><button mat-flat-button class="primary" type="submit">Finalizar configuración</button>
+        </footer>
+      </form>
+    }
+  </section>
+}
+@if (previsualizacion) {
+  <nav class="preview" aria-label="Previsualización">
+    <span>Previsualización</span
+    ><button mat-button type="button" (click)="estado = 'formulario'; paso = 1">
+      Información académica</button
+    ><button mat-button type="button" (click)="estado = 'formulario'; paso = 2">
+      Perfil del tutor</button
+    ><button mat-button type="button" (click)="estado = 'confirmacion'">Confirmación</button>
+  </nav>
+}

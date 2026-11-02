@@ -1,0 +1,48 @@
+<section class="card" aria-labelledby="recovery-title">
+  <p class="eyebrow">Recuperación de cuenta</p>
+  <h1 id="recovery-title">¿Olvidaste tu contraseña?</h1>
+  <p class="description">
+    Ingresa tu correo institucional y te enviaremos un código de verificación.
+  </p>
+  <form [formGroup]="form" (ngSubmit)="enviar()">
+    <label for="recovery-email">Correo institucional</label>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <input
+        matInput
+        id="recovery-email"
+        type="email"
+        autocomplete="username"
+        formControlName="correo"
+        placeholder="u20xxxxxx@upc.edu.pe"
+        [errorStateMatcher]="errorMatcher"
+        required
+      />
+      <mat-icon matSuffix fontSet="material-symbols-rounded" aria-hidden="true">mail</mat-icon>
+      @if (
+        form.controls.correo.invalid && (form.controls.correo.dirty || form.controls.correo.touched)
+      ) {
+        <mat-error>{{
+          form.controls.correo.hasError('required')
+            ? 'El correo es obligatorio'
+            : form.controls.correo.hasError('email')
+              ? 'Ingresa un correo válido'
+              : 'El correo debe terminar en @upc.edu.pe'
+        }}</mat-error>
+      }
+    </mat-form-field>
+    <button mat-flat-button class="primary" type="submit">Enviar código</button>
+  </form>
+  <a class="back" routerLink="/auth/iniciar-sesion">← Volver a iniciar sesión</a>
+  @if (previsualizacion) {
+    <nav class="preview" aria-label="Previsualización del flujo">
+      <span>Previsualización</span
+      ><a
+        routerLink="/auth/recuperar-contrasena"
+        [queryParams]="{ previsualizacion: true, estado: 'error' }"
+        >Ver errores</a
+      ><a routerLink="/auth/verificar-codigo" [queryParams]="{ previsualizacion: true }"
+        >Continuar al código</a
+      >
+    </nav>
+  }
+</section>
