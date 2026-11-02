@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+:host ::ng-deep .sharing-flow .mat-horizontal-stepper-header-container {
+  display: none;
+}
+:host ::ng-deep .sharing-flow .mat-horizontal-content-container {
+  padding: 0;
+}
+.sharing-flow {
+  background: transparent;
+}
+.intro {
+  margin-bottom: var(--space-4);
+  color: var(--color-muted);
+  font: var(--font-secondary);
+}
+.deck-card h3 {
+  font: var(--font-card-title);
+}
+.actions {
+  margin-top: var(--space-4);
+}

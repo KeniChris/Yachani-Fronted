@@ -1,0 +1,238 @@
+:host {
+  min-width: 0;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1 {
+  overflow-wrap: anywhere;
+}
+img {
+  display: block;
+  flex: none;
+}
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.page-heading > div {
+  min-width: 0;
+}
+.page-heading p {
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+}
+.page-heading > a,
+.page-heading > button {
+  flex: none;
+}
+.panel,
+.deck-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+}
+.deck-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+.deck-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.deck-card h2 {
+  font: var(--font-card-title);
+}
+.deck-card p {
+  font: var(--font-secondary);
+  color: var(--color-muted);
+}
+.deck-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-active);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-control);
+  color: var(--color-primary);
+  font: var(--font-help);
+}
+small {
+  font: var(--font-help);
+  color: var(--color-muted);
+}
+mat-progress-bar {
+  border-radius: var(--radius-control);
+  --mat-progress-bar-track-height: 8px;
+  --mat-progress-bar-active-indicator-height: 8px;
+  --mat-progress-bar-track-color: var(--color-active);
+  --mat-progress-bar-active-indicator-color: var(--color-primary);
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.form-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-8);
+}
+mat-form-field {
+  width: 100%;
+  min-width: 0;
+}
+textarea {
+  resize: vertical;
+}
+.steps {
+  display: flex;
+  gap: var(--space-6);
+  list-style: none;
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  max-width: 680px;
+}
+.steps li {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--font-secondary);
+  color: var(--color-muted);
+}
+.steps span,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-active);
+  color: var(--color-primary);
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  font: var(--font-help);
+}
+.steps span {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+.steps .current {
+  color: var(--color-primary);
+}
+.steps .current span {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.mobile-step {
+  display: none;
+}
+.badges {
+  display: flex;
+  gap: var(--space-2);
+}
+.success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+.dialog-shell {
+  padding: var(--space-8);
+}
+.dialog-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.dialog-heading h2 {
+  flex: 1;
+  min-width: 0;
+  font: var(--font-section-title);
+}
+.dialog-heading button {
+  flex: none;
+}
+.dialog-shell mat-dialog-content {
+  padding: 0;
+  color: var(--color-muted);
+  font: var(--font-secondary);
+  max-height: 65vh;
+}
+.dialog-shell mat-dialog-content p + p {
+  margin-top: var(--space-4);
+}
+.dialog-shell mat-dialog-actions {
+  padding: 0;
+  margin-top: var(--space-4);
+  gap: var(--space-3);
+  justify-content: end;
+}
+.dialog-shell .form-panel {
+  padding: 0;
+}
+.danger {
+  --mat-button-filled-container-color: var(--color-error);
+}
+@media (max-width: 1100px) {
+  .deck-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .page-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .deck-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .steps {
+    display: none;
+  }
+  .mobile-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    font: var(--font-control);
+  }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions > a,
+  .actions > button {
+    width: 100%;
+  }
+  .form-panel,
+  .dialog-shell {
+    padding: var(--space-6);
+  }
+  .dialog-heading h2 {
+    font-size: 24px;
+    line-height: 28px;
+  }
+  .dialog-shell mat-dialog-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dialog-shell mat-dialog-actions > button,
+  .dialog-shell mat-dialog-actions > a {
+    width: 100%;
+    margin: 0;
+  }
+}

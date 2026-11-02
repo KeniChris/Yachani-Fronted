@@ -1,0 +1,28 @@
+<header class="page-heading">
+  <div>
+    <h1>Mis mazos</h1>
+    <p>Tus borradores y mazos publicados, siempre en un mismo lugar.</p>
+  </div>
+  <a mat-flat-button routerLink="crear" queryParamsHandling="preserve">Crear mazo</a>
+</header>
+<div class="deck-grid">
+  @for (mazo of mazos; track mazo.id) {
+    <article class="deck-card">
+      <div class="deck-banner">
+        <img src="/icons/flashcards/style.svg" alt="" width="24" height="24" /><span
+          >{{ mazo.tarjetas }} tarjetas</span
+        >
+      </div>
+      <h2>{{ mazo.titulo }}</h2>
+      <p>{{ mazo.descripcion }}</p>
+      <small>{{ rol === 'tutor' ? 'Carlos Ríos' : 'Leicy Cahuana' }} · {{ mazo.estado }}</small
+      ><small>{{ mazo.avance }}</small>
+      <mat-progress-bar
+        mode="determinate"
+        [value]="mazo.progreso"
+        [attr.aria-label]="'Progreso de ' + mazo.titulo"
+      />
+      <a mat-stroked-button [routerLink]="[mazo.id]" queryParamsHandling="preserve">Ver mazo</a>
+    </article>
+  }
+</div>

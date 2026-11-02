@@ -1,0 +1,51 @@
+<header class="page-heading">
+  <div>
+    <h1>Mazos del grupo</h1>
+    <p>Practica con los mazos compartidos en este grupo.</p>
+  </div>
+  @if (rol === 'tutor' || publicaciones !== 'tutor' || contexto === 'estudiantes') {
+    <button
+      mat-flat-button
+      (click)="
+        dialog.open(compartirMazo, {
+          width: '600px',
+          maxWidth: 'calc(100vw - 32px)',
+          data: { elegir: true, contexto: contexto, rol: rol },
+        })
+      "
+    >
+      Compartir un mazo
+    </button>
+  }
+</header>
+<form class="topic-filter" [formGroup]="form">
+  <mat-form-field appearance="outline"
+    ><mat-label>Tema</mat-label
+    ><mat-select formControlName="tema"
+      ><mat-option value="Todos los temas">Todos los temas</mat-option>
+      @for (tema of contexto === 'estudiantes' ? temasEstudiantes : temas; track tema) {
+        <mat-option [value]="tema">{{ tema }}</mat-option>
+      }</mat-select
+    ><mat-hint>Elige un tema para ver sus mazos.</mat-hint></mat-form-field
+  >
+</form>
+<div class="deck-grid">
+  @for (mazo of contexto === 'estudiantes' ? mazosEstudiantes : mazos; track mazo.id) {
+    <article class="deck-card">
+      <div class="deck-banner">
+        <img src="/icons/flashcards/style.svg" width="24" height="24" alt="" /><span
+          >{{ mazo.tarjetas }} tarjetas</span
+        >
+      </div>
+      <h2>{{ mazo.titulo }}</h2>
+      <p>{{ mazo.descripcion }}</p>
+      <small>{{ publicaciones === 'tutor' ? 'Carlos Ríos' : mazo.autor }} · {{ mazo.tema }}</small
+      ><small>{{ mazo.avance }}</small
+      ><mat-progress-bar
+        mode="determinate"
+        [value]="mazo.progreso"
+        [attr.aria-label]="'Progreso de ' + mazo.titulo"
+      /><a mat-stroked-button [routerLink]="[mazo.id]" queryParamsHandling="preserve">Ver mazo</a>
+    </article>
+  }
+</div>
