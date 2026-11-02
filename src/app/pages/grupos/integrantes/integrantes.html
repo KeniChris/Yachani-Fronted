@@ -1,0 +1,149 @@
+<header class="page-heading">
+  <div>
+    <h1>Integrantes del grupo</h1>
+    <p>Conoce a las personas con las que estás estudiando.</p>
+  </div>
+  @if (rol === 'tutor') {
+    <a mat-stroked-button routerLink="/grupos/gestion" queryParamsHandling="preserve"
+      >Configuración del grupo</a
+    >
+  }
+</header>
+
+<div class="layout">
+  <section class="content-card" aria-label="Lista de integrantes">
+    <h2>Administración</h2>
+    <ul class="member-list">
+      <li class="member">
+        <span class="avatar" aria-hidden="true">CR</span>
+        <span class="member-copy"
+          ><strong>Carlos Ríos</strong><small>Tutor · Creador del grupo</small></span
+        >
+        <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
+          >chevron_right</mat-icon
+        >
+      </li>
+    </ul>
+    <h2>Estudiantes ({{ estudiantes.length }})</h2>
+    <ul class="member-list">
+      @for (estudiante of estudiantes; track estudiante.nombre; let primero = $first) {
+        <li class="member">
+          <span class="avatar" aria-hidden="true">{{ estudiante.iniciales }}</span>
+          <span class="member-copy"
+            ><strong>{{ estudiante.nombre }}</strong
+            ><small>{{ primero && rol !== 'tutor' ? 'Estudiante · Tú' : 'Estudiante' }}</small></span
+          >
+          <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
+            >chevron_right</mat-icon
+          >
+          @if (rol === 'tutor') {
+            <button
+              mat-icon-button
+              type="button"
+              class="remove"
+              [attr.aria-label]="'Eliminar a ' + estudiante.nombre + ' del grupo'"
+              (click)="
+                dialog.open(eliminarDialog, {
+                  width: '600px',
+                  maxWidth: 'calc(100vw - 32px)',
+                  data: estudiante.nombre,
+                })
+              "
+            >
+              <mat-icon fontSet="material-symbols-rounded">delete</mat-icon>
+            </button>
+          }
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="content-card seats" aria-labelledby="seats-title">
+    <h2 id="seats-title">Cupos</h2>
+    <p class="seats-count">8 de {{ estado === 'capacidad' ? 15 : 12 }} integrantes</p>
+    <p class="help">Quedan {{ estado === 'capacidad' ? 7 : 4 }} espacios disponibles.</p>
+    @if (rol === 'tutor') {
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="
+          capacidadForm.reset({ capacidad: 15 });
+          dialog.open(capacidadDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })
+        "
+      >
+        Cambiar capacidad
+      </button>
+      <a mat-flat-button routerLink="../solicitudes" queryParamsHandling="preserve">Revisar solicitudes</a>
+      <a mat-stroked-button routerLink="../sesiones" queryParamsHandling="preserve">Programar sesión</a>
+    } @else {
+      <p class="help">El creador administra los cupos y las solicitudes.</p>
+    }
+  </section>
+</div>
+
+@if (estado === 'capacidad') {
+  <div class="notice success" role="status">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+    <div>
+      <p class="notice-title">Capacidad actualizada</p>
+      <p>El grupo ahora admite hasta 15 integrantes.</p>
+    </div>
+  </div>
+}
+
+<ng-template #capacidadDialog>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>Cambiar capacidad</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>El grupo tiene 8 integrantes. La capacidad debe ser igual o mayor.</p>
+      <form [formGroup]="capacidadForm">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Nueva capacidad</mat-label>
+          <input matInput type="number" formControlName="capacidad" min="8" required />
+          @if (capacidadForm.controls.capacidad.touched && capacidadForm.controls.capacidad.invalid) {
+            <mat-error>La capacidad no puede ser menor a 8 integrantes.</mat-error>
+          } @else {
+            <mat-hint>Mínimo 2, sin bajar de los integrantes actuales.</mat-hint>
+          }
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        mat-dialog-close
+        [disabled]="capacidadForm.invalid"
+        routerLink="."
+        [queryParams]="{ estado: 'capacidad' }"
+        queryParamsHandling="merge"
+      >
+        Guardar cambios
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<ng-template #eliminarDialog let-nombre>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Eliminar a {{ nombre.split(' ')[0] }} del grupo?</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>{{ nombre }} dejará de tener acceso a este grupo.</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button mat-flat-button type="button" class="danger" mat-dialog-close>Eliminar integrante</button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

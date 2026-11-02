@@ -1,0 +1,114 @@
+<header class="page-heading">
+  <div>
+    <h1>Avisos del grupo</h1>
+    <p>Información compartida por quien administra el grupo.</p>
+  </div>
+  @if (rol === 'tutor') {
+    <button
+      mat-flat-button
+      type="button"
+      (click)="
+        form.reset();
+        dialog.open(avisoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: false })
+      "
+    >
+      Publicar aviso
+    </button>
+  }
+</header>
+
+@if (estado === 'publicado') {
+  <div class="notice success" role="status">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+    <div>
+      <p class="notice-title">Aviso publicado</p>
+      <p>Tu mensaje ya aparece en los avisos del grupo.</p>
+    </div>
+  </div>
+}
+
+@if (estado === 'vacio') {
+  <section class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">campaign</mat-icon>
+    <h2>No hay avisos publicados</h2>
+    <p>Publica un mensaje importante para tu grupo.</p>
+    @if (rol === 'tutor') {
+      <button
+        mat-flat-button
+        type="button"
+        (click)="
+          form.reset();
+          dialog.open(avisoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: false })
+        "
+      >
+        Publicar aviso
+      </button>
+    }
+  </section>
+} @else {
+  <article class="content-card notice-card">
+    <div class="card-heading">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">campaign</mat-icon>
+      <h2>Material para la próxima sesión</h2>
+    </div>
+    <p>Revisen la guía de derivadas antes del repaso de mañana.</p>
+    <p class="help">Carlos Ríos · 29 oct 2026</p>
+    @if (rol === 'tutor') {
+      <button
+        mat-button
+        type="button"
+        class="edit"
+        (click)="
+          form.reset();
+          dialog.open(avisoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: true })
+        "
+      >
+        Editar aviso
+      </button>
+    }
+  </article>
+}
+
+<ng-template #avisoDialog let-editar>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>{{ editar ? 'Editar aviso' : 'Publicar aviso' }}</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Comparte una indicación clara para el grupo.</p>
+      <form [formGroup]="form">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="titulo" maxlength="100" required />
+          @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
+            <mat-error>Escribe el título del aviso.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Mensaje</mat-label>
+          <textarea matInput formControlName="mensaje" rows="4" maxlength="500" required></textarea>
+          @if (form.controls.mensaje.touched && form.controls.mensaje.invalid) {
+            <mat-error>Escribe el mensaje del aviso.</mat-error>
+          }
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        mat-dialog-close
+        [disabled]="form.invalid"
+        routerLink="."
+        [queryParams]="{ estado: 'publicado' }"
+        queryParamsHandling="merge"
+      >
+        {{ editar ? 'Guardar cambios' : 'Publicar aviso' }}
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

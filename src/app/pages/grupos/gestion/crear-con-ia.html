@@ -1,0 +1,259 @@
+@switch (paso) {
+  @case ('mazos') {
+    <header class="page-heading">
+      <h1>Elige tus mazos</h1>
+      <p>Selecciona los mazos personales que quieres incorporar al nuevo grupo.</p>
+    </header>
+    <p class="step"><span class="step-chip">Paso 2 de 3</span>Selecciona y organiza tus mazos</p>
+    @for (mazo of mazos; track mazo.titulo) {
+      <section class="content-card">
+        <h2>{{ mazo.titulo }}</h2>
+        <p class="help">{{ mazo.detalle }}</p>
+        @if (mazo.disponible) {
+          <span class="badge success">Seleccionado</span>
+          <p class="help">Este mazo conservará su contenido y autoría.</p>
+        } @else {
+          <p class="help">Completa sus tarjetas antes de compartirlo.</p>
+          <button mat-flat-button type="button" class="unavailable" disabled>
+            No disponible para compartir
+          </button>
+        }
+      </section>
+    }
+    <div class="actions">
+      <a mat-stroked-button routerLink="." [queryParams]="{ paso: 'describir' }" queryParamsHandling="merge"
+        >Volver a mi descripción</a
+      >
+      <a mat-flat-button routerLink="." [queryParams]="{ paso: 'organizar' }" queryParamsHandling="merge"
+        >Organizar 2 mazos</a
+      >
+    </div>
+  }
+  @case ('organizar') {
+    <header class="page-heading">
+      <h1>Organiza tus mazos por tema</h1>
+      <p>Revisa en qué tema se compartirá cada mazo del nuevo grupo.</p>
+    </header>
+    <p class="step"><span class="step-chip">Paso 2 de 3</span>Selecciona y organiza tus mazos</p>
+    <section class="content-card">
+      <h2>Temas propuestos</h2>
+      <p class="help">Límites y continuidad · Reglas de derivación · Aplicaciones de la derivada</p>
+    </section>
+    <form class="stack" [formGroup]="organizarForm" aria-label="Tema de destino de cada mazo">
+      <section class="content-card">
+        <h2>Límites laterales</h2>
+        <p class="help">Carlos Ríos · 12 tarjetas</p>
+        <mat-form-field appearance="outline">
+          <mat-label>Tema de destino</mat-label>
+          <mat-select formControlName="limites" required>
+            @for (tema of temas; track tema) {
+              <mat-option [value]="tema">{{ tema }}</mat-option>
+            }
+          </mat-select>
+          @if (organizarForm.controls.limites.touched && organizarForm.controls.limites.invalid) {
+            <mat-error>Selecciona un tema de destino.</mat-error>
+          }
+        </mat-form-field>
+      </section>
+      <section class="content-card">
+        <h2>Fórmulas de derivadas</h2>
+        <p class="help">Carlos Ríos · 4 tarjetas</p>
+        <mat-form-field appearance="outline">
+          <mat-label>Tema de destino</mat-label>
+          <mat-select formControlName="derivadas" required>
+            @for (tema of temas; track tema) {
+              <mat-option [value]="tema">{{ tema }}</mat-option>
+            }
+          </mat-select>
+          @if (organizarForm.controls.derivadas.touched && organizarForm.controls.derivadas.invalid) {
+            <mat-error>Selecciona un tema de destino.</mat-error>
+          }
+        </mat-form-field>
+      </section>
+    </form>
+    <div class="actions">
+      <a mat-stroked-button routerLink="." [queryParams]="{ paso: 'mazos' }" queryParamsHandling="merge"
+        >Cambiar mazos</a
+      >
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="organizarForm.invalid"
+        routerLink="."
+        [queryParams]="{ paso: 'revision' }"
+        queryParamsHandling="merge"
+      >
+        Revisar propuesta
+      </button>
+    </div>
+  }
+  @case ('revision') {
+    <header class="page-heading">
+      <h1>Revisa la propuesta de tu grupo</h1>
+      <p>Comprueba los datos, los temas y tus mazos antes de crear el grupo.</p>
+    </header>
+    <p class="step"><span class="step-chip">Paso 3 de 3</span>Revisa y crea</p>
+    <form class="stack" [formGroup]="propuestaForm" aria-label="Propuesta del grupo">
+      <section class="content-card">
+        <h2>Datos del grupo</h2>
+        <p class="help">Puedes ajustar esta propuesta antes de confirmar.</p>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del grupo</mat-label>
+          <input matInput formControlName="nombre" required />
+          @if (propuestaForm.controls.nombre.touched && propuestaForm.controls.nombre.invalid) {
+            <mat-error>Escribe el nombre del grupo.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="descripcion" rows="4" maxlength="500" required></textarea>
+          @if (propuestaForm.controls.descripcion.touched && propuestaForm.controls.descripcion.invalid) {
+            <mat-error>Escribe una descripción de hasta 500 caracteres.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Método de estudio</mat-label>
+          <mat-select formControlName="metodo" required>
+            @for (metodo of metodos; track metodo) {
+              <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+          @if (propuestaForm.controls.metodo.touched && propuestaForm.controls.metodo.invalid) {
+            <mat-error>Selecciona un método de estudio.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Capacidad máxima</mat-label>
+          <input matInput type="number" formControlName="capacidad" min="2" required />
+          @if (propuestaForm.controls.capacidad.touched && propuestaForm.controls.capacidad.invalid) {
+            <mat-error>La capacidad mínima es de 2 integrantes.</mat-error>
+          }
+        </mat-form-field>
+      </section>
+      <section class="content-card">
+        <h2>Temas del grupo</h2>
+        <p class="help">Solo tú, como tutor administrador, podrás crear y editar los temas.</p>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del tema</mat-label>
+          <input matInput formControlName="tema1" required />
+          @if (propuestaForm.controls.tema1.touched && propuestaForm.controls.tema1.invalid) {
+            <mat-error>Escribe el nombre del tema.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del tema</mat-label>
+          <input matInput formControlName="tema2" required />
+          @if (propuestaForm.controls.tema2.touched && propuestaForm.controls.tema2.invalid) {
+            <mat-error>Escribe el nombre del tema.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del tema</mat-label>
+          <input matInput formControlName="tema3" required />
+          @if (propuestaForm.controls.tema3.touched && propuestaForm.controls.tema3.invalid) {
+            <mat-error>Escribe el nombre del tema.</mat-error>
+          }
+        </mat-form-field>
+      </section>
+      <section class="content-card">
+        <h2>Mazos que se compartirán</h2>
+        <ul class="deck-list">
+          <li>Límites laterales → Límites y continuidad</li>
+          <li>Fórmulas de derivadas → Reglas de derivación</li>
+        </ul>
+        <p class="help">Son tus mazos existentes. No se generan ni se duplican sus tarjetas.</p>
+        <a
+          mat-stroked-button
+          class="inline-action"
+          routerLink="."
+          [queryParams]="{ paso: 'organizar' }"
+          queryParamsHandling="merge"
+          >Cambiar temas de destino</a
+        >
+      </section>
+    </form>
+    <div class="actions">
+      <a mat-stroked-button routerLink="." [queryParams]="{ paso: 'describir' }" queryParamsHandling="merge"
+        >Editar mi descripción</a
+      >
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="propuestaForm.invalid"
+        routerLink="/grupos/gestion"
+        [queryParams]="{ estado: 'creado-ia', paso: null }"
+        queryParamsHandling="merge"
+      >
+        Crear grupo
+      </button>
+    </div>
+  }
+  @default {
+    <header class="page-heading">
+      <h1>Crea tu grupo con apoyo de IA</h1>
+      <p>Describe el grupo que quieres organizar y revisa la propuesta antes de crearlo.</p>
+    </header>
+    <p class="step"><span class="step-chip">Paso 1 de 3</span>Describe tu grupo</p>
+    <form class="content-card" [formGroup]="descripcionForm" aria-labelledby="describe-title">
+      <h2 id="describe-title">¿Cómo quieres organizar el grupo?</h2>
+      <p class="help">La IA utilizará tu descripción para proponer el grupo y sus temas.</p>
+      <mat-form-field appearance="outline">
+        <mat-label>Describe tu grupo</mat-label>
+        <textarea matInput formControlName="descripcion" rows="4" required></textarea>
+        @if (descripcionForm.controls.descripcion.touched && descripcionForm.controls.descripcion.invalid) {
+          <mat-error>Describe tu grupo para generar la propuesta.</mat-error>
+        } @else {
+          <mat-hint>Indica los temas y dónde quieres compartir tus mazos existentes.</mat-hint>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Método de estudio</mat-label>
+        <mat-select formControlName="metodo" required>
+          @for (metodo of metodos; track metodo) {
+            <mat-option [value]="metodo">{{ metodo }}</mat-option>
+          }
+        </mat-select>
+        @if (descripcionForm.controls.metodo.touched && descripcionForm.controls.metodo.invalid) {
+          <mat-error>Selecciona un método de estudio.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Capacidad máxima</mat-label>
+        <input matInput type="number" formControlName="capacidad" min="2" required />
+        @if (descripcionForm.controls.capacidad.touched && descripcionForm.controls.capacidad.invalid) {
+          <mat-error>La capacidad mínima es de 2 integrantes.</mat-error>
+        } @else {
+          <mat-hint>Mínimo 2 integrantes.</mat-hint>
+        }
+      </mat-form-field>
+    </form>
+    <section class="content-card" aria-labelledby="decks-title">
+      <h2 id="decks-title">Mazos de tu biblioteca</h2>
+      <p class="help">Se compartirán mazos que ya creaste. Sus originales seguirán en tu biblioteca.</p>
+      <p class="help">2 mazos seleccionados · 16 tarjetas</p>
+      <a
+        mat-stroked-button
+        class="inline-action"
+        routerLink="."
+        [queryParams]="{ paso: 'mazos' }"
+        queryParamsHandling="merge"
+        >Elegir y organizar mis mazos</a
+      >
+    </section>
+    <div class="actions">
+      <a mat-stroked-button routerLink="/grupos/gestion" [queryParams]="{ paso: null }" queryParamsHandling="merge"
+        >Cancelar</a
+      >
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="descripcionForm.invalid"
+        routerLink="."
+        [queryParams]="{ paso: 'revision' }"
+        queryParamsHandling="merge"
+      >
+        Generar propuesta
+      </button>
+    </div>
+  }
+}

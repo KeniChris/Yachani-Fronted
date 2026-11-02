@@ -1,0 +1,96 @@
+@if (vista === 'recordatorio') {
+  <h1>Recordatorio de sesión</h1>
+  <section class="content-card reminder" aria-labelledby="reminder-title">
+    <h2 id="reminder-title">Tu sesión empieza pronto</h2>
+    <p class="help">Repaso de derivadas</p>
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+    <dl>
+      <dt>Fecha y hora</dt>
+      <dd>30 oct 2026 · 19:00</dd>
+      <dt>Duración</dt>
+      <dd>60 minutos</dd>
+      <dt>Lugar o enlace</dt>
+      <dd>meet.google.com/abc-defg-hij</dd>
+    </dl>
+    <p class="help">Recibiste este recordatorio aproximadamente 60 minutos antes del encuentro.</p>
+    <a
+      mat-flat-button
+      routerLink="/grupos/dominando-calculo/sesiones"
+      [queryParams]="{ vista: 'detalle', estado: null }"
+      queryParamsHandling="merge"
+      >Ver sesión</a
+    >
+    <a
+      mat-stroked-button
+      routerLink="."
+      [queryParams]="{ vista: null, estado: null }"
+      queryParamsHandling="merge"
+      >Volver a notificaciones</a
+    >
+  </section>
+} @else {
+  <header class="page-heading">
+    <h1>Notificaciones</h1>
+    <p>Mantente al tanto de tus grupos y sesiones.</p>
+  </header>
+
+  @if (estado === 'vacio') {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+      <h2>Estás al día</h2>
+      <p>Las novedades de tus grupos y los recordatorios aparecerán aquí.</p>
+      <a mat-flat-button routerLink="/inicio" [queryParams]="{ estado: null }" queryParamsHandling="merge"
+        >Volver al inicio</a
+      >
+    </section>
+  } @else {
+    @if (estado === 'leida') {
+      <div class="notice success" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+        <div>
+          <p class="notice-title">Notificación marcada como leída</p>
+          <p>Puedes seguir revisando tus novedades.</p>
+        </div>
+      </div>
+    }
+    <span class="badge">{{ estado === 'leida' ? 1 : 2 }} sin leer</span>
+    <p class="help">Revisa las novedades de tus grupos y los recordatorios de sesión.</p>
+    <ul class="list">
+      @for (
+        notificacion of notificaciones[rol === 'tutor' ? 'tutor' : 'estudiante'];
+        track notificacion.texto;
+        let primera = $first
+      ) {
+        @let leida = notificacion.leida || (primera && estado === 'leida');
+        <li class="content-card item">
+          <div class="item-body">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+            <div class="item-copy">
+              <h2>{{ notificacion.titulo }}</h2>
+              <p>{{ notificacion.texto }}</p>
+              <p class="help">{{ notificacion.fecha }}</p>
+              <a
+                mat-button
+                [routerLink]="notificacion.enlace"
+                [queryParams]="{ vista: notificacion.vista, estado: null }"
+                queryParamsHandling="merge"
+                >{{ notificacion.accion }}</a
+              >
+            </div>
+          </div>
+          <span class="badge" [class.read]="leida">{{ leida ? 'Leída' : 'Sin leer' }}</span>
+          @if (!leida) {
+            <a
+              mat-button
+              class="mark"
+              routerLink="."
+              [queryParams]="{ estado: 'leida' }"
+              queryParamsHandling="merge"
+              >Marcar como leída</a
+            >
+          }
+        </li>
+      }
+    </ul>
+  }
+}

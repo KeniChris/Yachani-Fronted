@@ -1,0 +1,141 @@
+<header class="page-heading">
+  <h1>Solicitudes de ingreso</h1>
+  <p>Revisa quién desea formar parte de tu grupo.</p>
+</header>
+
+<section class="content-card summary">
+  <p>Dominando Cálculo · {{ estado === 'aceptada' ? 9 : 8 }} de 12 integrantes</p>
+</section>
+
+@switch (estado) {
+  @case ('vacio') {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person_add</mat-icon>
+      <h2>No tienes solicitudes pendientes</h2>
+      <p>Las nuevas solicitudes aparecerán aquí.</p>
+      <a mat-flat-button routerLink="../integrantes" [queryParams]="{ estado: null }" queryParamsHandling="merge"
+        >Ver integrantes</a
+      >
+    </section>
+  }
+  @default {
+    @if (estado === 'aceptada' || estado === 'rechazada') {
+      <div class="notice success" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+        <div>
+          @if (estado === 'aceptada') {
+            <p class="notice-title">Solicitud aceptada</p>
+            <p>Irene Castro ahora forma parte del grupo.</p>
+          } @else {
+            <p class="notice-title">Solicitud rechazada</p>
+            <p>Se notificó a Irene sobre el resultado de su solicitud.</p>
+          }
+        </div>
+      </div>
+    }
+    <div class="request-grid" [class.single]="estado === 'aceptada' || estado === 'rechazada'">
+      @for (
+        solicitud of estado === 'aceptada' || estado === 'rechazada' ? solicitudes.slice(1) : solicitudes;
+        track solicitud.nombre
+      ) {
+        <article class="content-card request">
+          <div class="request-person">
+            <span class="avatar" aria-hidden="true">{{ solicitud.iniciales }}</span>
+            <div>
+              <h2>{{ solicitud.nombre }}</h2>
+              <p class="help">{{ solicitud.fecha }}</p>
+            </div>
+          </div>
+          <p class="pending">Pendiente de revisión</p>
+          <div class="request-actions">
+            <button
+              mat-stroked-button
+              type="button"
+              [attr.aria-label]="'Rechazar a ' + solicitud.nombre"
+              (click)="
+                dialog.open(rechazarDialog, {
+                  width: '600px',
+                  maxWidth: 'calc(100vw - 32px)',
+                  data: solicitud.nombre,
+                })
+              "
+            >
+              Rechazar
+            </button>
+            <button
+              mat-flat-button
+              type="button"
+              [attr.aria-label]="'Aceptar a ' + solicitud.nombre"
+              (click)="
+                dialog.open(aceptarDialog, {
+                  width: '600px',
+                  maxWidth: 'calc(100vw - 32px)',
+                  data: solicitud.nombre,
+                })
+              "
+            >
+              Aceptar
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+}
+
+<ng-template #aceptarDialog let-nombre>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Aceptar a {{ nombre }}?</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>
+        {{ nombre.split(' ')[0] }} podrá participar en el chat, las sesiones y los recursos del grupo.
+      </p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        mat-dialog-close
+        routerLink="."
+        [queryParams]="{ estado: 'aceptada' }"
+        queryParamsHandling="merge"
+      >
+        Aceptar solicitud
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<ng-template #rechazarDialog let-nombre>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Rechazar esta solicitud?</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>{{ nombre.split(' ')[0] }} recibirá una notificación con el resultado.</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        class="danger"
+        mat-dialog-close
+        routerLink="."
+        [queryParams]="{ estado: 'rechazada' }"
+        queryParamsHandling="merge"
+      >
+        Rechazar solicitud
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

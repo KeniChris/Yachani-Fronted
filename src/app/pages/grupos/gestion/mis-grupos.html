@@ -1,0 +1,104 @@
+<header class="page-heading">
+  <div>
+    <h1>Mis grupos</h1>
+    <p>
+      {{
+        rol === 'tutor'
+          ? 'Administra los espacios que creaste para estudiar en comunidad.'
+          : 'Accede a tus grupos y continúa tu aprendizaje.'
+      }}
+    </p>
+  </div>
+  <a mat-flat-button routerLink="/grupos/crear" queryParamsHandling="preserve">Crear grupo</a>
+</header>
+
+@if (estado === 'vacio') {
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+    <h2>Todavía no tienes grupos</h2>
+    @if (rol === 'tutor') {
+      <a mat-flat-button routerLink="/grupos/crear" queryParamsHandling="preserve">Crear grupo</a>
+    } @else {
+      <p>Explora una comunidad o crea tu propio espacio de estudio.</p>
+      <a mat-flat-button routerLink="/grupos/descubrimiento" queryParamsHandling="preserve"
+        >Explorar grupos</a
+      >
+    }
+  </mat-card>
+  @if (rol === 'tutor') {
+    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear-con-ia" queryParamsHandling="preserve"
+      >Crear con apoyo de IA</a
+    >
+  } @else {
+    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear" queryParamsHandling="preserve"
+      >Crear mi primer grupo</a
+    >
+  }
+} @else {
+  @let nuevo = grupoCreado[rol === 'tutor' ? 'tutor' : 'estudiante'];
+  @let recienCreado = estado === 'creado' || estado === 'creado-ia';
+  @if (recienCreado) {
+    <div class="notice success" role="status">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+      <div>
+        @if (estado === 'creado-ia') {
+          <p class="notice-title">Grupo creado con IA</p>
+          <p>Se crearon los temas y se compartieron los mazos que revisaste.</p>
+        } @else {
+          <p class="notice-title">Grupo creado</p>
+          <p>{{ nuevo.nombre }} ya está listo para recibir solicitudes.</p>
+        }
+      </div>
+    </div>
+  }
+  <div class="group-grid" [class.single]="recienCreado">
+    @for (
+      grupo of recienCreado ? [nuevo] : grupos[rol === 'tutor' ? 'tutor' : 'estudiante'];
+      track grupo.id
+    ) {
+      <mat-card appearance="outlined" class="content-card">
+        <div class="card-heading">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+          <h2>{{ grupo.nombre }}</h2>
+        </div>
+        <p class="group-description">{{ grupo.descripcion }}</p>
+        <p class="group-responsible">{{ grupo.responsable }}</p>
+        <p class="group-detail">{{ grupo.detalle }}</p>
+        <a
+          mat-stroked-button
+          class="group-action"
+          [routerLink]="['/grupos', grupo.id]"
+          queryParamsHandling="preserve"
+          [attr.aria-label]="'Ver grupo ' + grupo.nombre"
+          >Ver grupo</a
+        >
+      </mat-card>
+    }
+  </div>
+
+  @if (rol !== 'tutor') {
+    <mat-card appearance="outlined" class="content-card requests" aria-labelledby="requests-title">
+      <h2 id="requests-title">Mis solicitudes</h2>
+      <ul>
+        @for (solicitud of solicitudes; track solicitud.grupo) {
+          <li>
+            <div class="request-row">
+              <div class="request-copy">
+                <h3>{{ solicitud.grupo }}</h3>
+                <p>{{ solicitud.fecha }}</p>
+              </div>
+              <span class="status-badge">{{ solicitud.estado }}</span>
+            </div>
+            <a
+              mat-button
+              routerLink="/grupos/descubrimiento"
+              queryParamsHandling="preserve"
+              [attr.aria-label]="'Ver grupo ' + solicitud.grupo"
+              >Ver grupo</a
+            >
+          </li>
+        }
+      </ul>
+    </mat-card>
+  }
+}
