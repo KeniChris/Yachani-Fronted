@@ -4,26 +4,31 @@
 </header>
 
 <section class="content-card summary">
-  <p>Dominando Cálculo · {{ estado === 'aceptada' ? 9 : 8 }} de 12 integrantes</p>
+  <p>Dominando Cálculo · {{ solicitudes === 'aceptada' ? 9 : 8 }} de 12 integrantes</p>
 </section>
 
-@switch (estado) {
+@if (rol !== 'tutor') {
+  <section class="content-card">
+    <p class="help">El creador administra los cupos y las solicitudes.</p>
+  </section>
+} @else {
+@switch (solicitudes) {
   @case ('vacio') {
     <section class="content-card empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person_add</mat-icon>
       <h2>No tienes solicitudes pendientes</h2>
       <p>Las nuevas solicitudes aparecerán aquí.</p>
-      <a mat-flat-button routerLink="../integrantes" [queryParams]="{ estado: null }" queryParamsHandling="merge"
+      <a mat-flat-button routerLink="../integrantes" [queryParams]="{ solicitudes: null, integrantes: null }" queryParamsHandling="merge"
         >Ver integrantes</a
       >
     </section>
   }
   @default {
-    @if (estado === 'aceptada' || estado === 'rechazada') {
+    @if (solicitudes === 'aceptada' || solicitudes === 'rechazada') {
       <div class="notice success" role="status">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
         <div>
-          @if (estado === 'aceptada') {
+          @if (solicitudes === 'aceptada') {
             <p class="notice-title">Solicitud aceptada</p>
             <p>Irene Castro ahora forma parte del grupo.</p>
           } @else {
@@ -33,9 +38,9 @@
         </div>
       </div>
     }
-    <div class="request-grid" [class.single]="estado === 'aceptada' || estado === 'rechazada'">
+    <div class="request-grid" [class.single]="solicitudes === 'aceptada' || solicitudes === 'rechazada'">
       @for (
-        solicitud of estado === 'aceptada' || estado === 'rechazada' ? solicitudes.slice(1) : solicitudes;
+        solicitud of solicitudes === 'aceptada' || solicitudes === 'rechazada' ? lista.slice(1) : lista;
         track solicitud.nombre
       ) {
         <article class="content-card request">
@@ -82,6 +87,7 @@
     </div>
   }
 }
+}
 
 <ng-template #aceptarDialog let-nombre>
   <div class="dialog-shell">
@@ -103,7 +109,7 @@
         type="button"
         mat-dialog-close
         routerLink="."
-        [queryParams]="{ estado: 'aceptada' }"
+        [queryParams]="{ solicitudes: 'aceptada' }"
         queryParamsHandling="merge"
       >
         Aceptar solicitud
@@ -131,7 +137,7 @@
         class="danger"
         mat-dialog-close
         routerLink="."
-        [queryParams]="{ estado: 'rechazada' }"
+        [queryParams]="{ solicitudes: 'rechazada' }"
         queryParamsHandling="merge"
       >
         Rechazar solicitud

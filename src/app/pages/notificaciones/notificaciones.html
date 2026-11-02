@@ -16,14 +16,14 @@
     <a
       mat-flat-button
       routerLink="/grupos/dominando-calculo/sesiones"
-      [queryParams]="{ vista: 'detalle', estado: null }"
+      [queryParams]="{ vista: 'detalle', notificaciones: null }"
       queryParamsHandling="merge"
       >Ver sesión</a
     >
     <a
       mat-stroked-button
       routerLink="."
-      [queryParams]="{ vista: null, estado: null }"
+      [queryParams]="{ vista: null, notificaciones: null }"
       queryParamsHandling="merge"
       >Volver a notificaciones</a
     >
@@ -34,17 +34,17 @@
     <p>Mantente al tanto de tus grupos y sesiones.</p>
   </header>
 
-  @if (estado === 'vacio') {
+  @if (notificaciones === 'vacio') {
     <section class="content-card empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
       <h2>Estás al día</h2>
       <p>Las novedades de tus grupos y los recordatorios aparecerán aquí.</p>
-      <a mat-flat-button routerLink="/inicio" [queryParams]="{ estado: null }" queryParamsHandling="merge"
+      <a mat-flat-button routerLink="/inicio" [queryParams]="{ notificaciones: null }" queryParamsHandling="merge"
         >Volver al inicio</a
       >
     </section>
   } @else {
-    @if (estado === 'leida') {
+    @if (notificaciones === 'leida') {
       <div class="notice success" role="status">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
         <div>
@@ -53,15 +53,15 @@
         </div>
       </div>
     }
-    <span class="badge">{{ estado === 'leida' ? 1 : 2 }} sin leer</span>
+    <span class="badge">{{ notificaciones === 'leida' ? 1 : 2 }} sin leer</span>
     <p class="help">Revisa las novedades de tus grupos y los recordatorios de sesión.</p>
     <ul class="list">
       @for (
-        notificacion of notificaciones[rol === 'tutor' ? 'tutor' : 'estudiante'];
+        notificacion of lista[rol === 'tutor' ? 'tutor' : 'estudiante'];
         track notificacion.texto;
         let primera = $first
       ) {
-        @let leida = notificacion.leida || (primera && estado === 'leida');
+        @let leida = notificacion.leida || (primera && notificaciones === 'leida');
         <li class="content-card item">
           <div class="item-body">
             <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
@@ -72,7 +72,7 @@
               <a
                 mat-button
                 [routerLink]="notificacion.enlace"
-                [queryParams]="{ vista: notificacion.vista, estado: null }"
+                [queryParams]="{ vista: notificacion.vista, notificaciones: null }"
                 queryParamsHandling="merge"
                 >{{ notificacion.accion }}</a
               >
@@ -84,7 +84,7 @@
               mat-button
               class="mark"
               routerLink="."
-              [queryParams]="{ estado: 'leida' }"
+              [queryParams]="{ notificaciones: 'leida' }"
               queryParamsHandling="merge"
               >Marcar como leída</a
             >

@@ -17,7 +17,8 @@ export const routes: Routes = [
     path: 'crear-con-ia',
     loadComponent: () => import('./gestion/crear-con-ia').then((m) => m.CrearConIa),
   },
-  { path: 'solicitudes', children: [] },
+  // Figma no tiene una pantalla global de solicitudes: se abre la del grupo de ejemplo.
+  { path: 'solicitudes', pathMatch: 'full', redirectTo: 'dominando-calculo/solicitudes' },
   {
     path: ':grupoId',
     loadComponent: () =>

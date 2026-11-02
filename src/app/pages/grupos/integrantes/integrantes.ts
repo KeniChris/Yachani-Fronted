@@ -23,9 +23,9 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './integrantes.css',
 })
 export class Integrantes {
-  // Variante visual mediante ?rol=tutor y capacidad guardada (G11) mediante ?estado=capacidad.
+  // Variante visual mediante ?rol=tutor y capacidad guardada (G11) mediante ?integrantes=capacidad.
   @Input() rol = 'estudiante';
-  @Input() estado = '';
+  @Input() integrantes = '';
   // Datos de ejemplo de G12 y G13; los tres últimos completan los 8 integrantes del frame.
   readonly estudiantes = [
     { iniciales: 'LC', nombre: 'Leicy Cahuana' },

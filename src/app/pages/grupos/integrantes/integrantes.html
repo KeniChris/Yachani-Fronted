@@ -4,7 +4,11 @@
     <p>Conoce a las personas con las que estás estudiando.</p>
   </div>
   @if (rol === 'tutor') {
-    <a mat-stroked-button routerLink="/grupos/gestion" queryParamsHandling="preserve"
+    <a
+      mat-stroked-button
+      routerLink="/grupos/gestion"
+      [queryParams]="{ integrantes: null }"
+      queryParamsHandling="merge"
       >Configuración del grupo</a
     >
   }
@@ -60,8 +64,8 @@
 
   <section class="content-card seats" aria-labelledby="seats-title">
     <h2 id="seats-title">Cupos</h2>
-    <p class="seats-count">8 de {{ estado === 'capacidad' ? 15 : 12 }} integrantes</p>
-    <p class="help">Quedan {{ estado === 'capacidad' ? 7 : 4 }} espacios disponibles.</p>
+    <p class="seats-count">8 de {{ integrantes === 'capacidad' ? 15 : 12 }} integrantes</p>
+    <p class="help">Quedan {{ integrantes === 'capacidad' ? 7 : 4 }} espacios disponibles.</p>
     @if (rol === 'tutor') {
       <button
         mat-stroked-button
@@ -73,15 +77,27 @@
       >
         Cambiar capacidad
       </button>
-      <a mat-flat-button routerLink="../solicitudes" queryParamsHandling="preserve">Revisar solicitudes</a>
-      <a mat-stroked-button routerLink="../sesiones" queryParamsHandling="preserve">Programar sesión</a>
+      <a
+        mat-flat-button
+        routerLink="../solicitudes"
+        [queryParams]="{ integrantes: null, solicitudes: null }"
+        queryParamsHandling="merge"
+        >Revisar solicitudes</a
+      >
+      <a
+        mat-stroked-button
+        routerLink="../sesiones"
+        [queryParams]="{ integrantes: null, sesiones: null, vista: 'programar' }"
+        queryParamsHandling="merge"
+        >Programar sesión</a
+      >
     } @else {
       <p class="help">El creador administra los cupos y las solicitudes.</p>
     }
   </section>
 </div>
 
-@if (estado === 'capacidad') {
+@if (integrantes === 'capacidad') {
   <div class="notice success" role="status">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <div>
@@ -121,7 +137,7 @@
         mat-dialog-close
         [disabled]="capacidadForm.invalid"
         routerLink="."
-        [queryParams]="{ estado: 'capacidad' }"
+        [queryParams]="{ integrantes: 'capacidad' }"
         queryParamsHandling="merge"
       >
         Guardar cambios

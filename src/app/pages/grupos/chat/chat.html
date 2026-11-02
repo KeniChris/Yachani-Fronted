@@ -2,7 +2,7 @@
 
 <section class="chat-card" aria-label="Conversación del grupo">
   <p class="day">HOY · 29 OCT 2026</p>
-  @if (estado === 'vacio') {
+  @if (chat === 'vacio') {
     <div class="empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chat</mat-icon>
       <h2>Comienza la conversación</h2>
@@ -37,7 +37,7 @@
   }
 
   <form class="composer" [formGroup]="form" aria-label="Enviar mensaje">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
       <mat-label>Mensaje</mat-label>
       <input matInput formControlName="mensaje" placeholder="Escribe para tu grupo…" maxlength="1000" />
       @if (form.controls.mensaje.touched && form.controls.mensaje.invalid) {

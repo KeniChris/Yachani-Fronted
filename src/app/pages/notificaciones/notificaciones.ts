@@ -12,12 +12,12 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class Notificaciones {
   // Variante visual mediante ?rol=tutor. Recordatorio (N06) mediante ?vista=recordatorio
-  // y estados de Figma mediante ?estado= (leida, vacio).
+  // y estados de Figma mediante ?notificaciones= (leida, vacio).
   @Input() rol = 'estudiante';
   @Input() vista = '';
-  @Input() estado = '';
+  @Input() notificaciones = '';
   // Datos de ejemplo de N01 (estudiante) y N02 (tutor).
-  readonly notificaciones = {
+  readonly lista = {
     estudiante: [
       {
         titulo: 'Solicitud aceptada',

@@ -23,15 +23,16 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './avisos.css',
 })
 export class Avisos {
-  // Variante visual mediante ?rol=tutor y estados de Figma mediante ?estado= (vacio, publicado).
+  // Variante visual mediante ?rol=tutor y estados de Figma mediante ?avisos= (vacio, publicado).
   @Input() rol = 'estudiante';
-  @Input() estado = '';
+  @Input() avisos = '';
+  // Publicar (AV03) empieza vacío; editar (AV04) carga el aviso actual al abrir el diálogo.
   readonly form = new FormGroup({
-    titulo: new FormControl('Material para la próxima sesión', {
+    titulo: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(100)],
     }),
-    mensaje: new FormControl('Revisen la guía de derivadas disponible en Temas y materiales.', {
+    mensaje: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(500)],
     }),

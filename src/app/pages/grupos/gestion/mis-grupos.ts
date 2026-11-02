@@ -12,11 +12,11 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './mis-grupos.css',
 })
 export class MisGrupos {
-  // Variante visual mediante ?rol=tutor y estados de Figma mediante ?estado=vacio.
+  // Variante visual mediante ?rol=tutor y estados de Figma mediante ?grupos=vacio|creado|creado-ia.
   @Input() rol = 'estudiante';
-  @Input() estado = '';
+  @Input() grupos = '';
   // Datos de ejemplo de los frames G01 y G02.
-  readonly grupos = {
+  readonly listas = {
     estudiante: [
       {
         id: 'dominando-calculo',
@@ -50,7 +50,7 @@ export class MisGrupos {
       },
     ],
   };
-  // Grupo recién creado de G07 (tutor) y G16 (estudiante) para ?estado=creado.
+  // Grupo recién creado de G07 (tutor) y G16 (estudiante) para ?grupos=creado.
   readonly grupoCreado = {
     estudiante: {
       id: 'ingenieria-software',

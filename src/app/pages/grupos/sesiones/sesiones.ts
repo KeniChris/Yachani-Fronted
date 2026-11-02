@@ -30,32 +30,45 @@ import { MatTimepickerModule } from '@angular/material/timepicker';
 })
 export class Sesiones {
   // Variante visual mediante ?rol=tutor. Vistas de Figma mediante ?vista= (programar, editar, detalle)
-  // y estados mediante ?estado= (vacio, programada, actualizada, cancelada).
+  // y estados mediante ?sesiones= (vacio, programada, actualizada, cancelada).
   @Input() rol = 'estudiante';
-  @Input() vista = '';
-  @Input() estado = '';
+  @Input() sesiones = '';
   // Las fechas anteriores a hoy muestran el error de S05.
   readonly hoy = new Date();
+  // Programar (S04) empieza vacío; editar (S07) muestra los datos actuales de la sesión.
   readonly form = new FormGroup({
-    tema: new FormControl('Repaso de derivadas', {
+    tema: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(150)],
     }),
-    descripcion: new FormControl('Repasaremos conceptos y resolveremos ejercicios paso a paso.', {
-      nonNullable: true,
-      validators: Validators.maxLength(500),
-    }),
-    fecha: new FormControl<Date | null>(new Date(2026, 10, 30), Validators.required),
-    hora: new FormControl<Date | null>(new Date(2026, 10, 30, 19, 0), Validators.required),
-    duracion: new FormControl<number | null>(60, [
+    descripcion: new FormControl('', { nonNullable: true, validators: Validators.maxLength(500) }),
+    fecha: new FormControl<Date | null>(null, Validators.required),
+    hora: new FormControl<Date | null>(null, Validators.required),
+    duracion: new FormControl<number | null>(null, [
       Validators.required,
       Validators.min(15),
       Validators.max(480),
     ]),
-    lugar: new FormControl('meet.google.com/abc-defg-hij', {
-      nonNullable: true,
-      validators: Validators.maxLength(200),
-    }),
+    lugar: new FormControl('', { nonNullable: true, validators: Validators.maxLength(200) }),
   });
+  private vistaActual = '';
+  @Input() set vista(valor: string) {
+    this.vistaActual = valor || '';
+    this.form.reset(
+      valor === 'editar'
+        ? {
+            tema: 'Repaso de derivadas',
+            descripcion: 'Repasaremos conceptos y resolveremos ejercicios paso a paso.',
+            fecha: new Date(2026, 10, 30),
+            hora: new Date(2026, 10, 30, 19, 0),
+            duracion: 60,
+            lugar: 'meet.google.com/abc-defg-hij',
+          }
+        : {},
+    );
+  }
+  get vista() {
+    return this.vistaActual;
+  }
   constructor(public readonly dialog: MatDialog) {}
 }

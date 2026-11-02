@@ -17,7 +17,7 @@
   }
 </header>
 
-@if (estado === 'publicado') {
+@if (avisos === 'publicado') {
   <div class="notice success" role="status">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <div>
@@ -27,7 +27,7 @@
   </div>
 }
 
-@if (estado === 'vacio') {
+@if (avisos === 'vacio') {
   <section class="content-card empty-state">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">campaign</mat-icon>
     <h2>No hay avisos publicados</h2>
@@ -59,7 +59,10 @@
         type="button"
         class="edit"
         (click)="
-          form.reset();
+          form.reset({
+            titulo: 'Material para la próxima sesión',
+            mensaje: 'Revisen la guía de derivadas disponible en Temas y materiales.',
+          });
           dialog.open(avisoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: true })
         "
       >
@@ -80,16 +83,29 @@
     <mat-dialog-content>
       <p>Comparte una indicación clara para el grupo.</p>
       <form [formGroup]="form">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
           <mat-label>Título</mat-label>
-          <input matInput formControlName="titulo" maxlength="100" required />
+          <input
+            matInput
+            formControlName="titulo"
+            maxlength="100"
+            placeholder="Ej.: Material para la próxima sesión"
+            required
+          />
           @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
             <mat-error>Escribe el título del aviso.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
           <mat-label>Mensaje</mat-label>
-          <textarea matInput formControlName="mensaje" rows="4" maxlength="500" required></textarea>
+          <textarea
+            matInput
+            formControlName="mensaje"
+            rows="4"
+            maxlength="500"
+            placeholder="Ej.: Revisen la guía de derivadas disponible en Temas y materiales."
+            required
+          ></textarea>
           @if (form.controls.mensaje.touched && form.controls.mensaje.invalid) {
             <mat-error>Escribe el mensaje del aviso.</mat-error>
           }
@@ -104,7 +120,7 @@
         mat-dialog-close
         [disabled]="form.invalid"
         routerLink="."
-        [queryParams]="{ estado: 'publicado' }"
+        [queryParams]="{ avisos: 'publicado' }"
         queryParamsHandling="merge"
       >
         {{ editar ? 'Guardar cambios' : 'Publicar aviso' }}

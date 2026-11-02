@@ -43,7 +43,7 @@
       <section class="content-card">
         <h2>Límites laterales</h2>
         <p class="help">Carlos Ríos · 12 tarjetas</p>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Tema de destino</mat-label>
           <mat-select formControlName="limites" required>
             @for (tema of temas; track tema) {
@@ -58,7 +58,7 @@
       <section class="content-card">
         <h2>Fórmulas de derivadas</h2>
         <p class="help">Carlos Ríos · 4 tarjetas</p>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Tema de destino</mat-label>
           <mat-select formControlName="derivadas" required>
             @for (tema of temas; track tema) {
@@ -97,21 +97,21 @@
       <section class="content-card">
         <h2>Datos del grupo</h2>
         <p class="help">Puedes ajustar esta propuesta antes de confirmar.</p>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nombre del grupo</mat-label>
           <input matInput formControlName="nombre" required />
           @if (propuestaForm.controls.nombre.touched && propuestaForm.controls.nombre.invalid) {
             <mat-error>Escribe el nombre del grupo.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Descripción</mat-label>
           <textarea matInput formControlName="descripcion" rows="4" maxlength="500" required></textarea>
           @if (propuestaForm.controls.descripcion.touched && propuestaForm.controls.descripcion.invalid) {
             <mat-error>Escribe una descripción de hasta 500 caracteres.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Método de estudio</mat-label>
           <mat-select formControlName="metodo" required>
             @for (metodo of metodos; track metodo) {
@@ -122,7 +122,7 @@
             <mat-error>Selecciona un método de estudio.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Capacidad máxima</mat-label>
           <input matInput type="number" formControlName="capacidad" min="2" required />
           @if (propuestaForm.controls.capacidad.touched && propuestaForm.controls.capacidad.invalid) {
@@ -133,21 +133,21 @@
       <section class="content-card">
         <h2>Temas del grupo</h2>
         <p class="help">Solo tú, como tutor administrador, podrás crear y editar los temas.</p>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nombre del tema</mat-label>
           <input matInput formControlName="tema1" required />
           @if (propuestaForm.controls.tema1.touched && propuestaForm.controls.tema1.invalid) {
             <mat-error>Escribe el nombre del tema.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nombre del tema</mat-label>
           <input matInput formControlName="tema2" required />
           @if (propuestaForm.controls.tema2.touched && propuestaForm.controls.tema2.invalid) {
             <mat-error>Escribe el nombre del tema.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nombre del tema</mat-label>
           <input matInput formControlName="tema3" required />
           @if (propuestaForm.controls.tema3.touched && propuestaForm.controls.tema3.invalid) {
@@ -181,7 +181,7 @@
         type="button"
         [disabled]="propuestaForm.invalid"
         routerLink="/grupos/gestion"
-        [queryParams]="{ estado: 'creado-ia', paso: null }"
+        [queryParams]="{ grupos: 'creado-ia', paso: null }"
         queryParamsHandling="merge"
       >
         Crear grupo
@@ -197,18 +197,24 @@
     <form class="content-card" [formGroup]="descripcionForm" aria-labelledby="describe-title">
       <h2 id="describe-title">¿Cómo quieres organizar el grupo?</h2>
       <p class="help">La IA utilizará tu descripción para proponer el grupo y sus temas.</p>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
         <mat-label>Describe tu grupo</mat-label>
-        <textarea matInput formControlName="descripcion" rows="4" required></textarea>
+        <textarea
+          matInput
+          formControlName="descripcion"
+          rows="4"
+          placeholder="Ej.: Quiero un grupo de Cálculo I para repasar límites, reglas de derivación y aplicaciones de la derivada."
+          required
+        ></textarea>
         @if (descripcionForm.controls.descripcion.touched && descripcionForm.controls.descripcion.invalid) {
           <mat-error>Describe tu grupo para generar la propuesta.</mat-error>
         } @else {
           <mat-hint>Indica los temas y dónde quieres compartir tus mazos existentes.</mat-hint>
         }
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
         <mat-label>Método de estudio</mat-label>
-        <mat-select formControlName="metodo" required>
+        <mat-select formControlName="metodo" placeholder="Selecciona un método de estudio…" required>
           @for (metodo of metodos; track metodo) {
             <mat-option [value]="metodo">{{ metodo }}</mat-option>
           }
@@ -217,9 +223,9 @@
           <mat-error>Selecciona un método de estudio.</mat-error>
         }
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
         <mat-label>Capacidad máxima</mat-label>
-        <input matInput type="number" formControlName="capacidad" min="2" required />
+        <input matInput type="number" formControlName="capacidad" min="2" placeholder="Ej.: 12" required />
         @if (descripcionForm.controls.capacidad.touched && descripcionForm.controls.capacidad.invalid) {
           <mat-error>La capacidad mínima es de 2 integrantes.</mat-error>
         } @else {
@@ -241,7 +247,7 @@
       >
     </section>
     <div class="actions">
-      <a mat-stroked-button routerLink="/grupos/gestion" [queryParams]="{ paso: null }" queryParamsHandling="merge"
+      <a mat-stroked-button routerLink="/grupos/gestion" [queryParams]="{ paso: null, grupos: null }" queryParamsHandling="merge"
         >Cancelar</a
       >
       <button

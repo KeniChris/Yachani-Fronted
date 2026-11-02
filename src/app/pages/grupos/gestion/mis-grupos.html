@@ -9,39 +9,44 @@
       }}
     </p>
   </div>
-  <a mat-flat-button routerLink="/grupos/crear" queryParamsHandling="preserve">Crear grupo</a>
+  <a mat-flat-button routerLink="/grupos/crear" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge">Crear grupo</a>
 </header>
 
-@if (estado === 'vacio') {
+@if (grupos === 'vacio') {
   <mat-card appearance="outlined" class="content-card empty-state">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
     <h2>Todavía no tienes grupos</h2>
     @if (rol === 'tutor') {
-      <a mat-flat-button routerLink="/grupos/crear" queryParamsHandling="preserve">Crear grupo</a>
+      <a mat-flat-button routerLink="/grupos/crear" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge">Crear grupo</a>
     } @else {
       <p>Explora una comunidad o crea tu propio espacio de estudio.</p>
-      <a mat-flat-button routerLink="/grupos/descubrimiento" queryParamsHandling="preserve"
+      <a mat-flat-button routerLink="/grupos/descubrimiento" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
         >Explorar grupos</a
       >
     }
   </mat-card>
   @if (rol === 'tutor') {
-    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear-con-ia" queryParamsHandling="preserve"
+    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear-con-ia" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
       >Crear con apoyo de IA</a
     >
   } @else {
-    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear" queryParamsHandling="preserve"
+    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
       >Crear mi primer grupo</a
     >
   }
 } @else {
   @let nuevo = grupoCreado[rol === 'tutor' ? 'tutor' : 'estudiante'];
-  @let recienCreado = estado === 'creado' || estado === 'creado-ia';
+  @let recienCreado = grupos === 'creado' || grupos === 'creado-ia';
   @if (recienCreado) {
     <div class="notice success" role="status">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
       <div>
-        @if (estado === 'creado-ia') {
+        @if (grupos === 'creado-ia') {
           <p class="notice-title">Grupo creado con IA</p>
           <p>Se crearon los temas y se compartieron los mazos que revisaste.</p>
         } @else {
@@ -53,7 +58,7 @@
   }
   <div class="group-grid" [class.single]="recienCreado">
     @for (
-      grupo of recienCreado ? [nuevo] : grupos[rol === 'tutor' ? 'tutor' : 'estudiante'];
+      grupo of recienCreado ? [nuevo] : listas[rol === 'tutor' ? 'tutor' : 'estudiante'];
       track grupo.id
     ) {
       <mat-card appearance="outlined" class="content-card">
@@ -68,7 +73,8 @@
           mat-stroked-button
           class="group-action"
           [routerLink]="['/grupos', grupo.id]"
-          queryParamsHandling="preserve"
+          [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
           [attr.aria-label]="'Ver grupo ' + grupo.nombre"
           >Ver grupo</a
         >
@@ -92,7 +98,8 @@
             <a
               mat-button
               routerLink="/grupos/descubrimiento"
-              queryParamsHandling="preserve"
+              [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
               [attr.aria-label]="'Ver grupo ' + solicitud.grupo"
               >Ver grupo</a
             >

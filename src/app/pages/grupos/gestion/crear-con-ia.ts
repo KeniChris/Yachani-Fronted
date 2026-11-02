@@ -46,17 +46,13 @@ export class CrearConIa {
     },
     { titulo: 'Repaso de integrales', detalle: 'Carlos Ríos · Borrador sin tarjetas', disponible: false },
   ];
+  // Paso 1 (creación): empieza vacío; el ejemplo de Figma va como placeholder.
   readonly descripcionForm = new FormGroup({
-    descripcion: new FormControl(
-      'Quiero un grupo de Cálculo I para repasar límites, reglas de derivación y aplicaciones de la derivada. Incluye mi mazo “Límites laterales” en Límites y continuidad y “Fórmulas de derivadas” en Reglas de derivación.',
-      { nonNullable: true, validators: Validators.required },
-    ),
-    metodo: new FormControl('Resolución de ejercicios', {
-      nonNullable: true,
-      validators: Validators.required,
-    }),
-    capacidad: new FormControl<number | null>(12, [Validators.required, Validators.min(2)]),
+    descripcion: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    metodo: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    capacidad: new FormControl<number | null>(null, [Validators.required, Validators.min(2)]),
   });
+  // A09 y A06 muestran la propuesta generada, por eso traen sus datos como una edición.
   readonly organizarForm = new FormGroup({
     limites: new FormControl('Límites y continuidad', {
       nonNullable: true,

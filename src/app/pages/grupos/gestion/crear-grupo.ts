@@ -24,12 +24,9 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class CrearGrupo {
   esTutor = false;
-  // Variante visual mediante ?rol=tutor con los ejemplos de G04 (tutor) y G05 (estudiante).
+  // Variante visual mediante ?rol=tutor: G04 (tutor) y G05 (estudiante).
   @Input() set rol(valor: string) {
     this.esTutor = valor === 'tutor';
-    this.form.controls.nombre.setValue(
-      this.esTutor ? 'Dominando Cálculo' : 'Ingeniería de Software: repasos',
-    );
   }
   // Mismos métodos que la configuración inicial del tutor.
   readonly metodos = [
@@ -40,19 +37,14 @@ export class CrearGrupo {
     'Resolución de ejercicios',
     'Debate',
   ];
+  // Formulario de creación: empieza vacío y los ejemplos de Figma van como placeholder.
   readonly form = new FormGroup({
-    nombre: new FormControl('Ingeniería de Software: repasos', {
+    nombre: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    descripcion: new FormControl('', {
       nonNullable: true,
-      validators: Validators.required,
+      validators: [Validators.required, Validators.maxLength(500)],
     }),
-    descripcion: new FormControl(
-      'Un espacio para repasar conceptos, compartir recursos y resolver ejercicios.',
-      { nonNullable: true, validators: [Validators.required, Validators.maxLength(500)] },
-    ),
-    metodo: new FormControl('Resolución de ejercicios', {
-      nonNullable: true,
-      validators: Validators.required,
-    }),
-    capacidad: new FormControl<number | null>(12, [Validators.required, Validators.min(2)]),
+    metodo: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    capacidad: new FormControl<number | null>(null, [Validators.required, Validators.min(2)]),
   });
 }

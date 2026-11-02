@@ -21,9 +21,9 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './chat.css',
 })
 export class Chat {
-  // Variante visual mediante ?rol=tutor (CH08) y conversación vacía mediante ?estado=vacio (CH02).
+  // Variante visual mediante ?rol=tutor (CH08) y conversación vacía mediante ?chat=vacio (CH02).
   @Input() rol = 'estudiante';
-  @Input() estado = '';
+  @Input() chat = '';
   readonly mensajes = [
     {
       autor: { estudiante: 'Carlos Ríos', tutor: 'Leicy Cahuana' },
@@ -44,8 +44,9 @@ export class Chat {
       propio: false,
     },
   ];
+  // El mensaje empieza vacío con el placeholder de Figma (CH12).
   readonly form = new FormGroup({
-    mensaje: new FormControl('¿En qué tema nos enfocaremos?', {
+    mensaje: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(1000)],
     }),
