@@ -1,0 +1,102 @@
+﻿<div class="dialog-shell">
+  <div class="dialog-heading">
+    <h2>{{ recorrido.selectedIndex === 0 ? 'Compartir un mazo' : 'Compartir en un grupo' }}</h2>
+    <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+      <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
+    </button>
+  </div>
+  <mat-dialog-content>
+    <mat-stepper
+      #recorrido
+      class="sharing-flow"
+      [selectedIndex]="data.elegir ? 0 : 1"
+      aria-label="Compartir mazo"
+    >
+      <mat-step>
+        <p class="intro">Elige uno de tus mazos personales o crea uno nuevo.</p>
+        <article class="deck-card">
+          <div class="deck-banner">
+            <img src="/icons/flashcards/style.svg" alt="" width="24" height="24" /><span
+              >4 tarjetas</span
+            >
+          </div>
+          <h3>
+            {{ data.contexto === 'estudiantes' ? 'Conceptos de UML' : 'Fórmulas de derivadas' }}
+          </h3>
+          <p>Reglas y ejemplos para tu próximo repaso.</p>
+          <small>Creado por ti · Publicado</small><small>3 de 4 revisadas · 75 %</small
+          ><mat-progress-bar mode="determinate" [value]="75" aria-label="75 % revisado" /><a
+            mat-stroked-button
+            mat-dialog-close
+            [routerLink]="['/flashcards', data.contexto === 'estudiantes' ? 'uml' : 'formulas']"
+            [queryParams]="{ rol: data.rol, contexto: data.contexto }"
+            >Ver mazo</a
+          >
+        </article>
+        <div class="actions">
+          <a
+            mat-stroked-button
+            mat-dialog-close
+            routerLink="/flashcards/crear"
+            [queryParams]="{ rol: data.rol }"
+            >Crear uno nuevo</a
+          ><button mat-flat-button matStepperNext>Elegir este mazo</button>
+        </div>
+      </mat-step>
+      <mat-step>
+        <p class="intro">
+          {{
+            data.titulo ||
+              (data.contexto === 'estudiantes' ? 'Conceptos de UML' : 'Fórmulas de derivadas')
+          }}
+          · 4 tarjetas
+        </p>
+        <ol class="steps" aria-label="Creación del mazo">
+          <li><span>1</span>Datos del mazo</li>
+          <li><span>2</span>Tarjetas</li>
+          <li class="current" aria-current="step"><span>3</span>Compartir</li>
+        </ol>
+        <div class="mobile-step"><span class="badge">Paso 3 de 3</span> Compartir</div>
+        <form class="form-panel" [formGroup]="form">
+          <mat-form-field appearance="outline"
+            ><mat-label>Grupo</mat-label
+            ><mat-select formControlName="grupo" required
+              ><mat-option value="demo">{{
+                data.contexto === 'estudiantes'
+                  ? 'Ingeniería de Software: repasos'
+                  : 'Dominando Cálculo'
+              }}</mat-option></mat-select
+            ><mat-hint>Solo los grupos en los que puedes publicar recursos.</mat-hint>
+            @if (form.controls.grupo.touched && form.controls.grupo.invalid) {
+              <mat-error>Elige un grupo.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline"
+            ><mat-label>Tema del grupo</mat-label
+            ><mat-select formControlName="tema" required>
+              @for (
+                tema of data.contexto === 'estudiantes' ? temasEstudiantes : temas;
+                track tema
+              ) {
+                <mat-option [value]="tema">{{ tema }}</mat-option>
+              }</mat-select
+            ><mat-hint>El tema debe pertenecer al grupo elegido.</mat-hint>
+            @if (form.controls.tema.touched && form.controls.tema.invalid) {
+              <mat-error>Selecciona un tema para publicar.</mat-error>
+            }
+          </mat-form-field>
+          <small
+            >Se comparte el mismo mazo. Los cambios del autor se reflejan donde esté
+            publicado.</small
+          >
+          <div class="actions">
+            <button type="button" mat-stroked-button mat-dialog-close>Cancelar</button
+            ><button type="button" mat-flat-button [disabled]="form.invalid" mat-dialog-close>
+              Compartir mazo
+            </button>
+          </div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+  </mat-dialog-content>
+</div>

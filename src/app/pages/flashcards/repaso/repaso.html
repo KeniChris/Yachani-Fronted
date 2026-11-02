@@ -1,0 +1,199 @@
+@let titulo =
+  mazoId === 'uml'
+    ? 'Conceptos de UML'
+    : mazoId === 'limites'
+      ? 'Límites laterales'
+      : mazoId === 'casos-de-uso'
+        ? 'Preguntas de casos de uso'
+        : 'Fórmulas de derivadas';
+@let nombreGrupo =
+  contexto === 'estudiantes' ? 'Ingeniería de Software: repasos' : 'Dominando Cálculo';
+@let ajeno =
+  autoria === 'otro' ||
+  mazoId === 'limites' ||
+  mazoId === 'casos-de-uso' ||
+  (publicaciones === 'tutor' && rol !== 'tutor');
+<mat-stepper #recorrido class="review-flow" aria-label="Repaso del mazo">
+  <mat-step>
+    <header class="page-heading">
+      <div>
+        <h1>{{ titulo }}</h1>
+        <p>
+          {{ mazoId === 'uml' ? 'Diagramas UML' : 'Reglas de derivación'
+          }}{{ enGrupo ? ' · ' + nombreGrupo : '' }}
+        </p>
+      </div>
+    </header>
+    <section class="panel overview">
+      <p class="author">
+        <img src="/icons/flashcards/person.svg" alt="" width="24" height="24" />Creado por
+        {{
+          publicaciones === 'tutor' || (rol === 'tutor' && !ajeno)
+            ? 'Carlos Ríos'
+            : ajeno
+              ? 'Lucía Paredes'
+              : 'Leicy Cahuana'
+        }}
+      </p>
+      <div class="badges">
+        <span class="badge">4 tarjetas</span><span class="badge">En progreso</span>
+      </div>
+      <h2>3 de 4 revisadas · 3 aprendidas</h2>
+      <mat-progress-bar mode="determinate" [value]="75" aria-label="3 de 4 revisadas" /><small
+        >El progreso es personal. Puedes salir y continuar después.</small
+      >
+      <div class="actions">
+        <button mat-flat-button matStepperNext>Continuar con tarjeta 4</button
+        ><button mat-stroked-button matStepperNext>Repasar de nuevo</button>
+      </div>
+      @if (!ajeno) {
+        <a mat-stroked-button [routerLink]="['/flashcards', mazoId]" queryParamsHandling="preserve"
+          >Editar mi mazo</a
+        >
+      }
+      @if (enGrupo && (!ajeno || rol === 'tutor' || permiso === 'administrador')) {
+        <button
+          mat-button
+          class="withdraw"
+          (click)="dialog.open(retirarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Retirar de este grupo
+        </button>
+      }
+    </section>
+  </mat-step>
+  <mat-step>
+    <header class="review-heading">
+      <button
+        mat-icon-button
+        aria-label="Salir del repaso"
+        (click)="dialog.open(salirDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+      >
+        <img src="/icons/flashcards/arrow_back.svg" alt="" width="24" height="24" />
+      </button>
+      <h2>{{ titulo }}</h2>
+      <span class="badge">4 de 4</span>
+    </header>
+    <mat-progress-bar mode="determinate" [value]="75" aria-label="3 de 4 revisadas" /><small
+      class="review-count"
+      >3 de 4 tarjetas revisadas.</small
+    >
+    <section class="question-face">
+      <small>PREGUNTA</small>
+      <h1>
+        {{
+          mazoId === 'uml'
+            ? '¿Qué representa una asociación en un diagrama de clases?'
+            : '¿Cómo se aplica la regla de la cadena?'
+        }}
+      </h1>
+      <button mat-flat-button matStepperNext>Mostrar respuesta</button>
+    </section>
+    <small class="footnote">Tu avance se confirma después de guardar cada respuesta.</small>
+  </mat-step>
+  <mat-step>
+    <header class="review-heading">
+      <button
+        mat-icon-button
+        aria-label="Salir del repaso"
+        (click)="dialog.open(salirDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+      >
+        <img src="/icons/flashcards/arrow_back.svg" alt="" width="24" height="24" />
+      </button>
+      <h2>{{ titulo }}</h2>
+      <span class="badge">4 de 4</span>
+    </header>
+    <mat-progress-bar mode="determinate" [value]="75" aria-label="3 de 4 revisadas" /><small
+      class="review-count"
+      >3 de 4 tarjetas revisadas.</small
+    >
+    <section class="panel answer-face">
+      <small>RESPUESTA</small>
+      <h1>
+        {{
+          mazoId === 'uml'
+            ? 'Una relación entre instancias de dos clases.'
+            : "(f ∘ g)'(x) = f'(g(x)) · g'(x)"
+        }}
+      </h1>
+      <p>
+        {{
+          mazoId === 'uml'
+            ? 'La asociación muestra cómo se vinculan los objetos y puede indicar su multiplicidad.'
+            : 'Deriva la función exterior y multiplícala por la derivada de la interior.'
+        }}
+      </p>
+    </section>
+    <h2 class="self-assessment">¿Te la aprendiste?</h2>
+    <div class="actions answer-actions">
+      <button mat-stroked-button matStepperNext>Aún no</button
+      ><button mat-flat-button matStepperNext>La aprendí</button>
+    </div>
+    <small class="footnote">Tu avance se confirma después de guardar cada respuesta.</small>
+  </mat-step>
+  <mat-step>
+    <section class="panel completed">
+      <img src="/icons/flashcards/check_circle.svg" alt="" width="24" height="24" />
+      <h1>¡Repaso completado!</h1>
+      <p>{{ titulo }}{{ enGrupo ? ' · ' + nombreGrupo : '' }}</p>
+      <span class="badge success">4 de 4 revisadas · 100 %</span
+      ><strong class="learned">75 %</strong>
+      <p>de tarjetas aprendidas</p>
+      <div class="summary-grid">
+        <article><strong>4</strong><span>Revisadas</span></article>
+        <article><strong>3</strong><span>Aprendidas</span></article>
+        <article><strong>1</strong><span>Por repasar</span></article>
+      </div>
+      <div class="actions">
+        <button mat-flat-button (click)="recorrido.selectedIndex = 1">Repasar la pendiente</button
+        ><button mat-stroked-button (click)="recorrido.selectedIndex = 1">Repasar de nuevo</button
+        ><a
+          mat-stroked-button
+          [routerLink]="enGrupo ? ['..'] : ['/flashcards']"
+          queryParamsHandling="preserve"
+          >{{ enGrupo ? 'Volver al grupo' : 'Volver a mis mazos' }}</a
+        >
+      </div>
+      <small>Tu progreso se conserva al volver al grupo.</small>
+    </section>
+  </mat-step>
+</mat-stepper>
+<ng-template #salirDialog
+  ><div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Salir del repaso?</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>Puedes volver después y continuar desde la primera tarjeta pendiente.</p>
+      <p>Tu avance confirmado: 3 de 4 tarjetas revisadas.</p></mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close>Seguir repasando</button
+      ><a
+        mat-flat-button
+        mat-dialog-close
+        [routerLink]="enGrupo ? ['..'] : ['/flashcards']"
+        queryParamsHandling="preserve"
+        >{{ enGrupo ? 'Salir al grupo' : 'Volver a mis mazos' }}</a
+      ></mat-dialog-actions
+    >
+  </div></ng-template
+>
+<ng-template #retirarDialog
+  ><div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Retirar el mazo de este grupo?</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>{{ titulo }} dejará de estar disponible en {{ nombreGrupo }}.</p></mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close>Cancelar</button
+      ><button mat-flat-button mat-dialog-close>Retirar de este grupo</button></mat-dialog-actions
+    >
+  </div></ng-template
+>

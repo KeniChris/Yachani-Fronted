@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+.publication {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  padding: var(--space-8);
+}
+.publication h2 {
+  font: var(--font-card-title);
+}
+.publication p {
+  color: var(--color-muted);
+  font: var(--font-secondary);
+}

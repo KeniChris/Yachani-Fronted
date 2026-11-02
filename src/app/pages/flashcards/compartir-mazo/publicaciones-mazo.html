@@ -1,0 +1,54 @@
+<header class="page-heading">
+  <div>
+    <h1>Dónde se comparte</h1>
+    <p>{{ mazoId === 'uml' ? 'Conceptos de UML' : 'Fórmulas de derivadas' }}</p>
+  </div>
+  <button
+    mat-flat-button
+    (click)="
+      dialog.open(compartirMazo, {
+        width: '600px',
+        maxWidth: 'calc(100vw - 32px)',
+        data: { contexto: contexto, rol: rol },
+      })
+    "
+  >
+    Compartir en otro grupo
+  </button>
+</header>
+<article class="panel publication">
+  <h2>
+    {{ contexto === 'estudiantes' ? 'Ingeniería de Software: repasos' : 'Dominando Cálculo' }}
+  </h2>
+  <p>Tema: {{ contexto === 'estudiantes' ? 'Diagramas UML' : 'Reglas de derivación' }}</p>
+  <small>Compartido el 28 oct 2026</small
+  ><button
+    mat-stroked-button
+    (click)="dialog.open(retirarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+  >
+    Retirar de este grupo
+  </button>
+</article>
+<a mat-stroked-button [routerLink]="['/flashcards', mazoId]" queryParamsHandling="preserve"
+  >Volver al mazo</a
+>
+<ng-template #retirarDialog
+  ><div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Retirar el mazo de este grupo?</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>
+        {{ mazoId === 'uml' ? 'Conceptos de UML' : 'Fórmulas de derivadas' }} dejará de estar
+        disponible en
+        {{ contexto === 'estudiantes' ? 'Ingeniería de Software: repasos' : 'Dominando Cálculo' }}.
+      </p></mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close>Cancelar</button
+      ><button mat-flat-button mat-dialog-close>Retirar de este grupo</button></mat-dialog-actions
+    >
+  </div></ng-template
+>
