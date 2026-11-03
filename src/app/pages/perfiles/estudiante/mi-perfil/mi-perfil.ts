@@ -26,7 +26,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatTabsModule,
   ],
   templateUrl: './mi-perfil.html',
-  styleUrl: './mi-perfil.css',
+  styleUrls: ['../../perfiles.css', './mi-perfil.css'],
 })
 export class MiPerfil {
   readonly academicoForm = new FormGroup({
