@@ -184,7 +184,4 @@ dd {
   .card-action {
     align-self: stretch;
   }
-  .content-card {
-    padding: var(--space-4);
-  }
 }
