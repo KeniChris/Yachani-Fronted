@@ -14,7 +14,13 @@ export const routes: Routes = [
   },
   { path: 'gestion', children: [] },
   { path: 'crear', children: [] },
-  { path: 'recomendaciones', children: [] },
+  {
+    path: 'recomendaciones',
+    loadComponent: () =>
+      import('./descubrimiento/recomendaciones-ia/recomendaciones-ia').then(
+        (m) => m.RecomendacionesIa,
+      ),
+  },
   { path: 'crear-con-ia', children: [] },
   { path: 'solicitudes', children: [] },
   {
