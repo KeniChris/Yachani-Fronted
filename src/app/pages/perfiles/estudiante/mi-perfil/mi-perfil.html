@@ -44,12 +44,25 @@
               <strong>{{ curso }}</strong>
               <span>Nivel Intermedio</span>
             </div>
-            <a mat-icon-button routerLink="/perfiles" [attr.aria-label]="'Editar ' + curso">
+            <button
+              mat-icon-button
+              [attr.aria-label]="'Editar ' + curso"
+              (click)="
+                editarCursoForm.controls.curso.setValue(curso);
+                dialog.open(editarCursoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })
+              "
+            >
               <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">edit</mat-icon>
-            </a>
+            </button>
           </div>
         }
-        <a mat-stroked-button class="card-action" routerLink="/perfiles">Agregar curso</a>
+        <button
+          mat-stroked-button
+          class="card-action"
+          (click)="dialog.open(agregarCursoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Agregar curso
+        </button>
       </mat-card>
     </div>
   </mat-tab>
@@ -67,7 +80,13 @@
             <dd>Virtual</dd>
           </div>
         </dl>
-        <a mat-stroked-button class="card-action" routerLink="/perfiles">Editar preferencias</a>
+        <button
+          mat-stroked-button
+          class="card-action"
+          (click)="dialog.open(preferenciasDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Editar preferencias
+        </button>
       </mat-card>
       <mat-card appearance="outlined" class="content-card">
         <h2>Temas de interés</h2>
@@ -112,6 +131,136 @@
         mat-dialog-close
         routerLink="/perfiles"
         [disabled]="academicoForm.invalid"
+        >Guardar cambios</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #preferenciasDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar preferencias</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Elige un método y una modalidad para estudiar.</p>
+      <form [formGroup]="preferenciasForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Método preferido</mat-label>
+          <mat-select formControlName="metodo" required>
+            @for (metodo of metodos; track metodo) {
+              <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Selecciona una opción.</mat-hint>
+          <mat-error>Selecciona un método.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Modalidad preferida</mat-label>
+          <mat-select formControlName="modalidad" required>
+            @for (modalidad of modalidades; track modalidad) {
+              <mat-option [value]="modalidad">{{ modalidad }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Virtual, presencial o híbrida.</mat-hint>
+          <mat-error>Selecciona una modalidad.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Temas de interés</mat-label>
+          <input matInput formControlName="temas" />
+          <mat-hint>Separa tus temas con comas.</mat-hint>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="preferenciasForm.invalid"
+        >Guardar cambios</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #agregarCursoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Agregar curso</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Indica el curso y selecciona tu nivel de conocimiento.</p>
+      <form [formGroup]="agregarCursoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso</mat-label>
+          <input matInput formControlName="curso" required />
+          <mat-error>Ingresa el curso.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nivel de conocimiento</mat-label>
+          <mat-select formControlName="nivel" required>
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel">{{ nivel }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Básico, intermedio o avanzado.</mat-hint>
+          <mat-error>Selecciona un nivel.</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="agregarCursoForm.invalid"
+        >Agregar curso</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #editarCursoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar curso</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Indica el curso y selecciona tu nivel de conocimiento.</p>
+      <form [formGroup]="editarCursoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso</mat-label>
+          <input matInput formControlName="curso" required />
+          <mat-error>Ingresa el curso.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nivel de conocimiento</mat-label>
+          <mat-select formControlName="nivel" required>
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel">{{ nivel }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Básico, intermedio o avanzado.</mat-hint>
+          <mat-error>Selecciona un nivel.</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="editarCursoForm.invalid"
         >Guardar cambios</a
       >
     </mat-dialog-actions>
