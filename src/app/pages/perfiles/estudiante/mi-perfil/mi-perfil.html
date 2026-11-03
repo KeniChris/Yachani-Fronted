@@ -99,7 +99,75 @@
       </mat-card>
     </div>
   </mat-tab>
-  <mat-tab label="Resúmenes"></mat-tab>
+  <mat-tab label="Resúmenes">
+    <header class="summaries-heading">
+      <div>
+        <h2>Mis resúmenes</h2>
+        <p>Publica archivos breves para complementar tu perfil.</p>
+      </div>
+      <button
+        mat-flat-button
+        (click)="
+          resumenForm.controls.titulo.setValue('Guía de límites');
+          dialog.open(resumenDialog, {
+            width: '600px',
+            maxWidth: 'calc(100vw - 32px)',
+            data: 'publicar'
+          })
+        "
+      >
+        Publicar resumen
+      </button>
+    </header>
+    @if (resumenes === 'vacio') {
+      <mat-card appearance="outlined" class="content-card empty-state">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">description</mat-icon>
+        <h2>Aún no tienes resúmenes</h2>
+        <p>Agrega tu primer resumen en PDF o imagen.</p>
+        <button
+          mat-flat-button
+          (click)="
+            dialog.open(resumenDialog, {
+              width: '600px',
+              maxWidth: 'calc(100vw - 32px)',
+              data: 'publicar'
+            })
+          "
+        >
+          Publicar resumen
+        </button>
+      </mat-card>
+    } @else {
+      <mat-card appearance="outlined" class="content-card">
+        @for (resumen of misResumenes; track resumen.archivo) {
+          <article class="file-item summary-item">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">picture_as_pdf</mat-icon>
+            <div class="file-copy">
+              <strong>{{ resumen.archivo }}</strong>
+              <span>{{ resumen.detalle }}</span>
+            </div>
+            <div class="summary-actions">
+              <a mat-stroked-button routerLink="/perfiles">Descargar</a>
+              <button
+                mat-button
+                (click)="
+                  resumenForm.controls.titulo.setValue(resumen.titulo);
+                  dialog.open(resumenDialog, {
+                    width: '600px',
+                    maxWidth: 'calc(100vw - 32px)',
+                    data: 'reemplazar'
+                  })
+                "
+              >
+                Reemplazar
+              </button>
+            </div>
+          </article>
+        }
+      </mat-card>
+      <p class="help">PDF, PNG o JPG/JPEG · Hasta 1 MB por archivo.</p>
+    }
+  </mat-tab>
 </mat-tab-group>
 <ng-template #academicoDialog>
   <div class="profile-dialog">
@@ -263,6 +331,68 @@
         [disabled]="editarCursoForm.invalid"
         >Guardar cambios</a
       >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #resumenDialog let-modo>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>{{ modo === 'reemplazar' ? 'Reemplazar resumen' : 'Publicar resumen' }}</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>
+        {{
+          modo === 'reemplazar'
+            ? 'El nuevo archivo reemplazará al anterior.'
+            : 'Elige un título y un archivo breve.'
+        }}
+      </p>
+      <form [formGroup]="resumenForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="titulo" required />
+          <mat-error>Ingresa un título.</mat-error>
+        </mat-form-field>
+        <div class="upload-zone" [class.upload-error]="archivoResumen === 'grande'">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">{{
+            archivoResumen === 'grande' ? 'error' : 'upload'
+          }}</mat-icon>
+          <strong>{{
+            archivoResumen === 'grande'
+              ? 'Guía de límites.pdf · 2,4 MB'
+              : 'Guía de límites.pdf · 680 KB'
+          }}</strong>
+          <small>PDF, PNG o JPG/JPEG · Máximo 1 MB.</small>
+          <button mat-stroked-button type="button" (click)="selector.click()">
+            Elegir otro archivo
+          </button>
+          <input
+            #selector
+            type="file"
+            hidden
+            formControlName="archivo"
+            accept=".pdf,.png,.jpg,.jpeg"
+          />
+        </div>
+        @if (archivoResumen === 'grande') {
+          <div class="alert" role="alert">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+            <div>
+              <strong>El archivo supera 1 MB</strong>
+              <span>Elige un archivo más pequeño para continuar.</span>
+            </div>
+          </div>
+        }
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a mat-flat-button mat-dialog-close routerLink="/perfiles" [disabled]="resumenForm.invalid">{{
+        modo === 'reemplazar' ? 'Reemplazar archivo' : 'Publicar resumen'
+      }}</a>
     </mat-dialog-actions>
   </div>
 </ng-template>

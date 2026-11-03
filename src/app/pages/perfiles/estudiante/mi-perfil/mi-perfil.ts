@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -72,6 +72,27 @@ export class MiPerfil {
   readonly editarCursoForm = new FormGroup({
     curso: new FormControl('Cálculo I', { nonNullable: true, validators: [Validators.required] }),
     nivel: new FormControl('Intermedio', { nonNullable: true, validators: [Validators.required] }),
+  });
+  @Input() resumenes = 'lista';
+  @Input() archivoResumen = 'valido';
+  readonly misResumenes = [
+    {
+      titulo: 'Guía de límites',
+      archivo: 'Guía de límites.pdf',
+      detalle: 'PDF · 680 KB · 29 oct 2026',
+    },
+    {
+      titulo: 'Repaso de ingeniería de software',
+      archivo: 'Repaso de ingeniería de software.pdf',
+      detalle: 'PDF · 680 KB · 29 oct 2026',
+    },
+  ];
+  readonly resumenForm = new FormGroup({
+    titulo: new FormControl('Guía de límites', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    archivo: new FormControl(''),
   });
   constructor(public readonly dialog: MatDialog) {}
 }
