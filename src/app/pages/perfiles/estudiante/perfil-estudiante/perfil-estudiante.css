@@ -1,0 +1,26 @@
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-control);
+}
+.file-item mat-icon {
+  color: var(--color-primary);
+}
+.file-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.file-copy strong {
+  font: var(--font-control);
+  overflow-wrap: anywhere;
+}
+.file-copy span {
+  color: var(--color-muted);
+  font: var(--font-help);
+}

@@ -1,0 +1,398 @@
+<header class="page-heading">
+  <h1>Mi perfil</h1>
+  <p>Mantén tu información clara y actualizada.</p>
+</header>
+<mat-card appearance="outlined" class="content-card profile-card">
+  <div class="identity">
+    <span class="avatar" aria-hidden="true">LC</span>
+    <div class="identity-copy">
+      <h2>Leicy Cahuana</h2>
+      <span class="role">Estudiante</span>
+    </div>
+  </div>
+  <p class="email">u20231e777&#64;upc.edu.pe</p>
+  <p>Universidad Peruana de Ciencias Aplicadas · Ingeniería de Software</p>
+</mat-card>
+<mat-tab-group class="profile-tabs" animationDuration="0ms" mat-stretch-tabs="false">
+  <mat-tab label="Académico">
+    <div class="columns">
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Datos académicos</h2>
+        <dl>
+          <div>
+            <dt>Universidad</dt>
+            <dd>Universidad Peruana de Ciencias Aplicadas</dd>
+          </div>
+          <div>
+            <dt>Carrera</dt>
+            <dd>Ingeniería de Software</dd>
+          </div>
+        </dl>
+        <button
+          mat-stroked-button
+          class="card-action"
+          (click)="dialog.open(academicoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Editar información
+        </button>
+      </mat-card>
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Cursos y conocimientos</h2>
+        @for (curso of ['Cálculo I', 'Ingeniería de Software']; track curso) {
+          <div class="course">
+            <div class="course-copy">
+              <strong>{{ curso }}</strong>
+              <span>Nivel Intermedio</span>
+            </div>
+            <button
+              mat-icon-button
+              [attr.aria-label]="'Editar ' + curso"
+              (click)="
+                editarCursoForm.controls.curso.setValue(curso);
+                dialog.open(editarCursoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })
+              "
+            >
+              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">edit</mat-icon>
+            </button>
+          </div>
+        }
+        <button
+          mat-stroked-button
+          class="card-action"
+          (click)="dialog.open(agregarCursoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Agregar curso
+        </button>
+      </mat-card>
+    </div>
+  </mat-tab>
+  <mat-tab label="Preferencias">
+    <div class="columns">
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Así prefiero aprender</h2>
+        <dl>
+          <div>
+            <dt>Método preferido</dt>
+            <dd>Resolución de ejercicios</dd>
+          </div>
+          <div>
+            <dt>Modalidad preferida</dt>
+            <dd>Virtual</dd>
+          </div>
+        </dl>
+        <button
+          mat-stroked-button
+          class="card-action"
+          (click)="dialog.open(preferenciasDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Editar preferencias
+        </button>
+      </mat-card>
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Temas de interés</h2>
+        <ul class="topics" aria-label="Temas de interés">
+          @for (tema of ['Cálculo', 'Ingeniería de Software', 'Inteligencia artificial']; track tema) {
+            <li>{{ tema }}</li>
+          }
+        </ul>
+        <p class="help">Estas preferencias ayudan a orientar la búsqueda de grupos.</p>
+      </mat-card>
+    </div>
+  </mat-tab>
+  <mat-tab label="Resúmenes">
+    <header class="summaries-heading">
+      <div>
+        <h2>Mis resúmenes</h2>
+        <p>Publica archivos breves para complementar tu perfil.</p>
+      </div>
+      <button
+        mat-flat-button
+        (click)="
+          resumenForm.controls.titulo.setValue('Guía de límites');
+          dialog.open(resumenDialog, {
+            width: '600px',
+            maxWidth: 'calc(100vw - 32px)',
+            data: 'publicar'
+          })
+        "
+      >
+        Publicar resumen
+      </button>
+    </header>
+    @if (resumenes === 'vacio') {
+      <mat-card appearance="outlined" class="content-card empty-state">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">description</mat-icon>
+        <h2>Aún no tienes resúmenes</h2>
+        <p>Agrega tu primer resumen en PDF o imagen.</p>
+        <button
+          mat-flat-button
+          (click)="
+            dialog.open(resumenDialog, {
+              width: '600px',
+              maxWidth: 'calc(100vw - 32px)',
+              data: 'publicar'
+            })
+          "
+        >
+          Publicar resumen
+        </button>
+      </mat-card>
+    } @else {
+      <mat-card appearance="outlined" class="content-card">
+        @for (resumen of misResumenes; track resumen.archivo) {
+          <article class="file-item summary-item">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">picture_as_pdf</mat-icon>
+            <div class="file-copy">
+              <strong>{{ resumen.archivo }}</strong>
+              <span>{{ resumen.detalle }}</span>
+            </div>
+            <div class="summary-actions">
+              <a mat-stroked-button routerLink="/perfiles">Descargar</a>
+              <button
+                mat-button
+                (click)="
+                  resumenForm.controls.titulo.setValue(resumen.titulo);
+                  dialog.open(resumenDialog, {
+                    width: '600px',
+                    maxWidth: 'calc(100vw - 32px)',
+                    data: 'reemplazar'
+                  })
+                "
+              >
+                Reemplazar
+              </button>
+            </div>
+          </article>
+        }
+      </mat-card>
+      <p class="help">PDF, PNG o JPG/JPEG · Hasta 1 MB por archivo.</p>
+    }
+  </mat-tab>
+</mat-tab-group>
+<ng-template #academicoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar información académica</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Los nombres y el correo pertenecen a tu cuenta. Aquí actualizas universidad y carrera.</p>
+      <form [formGroup]="academicoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Universidad</mat-label>
+          <input matInput formControlName="universidad" placeholder="Nombre de tu universidad" required />
+          <mat-error>Ingresa tu universidad.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Carrera</mat-label>
+          <input matInput formControlName="carrera" placeholder="Nombre de tu carrera" required />
+          <mat-error>Ingresa tu carrera.</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="academicoForm.invalid"
+        >Guardar cambios</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #preferenciasDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar preferencias</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Elige un método y una modalidad para estudiar.</p>
+      <form [formGroup]="preferenciasForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Método preferido</mat-label>
+          <mat-select formControlName="metodo" required>
+            @for (metodo of metodos; track metodo) {
+              <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Selecciona una opción.</mat-hint>
+          <mat-error>Selecciona un método.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Modalidad preferida</mat-label>
+          <mat-select formControlName="modalidad" required>
+            @for (modalidad of modalidades; track modalidad) {
+              <mat-option [value]="modalidad">{{ modalidad }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Virtual, presencial o híbrida.</mat-hint>
+          <mat-error>Selecciona una modalidad.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Temas de interés</mat-label>
+          <input matInput formControlName="temas" />
+          <mat-hint>Separa tus temas con comas.</mat-hint>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="preferenciasForm.invalid"
+        >Guardar cambios</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #agregarCursoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Agregar curso</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Indica el curso y selecciona tu nivel de conocimiento.</p>
+      <form [formGroup]="agregarCursoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso</mat-label>
+          <input matInput formControlName="curso" required />
+          <mat-error>Ingresa el curso.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nivel de conocimiento</mat-label>
+          <mat-select formControlName="nivel" required>
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel">{{ nivel }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Básico, intermedio o avanzado.</mat-hint>
+          <mat-error>Selecciona un nivel.</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="agregarCursoForm.invalid"
+        >Agregar curso</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #editarCursoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar curso</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Indica el curso y selecciona tu nivel de conocimiento.</p>
+      <form [formGroup]="editarCursoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso</mat-label>
+          <input matInput formControlName="curso" required />
+          <mat-error>Ingresa el curso.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nivel de conocimiento</mat-label>
+          <mat-select formControlName="nivel" required>
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel">{{ nivel }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Básico, intermedio o avanzado.</mat-hint>
+          <mat-error>Selecciona un nivel.</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="editarCursoForm.invalid"
+        >Guardar cambios</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+<ng-template #resumenDialog let-modo>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>{{ modo === 'reemplazar' ? 'Reemplazar resumen' : 'Publicar resumen' }}</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>
+        {{
+          modo === 'reemplazar'
+            ? 'El nuevo archivo reemplazará al anterior.'
+            : 'Elige un título y un archivo breve.'
+        }}
+      </p>
+      <form [formGroup]="resumenForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="titulo" required />
+          <mat-error>Ingresa un título.</mat-error>
+        </mat-form-field>
+        <div class="upload-zone" [class.upload-error]="archivoResumen === 'grande'">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">{{
+            archivoResumen === 'grande' ? 'error' : 'upload'
+          }}</mat-icon>
+          <strong>{{
+            archivoResumen === 'grande'
+              ? 'Guía de límites.pdf · 2,4 MB'
+              : 'Guía de límites.pdf · 680 KB'
+          }}</strong>
+          <small>PDF, PNG o JPG/JPEG · Máximo 1 MB.</small>
+          <button mat-stroked-button type="button" (click)="selector.click()">
+            Elegir otro archivo
+          </button>
+          <input
+            #selector
+            type="file"
+            hidden
+            formControlName="archivo"
+            accept=".pdf,.png,.jpg,.jpeg"
+          />
+        </div>
+        @if (archivoResumen === 'grande') {
+          <div class="alert" role="alert">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+            <div>
+              <strong>El archivo supera 1 MB</strong>
+              <span>Elige un archivo más pequeño para continuar.</span>
+            </div>
+          </div>
+        }
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a mat-flat-button mat-dialog-close routerLink="/perfiles" [disabled]="resumenForm.invalid">{{
+        modo === 'reemplazar' ? 'Reemplazar archivo' : 'Publicar resumen'
+      }}</a>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

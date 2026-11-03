@@ -1,0 +1,132 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+h1,
+h2,
+p,
+dl,
+dd {
+  margin: 0;
+}
+.page-heading {
+  margin-bottom: var(--space-6);
+}
+.page-heading p {
+  color: var(--color-muted);
+  margin-top: var(--space-2);
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 432px);
+  gap: var(--space-6);
+  align-items: start;
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-card);
+}
+.panel > a,
+.panel > button,
+.panel > .notice {
+  width: 100%;
+}
+.panel h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--font-card-title);
+  overflow-wrap: anywhere;
+}
+.group-info h2 {
+  font: var(--font-page-title);
+}
+.group-info h2 mat-icon {
+  flex: none;
+  color: var(--color-primary);
+}
+.badge {
+  padding: var(--space-2);
+  background: var(--color-active);
+  color: var(--color-primary);
+  border-radius: var(--radius-control);
+  font: var(--font-help);
+}
+.badge.success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+.description {
+  font: var(--font-body);
+  color: var(--color-text);
+}
+dt {
+  font: var(--font-help);
+  color: var(--color-muted);
+  margin-top: var(--space-4);
+}
+dd {
+  font: var(--font-body);
+}
+.count {
+  font: var(--font-section-title);
+}
+small {
+  font: var(--font-help);
+  color: var(--color-muted);
+}
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+}
+.notice mat-icon {
+  flex: none;
+}
+.notice strong {
+  font: var(--font-control);
+}
+.notice p {
+  font: var(--font-secondary);
+}
+.notice.success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+.notice.warning {
+  background: var(--color-warning-surface);
+  color: var(--color-warning);
+}
+.back {
+  margin-top: var(--space-6);
+}
+
+@media (max-width: 767px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .group-info h2 {
+    font: var(--font-section-title);
+  }
+  .group-info > a {
+    align-self: center;
+  }
+  .back {
+    display: flex;
+    margin-inline: auto;
+    width: fit-content;
+  }
+  .back.hide-mobile {
+    display: none;
+  }
+}

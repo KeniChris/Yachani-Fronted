@@ -1,0 +1,138 @@
+<header class="page-heading">
+  <h1>Mi perfil</h1>
+  <p>Mantén tu información clara y actualizada.</p>
+</header>
+<mat-card appearance="outlined" class="content-card profile-card">
+  <div class="identity">
+    <span class="avatar" aria-hidden="true">CR</span>
+    <div class="identity-copy">
+      <h2>Carlos Ríos</h2>
+      <span class="role">Tutor</span>
+    </div>
+  </div>
+  <p class="email">u20231t456&#64;upc.edu.pe</p>
+  <p>Comparte conocimientos y acompaña a otros estudiantes.</p>
+</mat-card>
+<mat-tab-group class="profile-tabs" animationDuration="0ms" mat-stretch-tabs="false">
+  <mat-tab label="Mi presentación">
+    <div class="columns">
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Sobre mí</h2>
+        <p class="about-text">
+          Me gusta explicar los conceptos de cálculo con ejemplos cotidianos y resolver dudas paso a
+          paso. Estudio contigo hasta que puedas aplicar cada idea por tu cuenta.
+        </p>
+        <dl>
+          <div>
+            <dt>Método de enseñanza</dt>
+            <dd>Resolución de ejercicios</dd>
+          </div>
+        </dl>
+        <button
+          mat-stroked-button
+          class="card-action"
+          (click)="dialog.open(presentacionDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Editar presentación
+        </button>
+      </mat-card>
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Lo que dicen sus estudiantes</h2>
+        <div class="rating">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+          <strong>4,8</strong>
+          <span>· 5 reseñas</span>
+        </div>
+        <a mat-stroked-button routerLink="/perfiles" queryParamsHandling="preserve">Ver reseñas</a>
+      </mat-card>
+    </div>
+  </mat-tab>
+  <mat-tab label="Mis reseñas">
+    <header class="reviews-heading">
+      <div>
+        <h2>Mis reseñas</h2>
+        <p>Comentarios de estudiantes que han participado en tus grupos.</p>
+      </div>
+    </header>
+    <mat-card appearance="outlined" class="content-card rating-summary">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+      <strong>4,8 de 5</strong>
+      <span>5 reseñas</span>
+    </mat-card>
+    <div class="reviews-grid">
+      @for (resena of resenas; track resena.autor) {
+        <mat-card appearance="outlined" class="content-card review-card">
+          <div class="review-head">
+            <span class="avatar small" aria-hidden="true">{{ resena.iniciales }}</span>
+            <div class="review-author">
+              <strong>{{ resena.autor }}</strong>
+              <span>{{ resena.fecha }}</span>
+            </div>
+          </div>
+          <div class="stars" aria-label="5 de 5 estrellas">
+            @for (estrella of estrellas; track estrella) {
+              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+            }
+          </div>
+          <p class="review-text">{{ resena.comentario }}</p>
+        </mat-card>
+      }
+    </div>
+    <p class="help">Se muestran las 10 reseñas mejor calificadas; en empate, las más recientes.</p>
+  </mat-tab>
+</mat-tab-group>
+<ng-template #presentacionDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar presentación</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Cuenta qué puedes aportar a tus grupos.</p>
+      <form [formGroup]="presentacionForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Presentación</mat-label>
+          <textarea matInput formControlName="presentacion" rows="4" required></textarea>
+          <mat-hint>96 / 500 caracteres</mat-hint>
+          <mat-error>
+            @if (presentacionForm.controls.presentacion.hasError('required')) {
+              Escribe tu presentación.
+            } @else {
+              Máximo permitido: 500 caracteres.
+            }
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Método de enseñanza</mat-label>
+          <mat-select formControlName="metodo" required>
+            @for (metodo of metodos; track metodo) {
+              <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+          <mat-error>Selecciona un método.</mat-error>
+        </mat-form-field>
+        @if (presentacionForm.controls.presentacion.hasError('maxlength')) {
+          <div class="alert" role="alert">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+            <div>
+              <strong>La presentación es demasiado larga</strong>
+              <span>Reduce el texto a un máximo de 500 caracteres.</span>
+            </div>
+          </div>
+        }
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles" queryParamsHandling="preserve"
+        [disabled]="presentacionForm.invalid"
+        >Guardar cambios</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
