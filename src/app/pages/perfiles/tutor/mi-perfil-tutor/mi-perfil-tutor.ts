@@ -47,5 +47,21 @@ export class MiPerfilTutor {
       validators: [Validators.required],
     }),
   });
+  readonly estrellas = [1, 2, 3, 4, 5];
+  readonly resenas = [
+    {
+      iniciales: 'LP',
+      autor: 'Lucía Paredes',
+      fecha: '28 oct 2026',
+      comentario: 'Explica con claridad y propone ejercicios que ayudan a comprender.',
+    },
+    {
+      iniciales: 'MS',
+      autor: 'María Salas',
+      fecha: '28 oct 2026',
+      comentario:
+        'Las explicaciones y los ejemplos me ayudaron a practicar con más confianza.',
+    },
+  ];
   constructor(public readonly dialog: MatDialog) {}
 }

@@ -28,6 +28,10 @@ export const routes: Routes = [
       import('./estudiante/perfil-estudiante/perfil-estudiante').then((m) => m.PerfilEstudiante),
   },
   {
+    path: 'otro-tutor/resenas',
+    loadComponent: () => import('./tutor/resenas-tutor/resenas-tutor').then((m) => m.ResenasTutor),
+  },
+  {
     path: 'otro-tutor',
     loadComponent: () => import('./tutor/perfil-tutor/perfil-tutor').then((m) => m.PerfilTutor),
   },

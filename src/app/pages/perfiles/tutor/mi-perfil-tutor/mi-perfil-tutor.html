@@ -47,7 +47,39 @@
       </mat-card>
     </div>
   </mat-tab>
-  <mat-tab label="Mis reseñas"></mat-tab>
+  <mat-tab label="Mis reseñas">
+    <header class="reviews-heading">
+      <div>
+        <h2>Mis reseñas</h2>
+        <p>Comentarios de estudiantes que han participado en tus grupos.</p>
+      </div>
+    </header>
+    <mat-card appearance="outlined" class="content-card rating-summary">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+      <strong>4,8 de 5</strong>
+      <span>5 reseñas</span>
+    </mat-card>
+    <div class="reviews-grid">
+      @for (resena of resenas; track resena.autor) {
+        <mat-card appearance="outlined" class="content-card review-card">
+          <div class="review-head">
+            <span class="avatar small" aria-hidden="true">{{ resena.iniciales }}</span>
+            <div class="review-author">
+              <strong>{{ resena.autor }}</strong>
+              <span>{{ resena.fecha }}</span>
+            </div>
+          </div>
+          <div class="stars" aria-label="5 de 5 estrellas">
+            @for (estrella of estrellas; track estrella) {
+              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+            }
+          </div>
+          <p class="review-text">{{ resena.comentario }}</p>
+        </mat-card>
+      }
+    </div>
+    <p class="help">Se muestran las 10 reseñas mejor calificadas; en empate, las más recientes.</p>
+  </mat-tab>
 </mat-tab-group>
 <ng-template #presentacionDialog>
   <div class="profile-dialog">
