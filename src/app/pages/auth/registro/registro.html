@@ -1,40 +1,82 @@
-@if (previsualizacion === 'exito') {
-  <section class="success" role="status" aria-labelledby="registro-exito">
-    <span class="success-icon" aria-hidden="true"
-      ><img src="/icons/auth/success.svg" width="42" height="42" alt=""
-    /></span>
+@if (registroExitoso() || previsualizacion === 'exito') {
+  <section
+    class="success"
+    role="status"
+    aria-labelledby="registro-exito"
+  >
+    <span class="success-icon" aria-hidden="true">
+      <img
+        src="/icons/auth/success.svg"
+        width="42"
+        height="42"
+        alt=""
+      />
+    </span>
+
     <p class="eyebrow">Bienvenido a Yachani</p>
+
     <h1 id="registro-exito">¡Registro exitoso!</h1>
+
     <p class="success-description">
-      Tu cuenta se creó correctamente. Ya puedes iniciar sesión y comenzar a aprender en comunidad.
+      Tu cuenta se creó correctamente. Ya puedes iniciar sesión y comenzar
+      a aprender en comunidad.
     </p>
-    <a mat-flat-button class="primary-button" routerLink="/auth/iniciar-sesion">Iniciar sesión</a>
+
+    <a
+      mat-flat-button
+      class="primary-button"
+      routerLink="/auth/iniciar-sesion"
+    >
+      Iniciar sesión
+    </a>
   </section>
 } @else {
   <section aria-labelledby="registro-title">
     <header>
       <p class="eyebrow">
-        {{ previsualizacion === 'error' ? 'Únete a nuestra comunidad' : 'Bienvenido de nuevo' }}
+        {{
+          previsualizacion === 'error'
+            ? 'Únete a nuestra comunidad'
+            : 'Bienvenido de nuevo'
+        }}
       </p>
+
       <h1 id="registro-title">Crea tu cuenta</h1>
+
       <p class="description">
         Regístrate con tu correo institucional y comienza a aprender en grupo.
       </p>
     </header>
+
     @if (previsualizacion === 'error') {
       <div class="registration-alert" role="alert">
         <strong>No pudimos completar tu registro</strong>
         <p>Revisa los campos indicados. No se creó ninguna cuenta.</p>
       </div>
     }
-    <form [formGroup]="form" (ngSubmit)="registrarse()" aria-label="Registro">
+
+    @if (errorRegistro()) {
+      <div class="registration-alert" role="alert">
+        <strong>No pudimos confirmar tu registro</strong>
+        <p>{{ errorRegistro() }}</p>
+      </div>
+    }
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="registrarse()"
+      [attr.aria-busy]="guardando()"
+      aria-label="Registro"
+    >
       <fieldset class="role-field">
         <legend id="role-label">Selecciona tu tipo de usuario</legend>
+
         <mat-radio-group
           formControlName="rol"
           aria-labelledby="role-label"
           [attr.aria-invalid]="
-            form.controls.rol.invalid && (form.controls.rol.dirty || form.controls.rol.touched)
+            form.controls.rol.invalid &&
+            (form.controls.rol.dirty || form.controls.rol.touched)
           "
           aria-describedby="role-error"
         >
@@ -42,42 +84,71 @@
             value="estudiante"
             [class.selected]="form.controls.rol.value === 'estudiante'"
           >
-            <span class="role-content"
-              ><picture
-                ><source
+            <span class="role-content">
+              <picture>
+                <source
                   media="(max-width: 767px)"
-                  srcset="/icons/auth/registro-estudiante-mobile.svg" />
+                  srcset="/icons/auth/registro-estudiante-mobile.svg"
+                />
                 <img
                   src="/icons/auth/registro-estudiante.svg"
                   width="28"
                   height="28"
-                  alt="" /></picture
-              ><span><strong>Estudiante</strong><small>Quiero encontrar grupos</small></span></span
-            >
+                  alt=""
+                />
+              </picture>
+
+              <span>
+                <strong>Estudiante</strong>
+                <small>Quiero encontrar grupos</small>
+              </span>
+            </span>
           </mat-radio-button>
-          <mat-radio-button value="tutor" [class.selected]="form.controls.rol.value === 'tutor'">
-            <span class="role-content"
-              ><picture
-                ><source
+
+          <mat-radio-button
+            value="tutor"
+            [class.selected]="form.controls.rol.value === 'tutor'"
+          >
+            <span class="role-content">
+              <picture>
+                <source
                   media="(max-width: 767px)"
-                  srcset="/icons/auth/registro-tutor-mobile.svg" />
-                <img src="/icons/auth/registro-tutor.svg" width="28" height="28" alt="" /></picture
-              ><span><strong>Tutor</strong><small>Quiero orientar grupos</small></span></span
-            >
+                  srcset="/icons/auth/registro-tutor-mobile.svg"
+                />
+                <img
+                  src="/icons/auth/registro-tutor.svg"
+                  width="28"
+                  height="28"
+                  alt=""
+                />
+              </picture>
+
+              <span>
+                <strong>Tutor</strong>
+                <small>Quiero orientar grupos</small>
+              </span>
+            </span>
           </mat-radio-button>
         </mat-radio-group>
+
         <div class="role-error" id="role-error">
           @if (
-            form.controls.rol.invalid && (form.controls.rol.dirty || form.controls.rol.touched)
+            form.controls.rol.invalid &&
+            (form.controls.rol.dirty || form.controls.rol.touched)
           ) {
             <mat-error>Selecciona tu tipo de usuario</mat-error>
           }
         </div>
       </fieldset>
+
       <div class="name-row">
         <div class="field">
           <label for="registro-nombres">Nombres</label>
-          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+          >
             <input
               matInput
               id="registro-nombres"
@@ -86,6 +157,7 @@
               [errorStateMatcher]="campoErrorMatcher"
               required
             />
+
             @if (
               form.controls.nombres.invalid &&
               (form.controls.nombres.dirty || form.controls.nombres.touched)
@@ -94,9 +166,14 @@
             }
           </mat-form-field>
         </div>
+
         <div class="field">
           <label for="registro-apellidos">Apellidos</label>
-          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+          >
             <input
               matInput
               id="registro-apellidos"
@@ -105,6 +182,7 @@
               [errorStateMatcher]="campoErrorMatcher"
               required
             />
+
             @if (
               form.controls.apellidos.invalid &&
               (form.controls.apellidos.dirty || form.controls.apellidos.touched)
@@ -114,9 +192,14 @@
           </mat-form-field>
         </div>
       </div>
+
       <div class="field">
         <label for="registro-correo">Correo institucional UPC</label>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
           <input
             matInput
             id="registro-correo"
@@ -126,23 +209,31 @@
             [errorStateMatcher]="campoErrorMatcher"
             required
           />
+
           @if (
             form.controls.correo.invalid &&
             (form.controls.correo.dirty || form.controls.correo.touched)
           ) {
-            <mat-error>{{
-              form.controls.correo.hasError('required')
-                ? 'El correo es obligatorio'
-                : form.controls.correo.hasError('email')
-                  ? 'Ingresa un correo válido'
-                  : 'El correo debe terminar en @upc.edu.pe'
-            }}</mat-error>
+            <mat-error>
+              {{
+                form.controls.correo.hasError('required')
+                  ? 'El correo es obligatorio'
+                  : form.controls.correo.hasError('email')
+                    ? 'Ingresa un correo válido'
+                    : 'El correo debe terminar en @upc.edu.pe'
+              }}
+            </mat-error>
           }
         </mat-form-field>
       </div>
+
       <div class="field">
         <label for="registro-contrasena">Contraseña</label>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
           <input
             matInput
             id="registro-contrasena"
@@ -152,33 +243,48 @@
             [errorStateMatcher]="campoErrorMatcher"
             required
           />
+
           <button
             mat-icon-button
             matSuffix
             type="button"
-            [attr.aria-label]="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-label]="
+              mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'
+            "
             [attr.aria-pressed]="mostrarContrasena"
             (click)="mostrarContrasena = !mostrarContrasena"
           >
-            <mat-icon class="password-icon" fontSet="material-symbols-rounded" aria-hidden="true">{{
-              mostrarContrasena ? 'visibility_off' : 'visibility'
-            }}</mat-icon>
+            <mat-icon
+              class="password-icon"
+              fontSet="material-symbols-rounded"
+              aria-hidden="true"
+            >
+              {{ mostrarContrasena ? 'visibility_off' : 'visibility' }}
+            </mat-icon>
           </button>
+
           @if (
             form.controls.contrasena.invalid &&
             (form.controls.contrasena.dirty || form.controls.contrasena.touched)
           ) {
-            <mat-error>{{
-              form.controls.contrasena.hasError('required')
-                ? 'La contraseña es obligatoria'
-                : 'La contraseña debe tener al menos 8 caracteres.'
-            }}</mat-error>
+            <mat-error>
+              {{
+                form.controls.contrasena.hasError('required')
+                  ? 'La contraseña es obligatoria'
+                  : 'La contraseña debe tener al menos 8 caracteres.'
+              }}
+            </mat-error>
           }
         </mat-form-field>
       </div>
+
       <div class="field">
         <label for="registro-confirmacion">Confirmar contraseña</label>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
           <input
             matInput
             id="registro-confirmacion"
@@ -188,34 +294,56 @@
             [errorStateMatcher]="confirmacionErrorMatcher"
             required
           />
+
           <button
             mat-icon-button
             matSuffix
             type="button"
-            [attr.aria-label]="mostrarConfirmacion ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-label]="
+              mostrarConfirmacion ? 'Ocultar contraseña' : 'Mostrar contraseña'
+            "
             [attr.aria-pressed]="mostrarConfirmacion"
             (click)="mostrarConfirmacion = !mostrarConfirmacion"
           >
-            <mat-icon class="password-icon" fontSet="material-symbols-rounded" aria-hidden="true">{{
-              mostrarConfirmacion ? 'visibility_off' : 'visibility'
-            }}</mat-icon>
+            <mat-icon
+              class="password-icon"
+              fontSet="material-symbols-rounded"
+              aria-hidden="true"
+            >
+              {{ mostrarConfirmacion ? 'visibility_off' : 'visibility' }}
+            </mat-icon>
           </button>
+
           @if (
-            (form.controls.confirmacion.invalid || form.hasError('contrasenasDiferentes')) &&
-            (form.controls.confirmacion.dirty || form.controls.confirmacion.touched)
+            (form.controls.confirmacion.invalid ||
+              form.hasError('contrasenasDiferentes')) &&
+            (form.controls.confirmacion.dirty ||
+              form.controls.confirmacion.touched)
           ) {
-            <mat-error>{{
-              form.controls.confirmacion.hasError('required')
-                ? 'Confirma tu contraseña'
-                : 'Las contraseñas no coinciden.'
-            }}</mat-error>
+            <mat-error>
+              {{
+                form.controls.confirmacion.hasError('required')
+                  ? 'Confirma tu contraseña'
+                  : 'Las contraseñas no coinciden.'
+              }}
+            </mat-error>
           }
         </mat-form-field>
       </div>
-      <button mat-flat-button class="primary-button" type="submit">Registrarse</button>
+
+      <button
+        mat-flat-button
+        class="primary-button"
+        type="submit"
+        [disabled]="guardando()"
+      >
+        {{ guardando() ? 'Registrando…' : 'Registrarse' }}
+      </button>
     </form>
+
     <p class="login-link">
-      ¿Ya tienes cuenta? <a routerLink="/auth/iniciar-sesion">Inicia sesión</a>
+      ¿Ya tienes cuenta?
+      <a routerLink="/auth/iniciar-sesion">Inicia sesión</a>
     </p>
   </section>
 }

@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-inicio-estudiante',
@@ -13,7 +13,16 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './inicio-estudiante.css',
 })
 export class InicioEstudiante {
-  @Input({ transform: (valor: unknown) => (Array.isArray(valor) ? valor : []) }) grupos: readonly {
+  private readonly authService = inject(AuthService);
+
+  get nombre(): string {
+    return this.authService.usuario()?.nombres.trim().split(/\s+/)[0] ?? '';
+  }
+
+  @Input({
+    transform: (valor: unknown) => (Array.isArray(valor) ? valor : []),
+  })
+  grupos: readonly {
     id: string;
     nombre: string;
     descripcion?: string;

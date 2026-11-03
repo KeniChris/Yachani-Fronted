@@ -1,5 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
+import { AuthService } from '../../core/services/auth.service';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,14 +30,37 @@ import { Brand } from '../brand/brand';
   styleUrl: './app-layout.css',
 })
 export class AppLayout {
-  // Variante visual mediante datos de ruta o ?rol=tutor; sin autenticación.
-  @Input() rol: 'estudiante' | 'tutor' = 'estudiante';
-  // Datos de ejemplo de estructura-base; no representan una sesión autenticada.
-  @Input() usuario: { nombre: string; iniciales?: string; rol?: string } | null = null;
-  readonly usuariosEjemplo = {
-    estudiante: { nombre: 'Leicy Cahuana', iniciales: 'LC', rol: 'Estudiante' },
-    tutor: { nombre: 'Carlos Ríos', iniciales: 'CR', rol: 'Tutor' },
+  private readonly authService = inject(AuthService);
+
+get rol(): 'estudiante' | 'tutor' {
+  return this.authService.usuario()?.tipoUsuario === 'TUTOR'
+    ? 'tutor'
+    : 'estudiante';
+}
+
+get usuario(): {
+  nombre: string;
+  iniciales: string;
+  rol: string;
+} | null {
+  const datos = this.authService.usuario();
+
+  if (!datos) {
+    return null;
+  }
+
+  const nombres = datos.nombres.trim();
+  const apellidos = datos.apellidos.trim();
+
+  const inicialNombre = Array.from(nombres)[0] ?? '';
+  const inicialApellido = Array.from(apellidos)[0] ?? '';
+
+  return {
+    nombre: `${nombres} ${apellidos}`.trim(),
+    iniciales: `${inicialNombre}${inicialApellido}`.toLocaleUpperCase(),
+    rol: datos.tipoUsuario === 'TUTOR' ? 'Tutor' : 'Estudiante',
   };
+}
   // Texto de cabecera para contextos de grupo; por defecto se muestra la ruta activa.
   @Input() ruta = '';
   readonly navigation = {
