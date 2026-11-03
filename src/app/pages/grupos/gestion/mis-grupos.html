@@ -73,7 +73,10 @@
           mat-stroked-button
           class="group-action"
           [routerLink]="['/grupos', grupo.id]"
-          [queryParams]="{ grupos: null }"
+          [queryParams]="{
+            grupos: null,
+            admin: rol !== 'tutor' && grupo.id === 'ingenieria-software' ? 'si' : null,
+          }"
       queryParamsHandling="merge"
           [attr.aria-label]="'Ver grupo ' + grupo.nombre"
           >Ver grupo</a

@@ -18,7 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatSelectModule,
   ],
   templateUrl: './crear-con-ia.html',
-  styleUrl: './crear-con-ia.css',
+  styleUrls: ['../grupos.css', './crear-con-ia.css'],
 })
 export class CrearConIa {
   // Pasos de Figma mediante ?paso=: describir (A05), mazos (A08), organizar (A09) y revision (A06).

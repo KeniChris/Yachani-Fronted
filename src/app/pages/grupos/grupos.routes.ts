@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', children: [] },
+  { path: '', pathMatch: 'full', redirectTo: 'gestion' },
   // Reservas de navegación de la guía; las pantallas se incorporarán en sus áreas.
   { path: 'descubrimiento', children: [] },
   {
@@ -25,7 +25,6 @@ export const routes: Routes = [
       import('../../layout/grupo-layout/grupo-layout').then((m) => m.GrupoLayout),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'chat' },
-      // Los contenedores reservan la navegación sin implementar pantallas.
       { path: 'chat', loadComponent: () => import('./chat/chat').then((m) => m.Chat) },
       {
         path: 'recursos',
@@ -48,6 +47,10 @@ export const routes: Routes = [
         loadComponent: () => import('./solicitudes/solicitudes').then((m) => m.Solicitudes),
       },
       { path: 'avisos', loadComponent: () => import('./avisos/avisos').then((m) => m.Avisos) },
+      {
+        path: 'configuracion',
+        loadComponent: () => import('./configuracion/configuracion').then((m) => m.Configuracion),
+      },
     ],
   },
 ];

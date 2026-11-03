@@ -1,35 +1,13 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  min-width: 0;
-  color: var(--color-text);
-  --mat-button-outlined-outline-color: var(--color-primary);
-}
-h1,
-h2,
 h3,
-p,
 ul {
   margin: 0;
 }
 .page-heading {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
-}
-.page-heading > div {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
-}
-.page-heading p {
-  color: var(--color-muted);
-}
-.page-heading a {
-  flex: none;
 }
 .content-card {
   display: flex;
@@ -54,29 +32,6 @@ mat-icon {
 }
 .group-grid.single {
   grid-template-columns: minmax(0, 1fr);
-}
-.notice {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-control);
-  font: var(--font-secondary);
-}
-.notice.success {
-  background: var(--color-success-surface);
-  color: var(--color-success);
-}
-.notice.success mat-icon {
-  color: var(--color-success);
-}
-.notice-title {
-  font: var(--font-control);
-}
-.card-heading {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
 }
 .card-heading h2 {
   font: var(--font-card-title);
@@ -146,9 +101,6 @@ mat-icon {
   padding-block: var(--space-8);
   text-align: center;
 }
-.empty-state h2 {
-  font: var(--font-section-title);
-}
 .empty-state p {
   max-width: 36rem;
   color: var(--color-muted);
@@ -157,10 +109,6 @@ mat-icon {
   align-self: flex-start;
 }
 @media (max-width: 767px) {
-  .page-heading {
-    flex-direction: column;
-    align-items: stretch;
-  }
   .page-heading a,
   .secondary-action,
   .empty-state a {

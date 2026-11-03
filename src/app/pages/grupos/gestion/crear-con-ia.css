@@ -1,24 +1,5 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  min-width: 0;
-  color: var(--color-text);
-  --mat-button-outlined-outline-color: var(--color-primary);
-}
-h1,
-h2,
-p,
 ul {
   margin: 0;
-}
-.page-heading {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.page-heading p {
-  color: var(--color-muted);
 }
 .step {
   display: flex;
@@ -50,30 +31,6 @@ ul {
   flex-direction: column;
   gap: var(--space-6);
 }
-.content-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  min-width: 0;
-  padding: var(--space-6);
-  border: 1px solid var(--color-outline);
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-}
-.content-card h2 {
-  font: var(--font-card-title);
-}
-.help {
-  font: var(--font-help);
-  color: var(--color-muted);
-}
-mat-form-field {
-  width: 100%;
-  min-width: 0;
-}
-textarea {
-  resize: vertical;
-}
 .deck-list {
   padding: 0;
   list-style: none;
@@ -83,16 +40,7 @@ textarea {
 .unavailable {
   align-self: flex-start;
 }
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-}
 @media (max-width: 767px) {
-  .actions {
-    flex-direction: column;
-  }
-  .actions > *,
   .inline-action,
   .unavailable {
     width: 100%;

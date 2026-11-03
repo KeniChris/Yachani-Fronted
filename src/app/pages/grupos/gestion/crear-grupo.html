@@ -9,6 +9,26 @@
   </p>
 </header>
 
+@if (crear === 'limite') {
+  <section class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">block</mat-icon>
+    <h2>Alcanzaste el máximo de grupos</h2>
+    <p>
+      {{
+        esTutor
+          ? 'Como tutor puedes crear hasta 10 grupos.'
+          : 'Como estudiante puedes crear hasta 5 grupos.'
+      }}
+    </p>
+    <a
+      mat-flat-button
+      routerLink="/grupos/gestion"
+      [queryParams]="{ crear: null }"
+      queryParamsHandling="merge"
+      >Ver mis grupos</a
+    >
+  </section>
+} @else {
 <div class="layout">
   <form class="content-card form-card" [formGroup]="form" aria-label="Datos del grupo">
     <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
@@ -108,3 +128,4 @@
     }
   </aside>
 </div>
+}

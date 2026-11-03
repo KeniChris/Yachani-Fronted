@@ -18,13 +18,13 @@
         <a mat-stroked-button routerLink="." [queryParams]="{ vista: null }" queryParamsHandling="merge"
           >Volver a sesiones</a
         >
-        @if (rol === 'tutor') {
+        @if (rol === 'tutor' || admin === 'si') {
           <a mat-flat-button routerLink="." [queryParams]="{ vista: 'editar' }" queryParamsHandling="merge"
             >Editar sesión</a
           >
         }
       </div>
-      @if (rol === 'tutor') {
+      @if (rol === 'tutor' || admin === 'si') {
         <button
           mat-button
           type="button"
@@ -142,7 +142,7 @@
         <h1>Sesiones de estudio</h1>
         <p>Consulta los próximos encuentros del grupo.</p>
       </div>
-      @if (rol === 'tutor') {
+      @if (rol === 'tutor' || admin === 'si') {
         <a
           mat-flat-button
           routerLink="."
@@ -180,7 +180,7 @@
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
         <h2>No hay sesiones programadas</h2>
         <p>Programa el próximo encuentro para tu grupo.</p>
-        @if (rol === 'tutor') {
+        @if (rol === 'tutor' || admin === 'si') {
           <a
             mat-flat-button
             routerLink="."
@@ -207,7 +207,7 @@
           aria-label="Ver sesión Repaso de derivadas"
           >Ver sesión</a
         >
-        @if (rol === 'tutor') {
+        @if (rol === 'tutor' || admin === 'si') {
           <div class="session-actions">
             <a
               mat-stroked-button

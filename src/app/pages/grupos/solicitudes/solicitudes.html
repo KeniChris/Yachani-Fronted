@@ -4,10 +4,17 @@
 </header>
 
 <section class="content-card summary">
-  <p>Dominando Cálculo · {{ solicitudes === 'aceptada' ? 9 : 8 }} de 12 integrantes</p>
+  @if (admin === 'si') {
+    <p>Ingeniería de Software: repasos · {{ solicitudes === 'aceptada' ? 5 : 4 }} de 8 integrantes</p>
+  } @else {
+    <p>
+      Dominando Cálculo ·
+      {{ solicitudes === 'aceptada' ? 9 : solicitudes === 'sin-cupos' ? 12 : 8 }} de 12 integrantes
+    </p>
+  }
 </section>
 
-@if (rol !== 'tutor') {
+@if (rol !== 'tutor' && admin !== 'si') {
   <section class="content-card">
     <p class="help">El creador administra los cupos y las solicitudes.</p>
   </section>
@@ -35,6 +42,32 @@
             <p class="notice-title">Solicitud rechazada</p>
             <p>Se notificó a Irene sobre el resultado de su solicitud.</p>
           }
+        </div>
+      </div>
+    }
+    @if (solicitudes === 'sin-cupos') {
+      <div class="notice" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+        <div>
+          <p class="notice-title">No hay cupos para aceptar esta solicitud</p>
+          <a
+            mat-stroked-button
+            routerLink="../integrantes"
+            [queryParams]="{ solicitudes: null }"
+            queryParamsHandling="merge"
+            >Cambiar capacidad</a
+          >
+        </div>
+      </div>
+    }
+    @if (solicitudes === 'procesada') {
+      <div class="notice" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+        <div>
+          <p class="notice-title">La solicitud ya fue procesada</p>
+          <a mat-stroked-button routerLink="." [queryParams]="{ solicitudes: null }" queryParamsHandling="merge"
+            >Actualizar solicitudes</a
+          >
         </div>
       </div>
     }

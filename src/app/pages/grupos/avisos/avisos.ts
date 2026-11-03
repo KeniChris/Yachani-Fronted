@@ -20,7 +20,7 @@ import { MatInputModule } from '@angular/material/input';
     MatInputModule,
   ],
   templateUrl: './avisos.html',
-  styleUrl: './avisos.css',
+  styleUrls: ['../grupos.css', './avisos.css'],
 })
 export class Avisos {
   // Variante visual mediante ?rol=tutor y estados de Figma mediante ?avisos= (vacio, publicado).

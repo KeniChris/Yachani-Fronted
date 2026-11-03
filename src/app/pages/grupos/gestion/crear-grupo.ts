@@ -20,7 +20,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatSelectModule,
   ],
   templateUrl: './crear-grupo.html',
-  styleUrl: './crear-grupo.css',
+  styleUrls: ['../grupos.css', './crear-grupo.css'],
 })
 export class CrearGrupo {
   esTutor = false;
@@ -28,6 +28,8 @@ export class CrearGrupo {
   @Input() set rol(valor: string) {
     this.esTutor = valor === 'tutor';
   }
+  // Límite de grupos alcanzado (G08 tutor, G14 estudiante) mediante ?crear=limite.
+  @Input() crear = '';
   // Mismos métodos que la configuración inicial del tutor.
   readonly metodos = [
     'Visual',

@@ -1,54 +1,11 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  min-width: 0;
-  color: var(--color-text);
-  --mat-button-outlined-outline-color: var(--color-primary);
-}
-h1,
-h2,
-p {
-  margin: 0;
-}
-.page-heading {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.page-heading p {
-  color: var(--color-muted);
-}
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: var(--space-6);
   align-items: start;
 }
-.content-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  min-width: 0;
-  padding: var(--space-6);
-  border: 1px solid var(--color-outline);
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
-}
 .form-card {
   gap: var(--space-4);
-}
-mat-form-field {
-  width: 100%;
-  min-width: 0;
-}
-textarea {
-  resize: vertical;
-}
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
 }
 .type-card mat-icon {
   color: var(--color-primary);
@@ -66,13 +23,5 @@ textarea {
 @media (max-width: 1000px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-@media (max-width: 767px) {
-  .actions {
-    flex-direction: column;
-  }
-  .actions > * {
-    width: 100%;
   }
 }

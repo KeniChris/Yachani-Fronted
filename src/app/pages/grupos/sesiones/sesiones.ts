@@ -26,13 +26,15 @@ import { MatTimepickerModule } from '@angular/material/timepicker';
   ],
   providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'es-PE' }],
   templateUrl: './sesiones.html',
-  styleUrl: './sesiones.css',
+  styleUrls: ['../grupos.css', './sesiones.css'],
 })
 export class Sesiones {
   // Variante visual mediante ?rol=tutor. Vistas de Figma mediante ?vista= (programar, editar, detalle)
   // y estados mediante ?sesiones= (vacio, programada, actualizada, cancelada).
   @Input() rol = 'estudiante';
   @Input() sesiones = '';
+  // Grupo entre estudiantes con administradora (S13…): ?admin=si junto con rol=estudiante.
+  @Input() admin = '';
   // Las fechas anteriores a hoy muestran el error de S05.
   readonly hoy = new Date();
   // Programar (S04) empieza vacío; editar (S07) muestra los datos actuales de la sesión.

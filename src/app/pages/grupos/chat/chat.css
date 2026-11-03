@@ -1,14 +1,3 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  min-width: 0;
-  color: var(--color-text);
-  --mat-button-outlined-outline-color: var(--color-primary);
-}
-h1,
-h2,
-p,
 ol {
   margin: 0;
 }
@@ -103,45 +92,13 @@ ol {
 .send mat-icon {
   margin: 0;
 }
-.help {
-  font: var(--font-help);
-  color: var(--color-muted);
-}
-.dialog-shell {
-  padding: var(--space-8);
-}
-.dialog-heading {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-}
-.dialog-heading h2 {
-  flex: 1;
-  min-width: 0;
-  font: var(--font-section-title);
-}
 .dialog-heading button {
   flex: none;
   color: var(--color-muted);
 }
-.dialog-shell mat-dialog-content {
-  padding: 0;
-  color: var(--color-muted);
-  font: var(--font-secondary);
-}
 .quote {
   margin-top: var(--space-4);
   color: var(--color-text);
-}
-.dialog-shell mat-dialog-actions {
-  padding: 0;
-  margin-top: var(--space-4);
-  gap: var(--space-3);
-  justify-content: end;
-}
-.danger {
-  --mat-button-filled-container-color: var(--color-error);
 }
 @media (max-width: 767px) {
   .chat-card {
@@ -151,20 +108,5 @@ ol {
   .message.own {
     max-width: 100%;
     width: auto;
-  }
-  .dialog-shell {
-    padding: var(--space-6);
-  }
-  .dialog-heading h2 {
-    font-size: 24px;
-    line-height: 28px;
-  }
-  .dialog-shell mat-dialog-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .dialog-shell mat-dialog-actions > button {
-    width: 100%;
-    margin: 0;
   }
 }

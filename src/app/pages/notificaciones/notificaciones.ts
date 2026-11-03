@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [RouterLink, MatButtonModule, MatIconModule],
   templateUrl: './notificaciones.html',
-  styleUrl: './notificaciones.css',
+  styleUrls: ['../grupos/grupos.css', './notificaciones.css'],
 })
 export class Notificaciones {
   // Variante visual mediante ?rol=tutor. Recordatorio (N06) mediante ?vista=recordatorio

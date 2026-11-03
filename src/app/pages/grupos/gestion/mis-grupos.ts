@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [RouterLink, MatButtonModule, MatCardModule, MatIconModule],
   templateUrl: './mis-grupos.html',
-  styleUrl: './mis-grupos.css',
+  styleUrls: ['../grupos.css', './mis-grupos.css'],
 })
 export class MisGrupos {
   // Variante visual mediante ?rol=tutor y estados de Figma mediante ?grupos=vacio|creado|creado-ia.
