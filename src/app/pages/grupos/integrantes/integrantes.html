@@ -15,14 +15,25 @@
 </header>
 
 <div class="layout">
+  @if (cargando()) {
+    <section class="content-card empty-state">
+      <p>Cargando integrantes…</p>
+    </section>
+  } @else if (error()) {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+      <h2>No pudimos cargar los integrantes</h2>
+      <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+    </section>
+  } @else {
   <section class="content-card" aria-label="Lista de integrantes">
-    @if (admin !== 'si') {
+    @if (admin !== 'si' && tutor) {
       <h2>Administración</h2>
       <ul class="member-list">
         <li class="member">
-          <span class="avatar" aria-hidden="true">CR</span>
+          <span class="avatar" aria-hidden="true">{{ iniciales(tutor.nombreCompleto) }}</span>
           <span class="member-copy"
-            ><strong>Carlos Ríos</strong><small>Tutor · Creador del grupo</small></span
+            ><strong>{{ tutor.nombreCompleto }}</strong><small>Tutor · Creador del grupo</small></span
           >
           <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
             >chevron_right</mat-icon
@@ -30,67 +41,73 @@
         </li>
       </ul>
     }
-    @let lista = admin === 'si' ? estudiantes.slice(0, 4) : estudiantes;
-    <h2>Estudiantes ({{ integrantes === 'eliminado' ? lista.length - 1 : lista.length }})</h2>
+    @if (errorEliminar()) {
+      <div class="notice" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+        <p class="notice-title">{{ errorEliminar() }}</p>
+      </div>
+    }
+    <h2>Estudiantes ({{ estudiantes.length }})</h2>
+    @if (estudiantes.length === 0) {
+      <p class="help">Todavía no hay estudiantes en este grupo.</p>
+    }
     <ul class="member-list">
-      @for (estudiante of lista; track estudiante.nombre; let primero = $first) {
-        @if (!(integrantes === 'eliminado' && primero)) {
-          <li class="member">
-            <span class="avatar" aria-hidden="true">{{ estudiante.iniciales }}</span>
-            <span class="member-copy"
-              ><strong>{{ estudiante.nombre }}</strong
-              ><small>{{ primero && rol !== 'tutor' ? 'Estudiante · Tú' : 'Estudiante' }}</small></span
+      @for (estudiante of estudiantes; track estudiante.idUsuario) {
+        <li class="member">
+          <span class="avatar" aria-hidden="true">{{ iniciales(estudiante.nombreCompleto) }}</span>
+          <span class="member-copy"><strong>{{ estudiante.nombreCompleto }}</strong><small>Estudiante</small></span>
+          <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
+            >chevron_right</mat-icon
+          >
+          @if (rol === 'tutor' || admin === 'si') {
+            <button
+              mat-icon-button
+              type="button"
+              class="remove"
+              [attr.aria-label]="'Eliminar a ' + estudiante.nombreCompleto + ' del grupo'"
+              (click)="
+                dialog.open(eliminarDialog, {
+                  width: '600px',
+                  maxWidth: 'calc(100vw - 32px)',
+                  data: estudiante,
+                })
+              "
             >
-            <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
-              >chevron_right</mat-icon
-            >
-            @if (rol === 'tutor' || admin === 'si') {
-              <button
-                mat-icon-button
-                type="button"
-                class="remove"
-                [attr.aria-label]="'Eliminar a ' + estudiante.nombre + ' del grupo'"
-                (click)="
-                  dialog.open(eliminarDialog, {
-                    width: '600px',
-                    maxWidth: 'calc(100vw - 32px)',
-                    data: estudiante.nombre,
-                  })
-                "
-              >
-                <mat-icon fontSet="material-symbols-rounded">delete</mat-icon>
-              </button>
-            }
-          </li>
-        }
+              <mat-icon fontSet="material-symbols-rounded">delete</mat-icon>
+            </button>
+          }
+        </li>
       }
     </ul>
   </section>
+  }
 
   <section class="content-card seats" aria-labelledby="seats-title">
+    @let resultado = resultadoCapacidad();
+    @let actuales = lista().length;
     <h2 id="seats-title">Cupos</h2>
     <p class="seats-count">
-      {{ integrantes === 'eliminado' ? base - 1 : base }} de
-      {{ integrantes === 'capacidad' ? 15 : capacidadBase }} integrantes
+      {{ resultado ? resultado.integrantesActuales : actuales }} de
+      {{ resultado ? resultado.capacidadMaxima : capacidadBase }} integrantes
     </p>
     <p class="help">
       Quedan
-      {{
-        integrantes === 'capacidad'
-          ? 15 - base
-          : integrantes === 'eliminado'
-            ? capacidadBase - (base - 1)
-            : capacidadBase - base
-      }}
+      {{ resultado ? resultado.capacidadMaxima - resultado.integrantesActuales : capacidadBase - actuales }}
       espacios disponibles.
     </p>
+    @if (errorCapacidad()) {
+      <div class="notice" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+        <p class="notice-title">{{ errorCapacidad() }}</p>
+      </div>
+    }
     @if (rol === 'tutor' || admin === 'si') {
       <button
         mat-stroked-button
         type="button"
         (click)="
           capacidadForm.reset({ capacidad: 15 });
-          dialog.open(capacidadDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })
+          dialogRefCapacidad = dialog.open(capacidadDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })
         "
       >
         Cambiar capacidad
@@ -115,16 +132,16 @@
   </section>
 </div>
 
-@if (integrantes === 'capacidad') {
+@if (resultadoCapacidad(); as resultado) {
   <div class="notice success" role="status">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <div>
       <p class="notice-title">Capacidad actualizada</p>
-      <p>El grupo ahora admite hasta 15 integrantes.</p>
+      <p>El grupo ahora admite hasta {{ resultado.capacidadMaxima }} integrantes.</p>
     </div>
   </div>
 }
-@if (integrantes === 'eliminado') {
+@if (eliminadoReal()) {
   <div class="notice success" role="status">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <p class="notice-title">Integrante eliminado</p>
@@ -158,11 +175,8 @@
       <button
         mat-flat-button
         type="button"
-        mat-dialog-close
         [disabled]="capacidadForm.invalid"
-        routerLink="."
-        [queryParams]="{ integrantes: 'capacidad' }"
-        queryParamsHandling="merge"
+        (click)="cambiarCapacidad()"
       >
         Guardar cambios
       </button>
@@ -170,28 +184,27 @@
   </div>
 </ng-template>
 
-<ng-template #eliminarDialog let-nombre>
+<ng-template #eliminarDialog let-estudiante>
   <div class="dialog-shell">
     <div class="dialog-heading">
-      <h2>¿Eliminar a {{ nombre.split(' ')[0] }} del grupo?</h2>
+      <h2>¿Eliminar a {{ estudiante.nombreCompleto.split(' ')[0] }} del grupo?</h2>
       <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
         <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
       </button>
     </div>
     <mat-dialog-content>
-      <p>{{ nombre }} dejará de tener acceso a este grupo.</p>
+      <p>{{ estudiante.nombreCompleto }} dejará de tener acceso a este grupo.</p>
     </mat-dialog-content>
     <mat-dialog-actions>
       <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
-      <a
+      <button
         mat-flat-button
+        type="button"
         class="danger"
-        mat-dialog-close
-        routerLink="."
-        [queryParams]="{ integrantes: 'eliminado' }"
-        queryParamsHandling="merge"
-        >Eliminar integrante</a
+        (click)="eliminarIntegrante(estudiante.idUsuario)"
       >
+        Eliminar integrante
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>

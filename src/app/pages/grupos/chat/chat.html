@@ -1,36 +1,35 @@
 <h1>Chat del grupo</h1>
 
-@if (chat === 'enviado') {
+@if (avisoEnviado()) {
   <div class="notice success" role="status">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <p class="notice-title">Mensaje enviado</p>
   </div>
 }
-@if (chat === 'eliminado') {
+@if (avisoEliminado()) {
   <div class="notice success" role="status">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <p class="notice-title">Mensaje eliminado</p>
   </div>
 }
-@if (chat === 'plazo') {
+@if (errorAccion()) {
   <div class="notice" role="status">
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">schedule</mat-icon>
-    <p class="notice-title">Ya no puedes eliminar este mensaje</p>
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+    <p class="notice-title">{{ errorAccion() }}</p>
   </div>
 }
 
-@if (chat === 'error') {
+@if (error()) {
   <section class="chat-card empty-state" aria-label="Conversación del grupo">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
     <h2>No pudimos cargar la conversación</h2>
-    <a mat-flat-button routerLink="." [queryParams]="{ chat: null }" queryParamsHandling="merge"
-      >Reintentar</a
-    >
+    <button mat-flat-button type="button" (click)="cargar()">Reintentar</button>
   </section>
 } @else {
   <section class="chat-card" aria-label="Conversación del grupo">
-    <p class="day">HOY · 29 OCT 2026</p>
-    @if (chat === 'vacio') {
+    @if (cargando()) {
+      <p class="help">Cargando conversación…</p>
+    } @else if (mensajes().length === 0) {
       <div class="empty-state">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chat</mat-icon>
         <h2>Comienza la conversación</h2>
@@ -38,57 +37,33 @@
       </div>
     } @else {
       <ol class="messages">
-        @for (mensaje of mensajes; track mensaje.id) {
-          @if (!(mensaje.propio && (chat === 'enviado' || chat === 'eliminado'))) {
-            <li class="message" [class.own]="mensaje.propio">
-              <p class="author">{{ mensaje.autor[rol === 'tutor' ? 'tutor' : 'estudiante'] }}</p>
-              <p>{{ mensaje.texto }}</p>
-              <p class="time">{{ mensaje.hora }}</p>
-              @if (mensaje.propio) {
-                <button
-                  mat-button
-                  type="button"
-                  class="delete"
-                  [disabled]="chat === 'plazo'"
-                  (click)="
-                    dialog.open(eliminarDialog, {
-                      width: '600px',
-                      maxWidth: 'calc(100vw - 32px)',
-                      data: mensaje.texto,
-                    })
-                  "
-                >
-                  Eliminar
-                </button>
-              }
-            </li>
-          }
-        }
-        @if (chat === 'enviado') {
-          <li class="message own">
-            <p class="author">Tú</p>
-            <p>¡Gracias! Revisaré el material antes de la sesión.</p>
-            <p class="time">13:45</p>
-            <button
-              mat-button
-              type="button"
-              class="delete"
-              (click)="
-                dialog.open(eliminarDialog, {
-                  width: '600px',
-                  maxWidth: 'calc(100vw - 32px)',
-                  data: '¡Gracias! Revisaré el material antes de la sesión.',
-                })
-              "
-            >
-              Eliminar
-            </button>
+        @for (mensaje of mensajes(); track mensaje.idMensaje) {
+          <li class="message" [class.own]="mensaje.idAutor === idUsuario">
+            <p class="author">{{ mensaje.idAutor === idUsuario ? 'Tú' : mensaje.nombreAutor }}</p>
+            <p>{{ mensaje.contenido }}</p>
+            <p class="time">{{ mensaje.fechaEnvio | date: 'HH:mm' }}</p>
+            @if (puedeEliminar(mensaje)) {
+              <button
+                mat-button
+                type="button"
+                class="delete"
+                (click)="
+                  dialog.open(eliminarDialog, {
+                    width: '600px',
+                    maxWidth: 'calc(100vw - 32px)',
+                    data: mensaje,
+                  })
+                "
+              >
+                Eliminar
+              </button>
+            }
           </li>
         }
       </ol>
     }
 
-    <form class="composer" [formGroup]="form" aria-label="Enviar mensaje">
+    <form class="composer" [formGroup]="form" (ngSubmit)="enviar()" aria-label="Enviar mensaje">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
         <mat-label>Mensaje</mat-label>
         <input matInput formControlName="mensaje" placeholder="Escribe para tu grupo…" maxlength="1000" />
@@ -102,20 +77,16 @@
         mat-flat-button
         type="submit"
         class="send"
-        [disabled]="form.invalid"
-        routerLink="."
-        [queryParams]="{ chat: 'enviado' }"
-        queryParamsHandling="merge"
+        [disabled]="form.invalid || enviando()"
         aria-label="Enviar mensaje"
       >
         <mat-icon fontSet="material-symbols-rounded">send</mat-icon>
       </button>
     </form>
-    <p class="help">Puedes eliminar tus mensajes durante los primeros 2 minutos.</p>
   </section>
 }
 
-<ng-template #eliminarDialog let-texto>
+<ng-template #eliminarDialog let-mensaje>
   <div class="dialog-shell">
     <div class="dialog-heading">
       <h2>¿Eliminar tu mensaje?</h2>
@@ -125,19 +96,19 @@
     </div>
     <mat-dialog-content>
       <p>El mensaje se retirará de la conversación del grupo.</p>
-      <p class="quote">“{{ texto }}”</p>
+      <p class="quote">"{{ mensaje.contenido }}"</p>
     </mat-dialog-content>
     <mat-dialog-actions>
       <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
-      <a
+      <button
         mat-flat-button
+        type="button"
         class="danger"
         mat-dialog-close
-        routerLink="."
-        [queryParams]="{ chat: 'eliminado' }"
-        queryParamsHandling="merge"
-        >Eliminar mensaje</a
+        (click)="eliminar(mensaje.idMensaje)"
       >
+        Eliminar mensaje
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>
