@@ -3,10 +3,24 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', children: [] },
   // Reservas de navegación de la guía; las pantallas se incorporarán en sus áreas.
-  { path: 'descubrimiento', children: [] },
+  {
+    path: 'descubrimiento',
+    loadComponent: () => import('./descubrimiento/descubrimiento').then((m) => m.Descubrimiento),
+  },
+  {
+    path: 'descubrimiento/:grupoId',
+    loadComponent: () =>
+      import('./descubrimiento/detalle-grupo/detalle-grupo').then((m) => m.DetalleGrupo),
+  },
   { path: 'gestion', children: [] },
   { path: 'crear', children: [] },
-  { path: 'recomendaciones', children: [] },
+  {
+    path: 'recomendaciones',
+    loadComponent: () =>
+      import('./descubrimiento/recomendaciones-ia/recomendaciones-ia').then(
+        (m) => m.RecomendacionesIa,
+      ),
+  },
   { path: 'crear-con-ia', children: [] },
   { path: 'solicitudes', children: [] },
   {

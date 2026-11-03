@@ -1,0 +1,119 @@
+@switch (estado) {
+  @case ('buscando') {
+    <h1>Recomendaciones con IA</h1>
+    <section class="panel state-panel left" aria-live="polite">
+      <mat-icon fontSet="material-symbols-rounded">refresh</mat-icon>
+      <h2>Buscando grupos para ti…</h2>
+      <p>Estamos revisando el curso y el método de estudio elegidos.</p>
+    </section>
+    <a
+      mat-button
+      class="link"
+      routerLink="/grupos/recomendaciones"
+      [queryParams]="{ estado: 'resultados' }"
+      >Ver recomendaciones</a
+    >
+    <a mat-stroked-button class="action" routerLink="/grupos/recomendaciones">Cancelar</a>
+  }
+  @case ('resultados') {
+    <header class="page-heading row">
+      <div>
+        <h1>Grupos que podrías explorar</h1>
+        <p>Revisa cuál se ajusta a lo que quieres estudiar.</p>
+      </div>
+      <a mat-stroked-button routerLink="/grupos/recomendaciones">Cambiar preferencias</a>
+    </header>
+    <section class="panel criteria" aria-label="Preferencias usadas">
+      <span class="chip">Cálculo I · Resolución de ejercicios</span>
+    </section>
+    <div class="group-grid">
+      @for (grupo of grupos; track grupo.id) {
+        <article class="panel group-card">
+          <h2><mat-icon fontSet="material-symbols-rounded">groups</mat-icon>{{ grupo.nombre }}</h2>
+          <p>{{ grupo.descripcion }}</p>
+          <small>{{ grupo.tipo }} · {{ grupo.responsable }}</small>
+          <strong>{{ grupo.metodo }} · {{ grupo.integrantes }}</strong>
+          <a mat-stroked-button [routerLink]="['/grupos/descubrimiento', grupo.id]">Ver grupo</a>
+        </article>
+      }
+    </div>
+  }
+  @case ('vacio') {
+    <h1>Recomendaciones con IA</h1>
+    <section class="panel state-panel" aria-labelledby="vacio-title">
+      <mat-icon fontSet="material-symbols-rounded">auto_awesome</mat-icon>
+      <h2 id="vacio-title">No encontramos una sugerencia por ahora</h2>
+      <p>Prueba otro curso o explora los grupos disponibles.</p>
+      <a mat-flat-button routerLink="/grupos/recomendaciones">Cambiar preferencias</a>
+    </section>
+    <a mat-stroked-button class="action" routerLink="/grupos/descubrimiento">Explorar grupos</a>
+  }
+  @case ('error') {
+    <h1>Recomendaciones con IA</h1>
+    <section class="error-panel" role="alert">
+      <mat-icon fontSet="material-symbols-rounded">error</mat-icon>
+      <div>
+        <strong>No pudimos generar recomendaciones</strong>
+        <p>Inténtalo nuevamente o continúa explorando los grupos.</p>
+      </div>
+    </section>
+    <a
+      mat-stroked-button
+      class="action"
+      routerLink="/grupos/recomendaciones"
+      [queryParams]="{ estado: 'buscando' }"
+      >Reintentar</a
+    >
+    <a mat-button class="link" routerLink="/grupos/descubrimiento">Explorar grupos</a>
+  }
+  @default {
+    <header class="page-heading">
+      <h1>Encuentra grupos con ayuda de IA</h1>
+      <p>Usaremos tus preferencias como punto de partida.</p>
+    </header>
+    <div class="layout">
+      <form [formGroup]="form" class="panel form-panel">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso o tema</mat-label>
+          <input matInput formControlName="curso" required />
+          @if (form.controls.curso.hasError('required')) {
+            <mat-error>Ingresa un curso o tema.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Método de estudio</mat-label>
+          <mat-select formControlName="metodo">
+            @for (metodo of metodos; track metodo) {
+              <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de grupo</mat-label>
+          <mat-select formControlName="tipo">
+            @for (tipo of tipos; track tipo) {
+              <mat-option [value]="tipo">{{ tipo }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Con tutor o entre estudiantes.</mat-hint>
+        </mat-form-field>
+        <a
+          mat-flat-button
+          routerLink="/grupos/recomendaciones"
+          [queryParams]="{ estado: 'buscando' }"
+          [disabled]="form.invalid"
+          >Recomendar grupos</a
+        >
+      </form>
+      <aside class="panel help-panel">
+        <mat-icon fontSet="material-symbols-rounded">auto_awesome</mat-icon>
+        <h2>Una ayuda para elegir</h2>
+        <p>
+          Revisa las descripciones, el método y los cupos de cada grupo antes de solicitar tu
+          ingreso.
+        </p>
+        <a mat-stroked-button routerLink="/perfiles">Editar mis preferencias</a>
+      </aside>
+    </div>
+  }
+}

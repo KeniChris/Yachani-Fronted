@@ -1,0 +1,137 @@
+<header class="page-heading">
+  <h1>Explorar grupos</h1>
+  <p>Busca un curso o tema y encuentra tu comunidad.</p>
+</header>
+
+<form [formGroup]="buscarForm" class="search-panel">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Curso o tema</mat-label>
+    <input matInput formControlName="busqueda" placeholder="Ej.: Ingeniería de Software" />
+    <mat-hint>Busca por el nombre o la descripción del grupo.</mat-hint>
+  </mat-form-field>
+  <div class="search-actions">
+    <a mat-flat-button routerLink="/grupos/descubrimiento" [queryParams]="{ estado: 'filtrados' }"
+      >Buscar</a
+    >
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="dialog.open(filtrosDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+    >
+      Filtros
+    </button>
+  </div>
+</form>
+
+@switch (estado) {
+  @case ('filtrados') {
+    <div class="chips" aria-label="Filtros aplicados">
+      <span class="chip">Cálculo</span>
+      <span class="chip">Con tutor</span>
+      <a mat-button routerLink="/grupos/descubrimiento">Limpiar</a>
+    </div>
+    <p class="count">1 grupo encontrado</p>
+    <div class="group-grid single">
+      @for (grupo of filtrados; track grupo.id) {
+        <article class="group-card">
+          <h2><mat-icon fontSet="material-symbols-rounded">groups</mat-icon>{{ grupo.nombre }}</h2>
+          <p>{{ grupo.descripcion }}</p>
+          <small>{{ grupo.tipo }} · {{ grupo.responsable }}</small>
+          <strong>{{ grupo.metodo }} · {{ grupo.integrantes }}</strong>
+          <a mat-stroked-button [routerLink]="['/grupos/descubrimiento', grupo.id]">Ver grupo</a>
+        </article>
+      }
+    </div>
+  }
+  @case ('vacio') {
+    <section class="state-panel" aria-labelledby="vacio-title">
+      <mat-icon fontSet="material-symbols-rounded">search</mat-icon>
+      <h2 id="vacio-title">No encontramos grupos con esa búsqueda</h2>
+      <p>Prueba otro nombre o quita alguno de los filtros.</p>
+      <a mat-flat-button routerLink="/grupos/descubrimiento">Limpiar búsqueda</a>
+    </section>
+  }
+  @case ('error') {
+    <section class="error-panel" role="alert">
+      <mat-icon fontSet="material-symbols-rounded">error</mat-icon>
+      <div>
+        <strong>No pudimos buscar los grupos</strong>
+        <p>Revisa tu conexión y vuelve a intentarlo.</p>
+      </div>
+    </section>
+    <a
+      mat-stroked-button
+      class="retry"
+      routerLink="/grupos/descubrimiento"
+      [queryParams]="{ estado: 'error' }"
+      >Reintentar</a
+    >
+  }
+  @default {
+    <p class="count">4 grupos disponibles</p>
+    <div class="group-grid">
+      @for (grupo of grupos; track grupo.id) {
+        <article class="group-card">
+          <h2><mat-icon fontSet="material-symbols-rounded">groups</mat-icon>{{ grupo.nombre }}</h2>
+          <p>{{ grupo.descripcion }}</p>
+          <small>{{ grupo.tipo }} · {{ grupo.responsable }}</small>
+          <strong>{{ grupo.metodo }} · {{ grupo.integrantes }}</strong>
+          <a mat-stroked-button [routerLink]="['/grupos/descubrimiento', grupo.id]">Ver grupo</a>
+        </article>
+      }
+    </div>
+  }
+}
+
+<ng-template #filtrosDialog>
+  <div class="filters-dialog">
+    <div class="dialog-heading">
+      <h2>Filtrar grupos</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Usa solo los filtros que necesites.</p>
+      <form [formGroup]="filtrosForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso o tema</mat-label>
+          <input matInput formControlName="curso" />
+          <mat-hint>Busca en el nombre del grupo.</mat-hint>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Método de estudio</mat-label>
+          <mat-select formControlName="metodo">
+            @for (metodo of metodos; track metodo) {
+              <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de grupo</mat-label>
+          <mat-select formControlName="tipo">
+            @for (tipo of tipos; track tipo) {
+              <mat-option [value]="tipo">{{ tipo }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Cantidad de integrantes</mat-label>
+          <input matInput type="number" formControlName="integrantes" />
+          <mat-hint>Filtra por la cantidad actual de integrantes.</mat-hint>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <a mat-stroked-button mat-dialog-close routerLink="/grupos/descubrimiento">Cancelar</a>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/grupos/descubrimiento"
+        [queryParams]="{ estado: 'filtrados' }"
+        [class.disabled]="filtrosForm.invalid"
+        >Aplicar filtros</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
