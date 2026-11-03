@@ -28,7 +28,13 @@
             <dd>Ingeniería de Software</dd>
           </div>
         </dl>
-        <a mat-stroked-button class="card-action" routerLink="/perfiles">Editar información</a>
+        <button
+          mat-stroked-button
+          class="card-action"
+          (click)="dialog.open(academicoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Editar información
+        </button>
       </mat-card>
       <mat-card appearance="outlined" class="content-card">
         <h2>Cursos y conocimientos</h2>
@@ -76,3 +82,38 @@
   </mat-tab>
   <mat-tab label="Resúmenes"></mat-tab>
 </mat-tab-group>
+<ng-template #academicoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar información académica</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Los nombres y el correo pertenecen a tu cuenta. Aquí actualizas universidad y carrera.</p>
+      <form [formGroup]="academicoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Universidad</mat-label>
+          <input matInput formControlName="universidad" placeholder="Nombre de tu universidad" required />
+          <mat-error>Ingresa tu universidad.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Carrera</mat-label>
+          <input matInput formControlName="carrera" placeholder="Nombre de tu carrera" required />
+          <mat-error>Ingresa tu carrera.</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="academicoForm.invalid"
+        >Guardar cambios</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>
