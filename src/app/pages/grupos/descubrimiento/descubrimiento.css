@@ -1,0 +1,220 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+.page-heading {
+  margin-bottom: var(--space-6);
+}
+.page-heading p {
+  color: var(--color-muted);
+  margin-top: var(--space-2);
+}
+mat-form-field {
+  width: 100%;
+  min-width: 0;
+}
+.search-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-card);
+  margin-bottom: var(--space-6);
+}
+.search-field {
+  flex: 1;
+}
+.search-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+  flex: none;
+}
+.chips {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+.chip {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-active);
+  color: var(--color-primary);
+  border-radius: var(--radius-control);
+  font: var(--font-help);
+}
+.chips a {
+  color: var(--color-primary);
+}
+.count {
+  font: var(--font-help);
+  color: var(--color-muted);
+  margin-bottom: var(--space-4);
+}
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+.group-grid.single {
+  grid-template-columns: minmax(0, 1fr);
+}
+.group-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-card);
+}
+.group-card h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--font-card-title);
+  overflow-wrap: anywhere;
+}
+.group-card h2 mat-icon {
+  flex: none;
+  color: var(--color-primary);
+}
+.group-card p {
+  font: var(--font-secondary);
+  color: var(--color-muted);
+}
+.group-card small {
+  font: var(--font-help);
+  color: var(--color-muted);
+}
+.group-card strong {
+  font: var(--font-body);
+  font-weight: 400;
+}
+.group-card a {
+  width: 100%;
+}
+.state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-card);
+}
+.state-panel mat-icon {
+  color: var(--color-primary);
+}
+.state-panel h2 {
+  font: var(--font-section-title);
+}
+.state-panel p {
+  color: var(--color-muted);
+}
+.error-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-error-surface);
+  color: var(--color-error);
+  border-radius: var(--radius-control);
+  margin-bottom: var(--space-6);
+}
+.error-panel mat-icon {
+  flex: none;
+}
+.error-panel strong {
+  font: var(--font-control);
+}
+.error-panel p {
+  font: var(--font-secondary);
+}
+.filters-dialog {
+  padding: var(--space-8);
+}
+.dialog-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.dialog-heading h2 {
+  flex: 1;
+  min-width: 0;
+  font: var(--font-section-title);
+}
+.dialog-heading button {
+  flex: none;
+  color: var(--color-muted);
+}
+.filters-dialog mat-dialog-content {
+  padding: 0;
+  max-height: 65vh;
+}
+.filters-dialog mat-dialog-content > p {
+  font: var(--font-secondary);
+  color: var(--color-muted);
+  margin-bottom: var(--space-4);
+}
+.filters-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.filters-dialog mat-dialog-actions {
+  padding: 0;
+  margin-top: var(--space-4);
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+@media (max-width: 767px) {
+  .search-panel {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-4);
+    gap: var(--space-2);
+  }
+  .search-actions {
+    flex-direction: column;
+    padding-top: 0;
+  }
+  .group-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .retry {
+    width: 100%;
+  }
+  .filters-dialog {
+    padding: var(--space-6);
+  }
+  .filters-dialog mat-dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .filters-dialog mat-dialog-actions a {
+    width: 100%;
+    margin: 0;
+  }
+  .dialog-heading h2 {
+    font-size: 24px;
+    line-height: 28px;
+  }
+}
