@@ -1,0 +1,78 @@
+<header class="page-heading">
+  <h1>Mi perfil</h1>
+  <p>Mantén tu información clara y actualizada.</p>
+</header>
+<mat-card appearance="outlined" class="content-card profile-card">
+  <div class="identity">
+    <span class="avatar" aria-hidden="true">LC</span>
+    <div class="identity-copy">
+      <h2>Leicy Cahuana</h2>
+      <span class="role">Estudiante</span>
+    </div>
+  </div>
+  <p class="email">u20231e777&#64;upc.edu.pe</p>
+  <p>Universidad Peruana de Ciencias Aplicadas · Ingeniería de Software</p>
+</mat-card>
+<mat-tab-group class="profile-tabs" animationDuration="0ms" mat-stretch-tabs="false">
+  <mat-tab label="Académico">
+    <div class="columns">
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Datos académicos</h2>
+        <dl>
+          <div>
+            <dt>Universidad</dt>
+            <dd>Universidad Peruana de Ciencias Aplicadas</dd>
+          </div>
+          <div>
+            <dt>Carrera</dt>
+            <dd>Ingeniería de Software</dd>
+          </div>
+        </dl>
+        <a mat-stroked-button class="card-action" routerLink="/perfiles">Editar información</a>
+      </mat-card>
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Cursos y conocimientos</h2>
+        @for (curso of ['Cálculo I', 'Ingeniería de Software']; track curso) {
+          <div class="course">
+            <div class="course-copy">
+              <strong>{{ curso }}</strong>
+              <span>Nivel Intermedio</span>
+            </div>
+            <a mat-icon-button routerLink="/perfiles" [attr.aria-label]="'Editar ' + curso">
+              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">edit</mat-icon>
+            </a>
+          </div>
+        }
+        <a mat-stroked-button class="card-action" routerLink="/perfiles">Agregar curso</a>
+      </mat-card>
+    </div>
+  </mat-tab>
+  <mat-tab label="Preferencias">
+    <div class="columns">
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Así prefiero aprender</h2>
+        <dl>
+          <div>
+            <dt>Método preferido</dt>
+            <dd>Resolución de ejercicios</dd>
+          </div>
+          <div>
+            <dt>Modalidad preferida</dt>
+            <dd>Virtual</dd>
+          </div>
+        </dl>
+        <a mat-stroked-button class="card-action" routerLink="/perfiles">Editar preferencias</a>
+      </mat-card>
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Temas de interés</h2>
+        <ul class="topics" aria-label="Temas de interés">
+          @for (tema of ['Cálculo', 'Ingeniería de Software', 'Inteligencia artificial']; track tema) {
+            <li>{{ tema }}</li>
+          }
+        </ul>
+        <p class="help">Estas preferencias ayudan a orientar la búsqueda de grupos.</p>
+      </mat-card>
+    </div>
+  </mat-tab>
+  <mat-tab label="Resúmenes"></mat-tab>
+</mat-tab-group>

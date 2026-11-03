@@ -1,4 +1,9 @@
-﻿import { Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
-// Registrar aquí las pantallas del área cuando se implementen.
-export const routes: Routes = [{ path: '', children: [] }];
+export const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./estudiante/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
+  },
+];

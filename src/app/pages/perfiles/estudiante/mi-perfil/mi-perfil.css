@@ -1,0 +1,190 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+  color: var(--color-text);
+}
+h1,
+h2,
+p,
+dl,
+dd,
+ul {
+  margin: 0;
+}
+h1 {
+  font: var(--font-page-title);
+}
+.page-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.page-heading p {
+  color: var(--color-muted);
+  font: var(--font-body);
+}
+.content-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  min-width: 0;
+  border-color: var(--color-outline);
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: none;
+}
+.content-card h2 {
+  font: var(--font-card-title);
+}
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-active);
+  color: var(--color-primary);
+  font: var(--font-control);
+}
+.identity-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.identity-copy h2 {
+  font: var(--font-section-title);
+  overflow-wrap: anywhere;
+}
+.role {
+  color: var(--color-primary);
+  font: var(--font-control);
+}
+.email {
+  color: var(--color-muted);
+  font: var(--font-secondary);
+  overflow-wrap: anywhere;
+}
+.profile-card > p:last-child {
+  font: var(--font-body);
+}
+.profile-tabs {
+  --mat-tab-header-divider-height: 0;
+  min-width: 0;
+}
+.profile-tabs ::ng-deep .mat-mdc-tab-header {
+  padding-bottom: var(--space-6);
+}
+.profile-tabs ::ng-deep .mat-mdc-tab-labels {
+  gap: var(--space-2);
+}
+.profile-tabs ::ng-deep .mdc-tab {
+  flex: 0 0 auto;
+  height: var(--control-height);
+  padding: 0 var(--space-6);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-control);
+}
+.profile-tabs ::ng-deep .mdc-tab .mdc-tab__text-label {
+  color: var(--color-primary);
+  font: var(--font-control);
+}
+.profile-tabs ::ng-deep .mdc-tab--active {
+  background: var(--color-primary);
+}
+.profile-tabs ::ng-deep .mdc-tab--active .mdc-tab__text-label {
+  color: var(--color-on-primary);
+}
+.profile-tabs ::ng-deep .mdc-tab-indicator {
+  display: none;
+}
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: start;
+  gap: var(--space-6);
+}
+dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+dt {
+  color: var(--color-muted);
+  font: var(--font-help);
+}
+dd {
+  margin: var(--space-1) 0 0;
+  font: var(--font-body);
+  overflow-wrap: anywhere;
+}
+.card-action {
+  align-self: flex-start;
+}
+.course {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--color-background);
+}
+.course-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.course-copy strong {
+  font: var(--font-control);
+}
+.course-copy span {
+  color: var(--color-muted);
+  font: var(--font-help);
+}
+.course mat-icon {
+  color: var(--color-primary);
+}
+.topics {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+.topics li {
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-active);
+  color: var(--color-primary);
+  font: var(--font-help);
+}
+.help {
+  color: var(--color-muted);
+  font: var(--font-help);
+}
+@media (max-width: 1000px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .card-action {
+    align-self: stretch;
+  }
+  .content-card {
+    padding: var(--space-4);
+  }
+}
