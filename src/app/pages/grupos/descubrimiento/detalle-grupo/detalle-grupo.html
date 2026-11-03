@@ -1,0 +1,92 @@
+<header class="page-heading">
+  <h1>Dominando Cálculo</h1>
+  <p>Conoce el grupo antes de solicitar tu ingreso.</p>
+</header>
+
+<div class="detail-layout">
+  <section class="panel group-info" aria-labelledby="grupo-title">
+    <h2 id="grupo-title">
+      <mat-icon fontSet="material-symbols-rounded">groups</mat-icon>Dominando Cálculo
+    </h2>
+    <span class="badge">Grupo con tutor</span>
+    <p class="description">
+      Un espacio para repasar límites, derivadas y sus aplicaciones. Resolvemos ejercicios en grupo
+      y compartimos materiales para estudiar con más claridad.
+    </p>
+    <dl>
+      <dt>Método de estudio</dt>
+      <dd>Resolución de ejercicios</dd>
+      <dt>Creador</dt>
+      <dd>Carlos Ríos · Tutor</dd>
+    </dl>
+    <a mat-button routerLink="/perfiles/otro-tutor">Ver perfil del tutor</a>
+  </section>
+
+  <section class="panel seats" aria-labelledby="cupos-title">
+    <h2 id="cupos-title">Cupos disponibles</h2>
+    @if (estado === 'sin-cupos') {
+      <p class="count">12 de 12 integrantes</p>
+      <small>El grupo completó su capacidad.</small>
+    } @else {
+      <p class="count">8 de 12 integrantes</p>
+      <small>Quedan 4 espacios para estudiantes.</small>
+    }
+
+    @switch (estado) {
+      @case ('enviada') {
+        <div class="notice success" role="status">
+          <mat-icon fontSet="material-symbols-rounded">check_circle</mat-icon>
+          <div>
+            <strong>Solicitud enviada</strong>
+            <p>Carlos revisará tu solicitud de ingreso.</p>
+          </div>
+        </div>
+        <button mat-flat-button disabled>Solicitud registrada</button>
+        <a mat-stroked-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
+      }
+      @case ('sin-cupos') {
+        <div class="notice warning" role="alert">
+          <mat-icon fontSet="material-symbols-rounded">warning</mat-icon>
+          <div>
+            <strong>Este grupo no tiene cupos</strong>
+            <p>Busca otro grupo disponible.</p>
+          </div>
+        </div>
+        <button mat-flat-button disabled>Sin cupos</button>
+        <a mat-stroked-button routerLink="/grupos/descubrimiento">Explorar otros grupos</a>
+      }
+      @case ('registrada') {
+        <div class="notice warning" role="alert">
+          <mat-icon fontSet="material-symbols-rounded">warning</mat-icon>
+          <div>
+            <strong>Ya tienes una solicitud registrada</strong>
+            <p>No puedes enviar otra solicitud al mismo grupo.</p>
+          </div>
+        </div>
+        <button mat-flat-button disabled>Solicitud registrada</button>
+        <a mat-stroked-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
+      }
+      @case ('integrante') {
+        <span class="badge success">Ya eres integrante</span>
+        <a mat-flat-button routerLink="/grupos/dominando-calculo">Entrar al grupo</a>
+      }
+      @default {
+        <a
+          mat-flat-button
+          routerLink="/grupos/descubrimiento/dominando-calculo"
+          [queryParams]="{ estado: 'enviada' }"
+          >Solicitar ingreso</a
+        >
+        <small>El administrador revisará tu solicitud antes de que puedas entrar.</small>
+      }
+    }
+  </section>
+</div>
+
+<a
+  mat-button
+  class="back"
+  [class.hide-mobile]="estado === 'enviada' || estado === 'sin-cupos' || estado === 'registrada'"
+  routerLink="/grupos/descubrimiento"
+  >Volver a explorar</a
+>

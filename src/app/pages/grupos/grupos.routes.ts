@@ -7,6 +7,11 @@ export const routes: Routes = [
     path: 'descubrimiento',
     loadComponent: () => import('./descubrimiento/descubrimiento').then((m) => m.Descubrimiento),
   },
+  {
+    path: 'descubrimiento/:grupoId',
+    loadComponent: () =>
+      import('./descubrimiento/detalle-grupo/detalle-grupo').then((m) => m.DetalleGrupo),
+  },
   { path: 'gestion', children: [] },
   { path: 'crear', children: [] },
   { path: 'recomendaciones', children: [] },
