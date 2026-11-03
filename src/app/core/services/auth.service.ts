@@ -34,4 +34,30 @@ export class AuthService {
         tap((usuario) => this.usuarioActual.set(usuario)),
       );
   }
+
+  solicitarCodigo(correo: string) {
+    return this.http.post<{ mensaje: string }>(
+      `${this.authUrl}/recuperar-contrasena`,
+      { correo },
+    );
+  }
+
+  verificarCodigo(correo: string, codigo: string) {
+  return this.http.post<{ mensaje: string }>(
+    `${this.authUrl}/verificar-codigo`,
+    { correo, codigo },
+  );
+}
+
+restablecerContrasena(datos: {
+  correo: string;
+  codigo: string;
+  nuevaContrasena: string;
+  confirmarContrasena: string;
+}) {
+  return this.http.post<{ mensaje: string }>(
+    `${this.authUrl}/restablecer-contrasena`,
+    datos,
+  );
+}
 }

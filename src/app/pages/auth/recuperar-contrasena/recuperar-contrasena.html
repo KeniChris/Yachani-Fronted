@@ -1,11 +1,22 @@
 <section class="card" aria-labelledby="recovery-title">
   <p class="eyebrow">Recuperación de cuenta</p>
   <h1 id="recovery-title">¿Olvidaste tu contraseña?</h1>
+
   <p class="description">
     Ingresa tu correo institucional y te enviaremos un código de verificación.
   </p>
-  <form [formGroup]="form" (ngSubmit)="enviar()">
+
+  @if (errorEnvio()) {
+    <p role="alert">{{ errorEnvio() }}</p>
+  }
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="enviar()"
+    [attr.aria-busy]="enviando()"
+  >
     <label for="recovery-email">Correo institucional</label>
+
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <input
         matInput
@@ -17,9 +28,18 @@
         [errorStateMatcher]="errorMatcher"
         required
       />
-      <mat-icon matSuffix fontSet="material-symbols-rounded" aria-hidden="true">mail</mat-icon>
+
+      <mat-icon
+        matSuffix
+        fontSet="material-symbols-rounded"
+        aria-hidden="true"
+      >
+        mail
+      </mat-icon>
+
       @if (
-        form.controls.correo.invalid && (form.controls.correo.dirty || form.controls.correo.touched)
+        form.controls.correo.invalid &&
+        (form.controls.correo.dirty || form.controls.correo.touched)
       ) {
         <mat-error>{{
           form.controls.correo.hasError('required')
@@ -30,19 +50,38 @@
         }}</mat-error>
       }
     </mat-form-field>
-    <button mat-flat-button class="primary" type="submit">Enviar código</button>
+
+    <button
+      mat-flat-button
+      class="primary"
+      type="submit"
+      [disabled]="enviando()"
+    >
+      {{ enviando() ? 'Enviando código…' : 'Enviar código' }}
+    </button>
   </form>
-  <a class="back" routerLink="/auth/iniciar-sesion">← Volver a iniciar sesión</a>
+
+  <a class="back" routerLink="/auth/iniciar-sesion">
+    ← Volver a iniciar sesión
+  </a>
+
   @if (previsualizacion) {
     <nav class="preview" aria-label="Previsualización del flujo">
-      <span>Previsualización</span
-      ><a
+      <span>Previsualización</span>
+
+      <a
         routerLink="/auth/recuperar-contrasena"
         [queryParams]="{ previsualizacion: true, estado: 'error' }"
-        >Ver errores</a
-      ><a routerLink="/auth/verificar-codigo" [queryParams]="{ previsualizacion: true }"
-        >Continuar al código</a
       >
+        Ver errores
+      </a>
+
+      <a
+        routerLink="/auth/verificar-codigo"
+        [queryParams]="{ previsualizacion: true }"
+      >
+        Continuar al código
+      </a>
     </nav>
   }
 </section>

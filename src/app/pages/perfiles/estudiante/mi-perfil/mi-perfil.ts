@@ -153,6 +153,18 @@ export class MiPerfil implements OnInit {
     archivo: new FormControl(''),
   });
 
+  readonly archivoSeleccionado = signal<File | null>(null);
+
+  prepararResumen(): void {
+    this.resumenForm.reset();
+    this.archivoSeleccionado.set(null);
+  }
+
+  seleccionarArchivo(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    this.archivoSeleccionado.set(input.files?.[0] ?? null);
+  }
+
   constructor(public readonly dialog: MatDialog) {}
 
   ngOnInit(): void {
