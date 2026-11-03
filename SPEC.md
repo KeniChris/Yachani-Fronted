@@ -113,11 +113,11 @@ Los servicios, modelos, utilidades y `src/environments/` se incorporarán cuando
 
 ## Alcance
 
-Construir las interfaces asignadas y su navegación. Figma define contenido, campos, opciones y valores de ejemplo; no consultar el backend para esta tarea.
+Construir las interfaces asignadas y su navegación. Figma define contenido, campos, opciones y valores de ejemplo; los valores que Figma muestra dentro de un campo se usan como placeholder, no como valor inicial (ver **Campos vacíos**). No consultar el backend para esta tarea.
 
 - **Permitido:** configuración del componente, imports, listas con datos fijos, formularios con validaciones simples y navegación con `routerLink`. La clase TypeScript puede estar vacía cuando no necesite propiedades ni formularios.
 - **Fuera de alcance:** funciones propias para ejecutar acciones, cálculos, búsquedas, filtros, servicios, modelos/interfaces, HTTP, autenticación, persistencia y simulaciones de IA o backend. No añadir `signal`, `computed`, `inject()` ni el servicio `Router` en las páginas generadas.
-- Buscadores, contadores y progreso muestran los valores del diseño. Se permite el comportamiento nativo de los controles Material, como abrir un menú, seleccionar una opción o marcar un checkbox.
+- Contadores y progreso muestran los valores del diseño. Los buscadores empiezan vacíos, con su placeholder. Se permite el comportamiento nativo de los controles Material, como abrir un menú, seleccionar una opción o marcar un checkbox.
 
 ## Reglas
 
@@ -126,8 +126,15 @@ Construir las interfaces asignadas y su navegación. Figma define contenido, cam
 - **UI:** utilizar Angular Material. No crear componentes auxiliares ni carpetas `components/` para cada sección de una página; reutilizar los elementos compartidos de la base.
 - **Controles:** fechas con `mat-datepicker` y listas largas con `mat-paginator`, configurados donde se utilizan.
 - **Formularios:** Reactive Forms con `FormGroup`, `[formGroup]` y `formControlName`. Toda entrada del usuario pertenece al grupo. No usar `ngModel` ni Signal Forms.
+- **Campos vacíos:** al entrar a un formulario de creación, todos los campos empiezan vacíos: `FormControl('')` o `FormControl<…>(null)`, nunca con el texto de Figma. El texto que Figma muestra dentro del campo se usa solo como placeholder, que desaparece al escribir:
+  - Texto libre (`input`, `textarea`): `placeholder="Ej.: <valor de Figma>"`, por ejemplo `placeholder="Ej.: Dominando Cálculo"`.
+  - Números: `placeholder="Ej.: <valor de Figma>"`, por ejemplo `placeholder="Ej.: 12"`.
+  - Listas (`mat-select`): `placeholder="Selecciona <el campo en minúsculas>…"`, por ejemplo `placeholder="Selecciona un método de estudio…"`.
+  - Fechas y horas: el formato esperado, por ejemplo `placeholder="dd/mm/aaaa"` o `placeholder="hh:mm"`.
+  - Para que el placeholder se vea sin hacer clic en un campo con `mat-label`, el `mat-form-field` lleva `floatLabel="always"`.
+  - **Excepción:** en las pantallas de edición (por ejemplo, editar sesión, editar aviso o cambiar capacidad), los campos muestran los datos actuales del elemento que se edita, tal como aparecen en Figma.
 - **Validaciones:** simples y según Figma, como `required`, `email`, `minLength` y los límites indicados. Cada campo validado lleva su `mat-error`, visible cuando se haya tocado y sea inválido. El botón de continuar lleva `[disabled]="form.invalid"`.
-- **Cobertura y navegación:** construir todas las pantallas asignadas y conectarlas mediante `routerLink` y las rutas acordadas. Los botones de continuar permiten recorrer las vistas con datos de ejemplo. Las operaciones reales y la conexión con el backend se implementarán después.
+- **Cobertura y navegación:** construir todas las pantallas asignadas y conectarlas mediante `routerLink` y las rutas acordadas. Los botones de continuar permiten recorrer las vistas una vez que el usuario completa los campos obligatorios; mientras tanto permanecen deshabilitados. Las operaciones reales y la conexión con el backend se implementarán después.
 - **Estados:** las variantes de una pantalla son estados del mismo componente, no rutas ni componentes adicionales. Por ahora implementar los errores de formulario; los demás estados de Figma quedan como referencia.
 - **Estilos:** seguir la guía visual, centralizar las variables en `styles.css` y el tema Material en `material-theme.scss`. Usar Roboto y Material Symbols Rounded.
 - **Responsive:** una misma página se adapta a escritorio y móvil, con etiquetas, foco visible y sin desbordes horizontales.
@@ -144,4 +151,3 @@ Construir las interfaces asignadas y su navegación. Figma define contenido, cam
 3. Implementar únicamente la pantalla solicitada, registrar su ruta en el archivo de rutas de su área y conservar los cambios ajenos. Reutilizar los componentes compartidos. Consultar antes de modificar la estructura común, las rutas generales, los layouts o el tema. Modificar Figma solo si se solicita expresamente.
 4. Ejecutar `npm run build` y revisar con `npm start`. Comparar con Figma en escritorio y móvil, comprobar la navegación y los errores de formulario. Informar las comprobaciones que no se hayan podido realizar.
 5. Entregar en el chat la ruta para abrir la pantalla, los archivos creados/modificados y los pendientes. Los PR se dirigen a `develop`. No hacer commit, push o merge sin que se solicite.
-

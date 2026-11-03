@@ -1,0 +1,268 @@
+@if (vista === 'detalle') {
+    <h1>Detalle de la sesión</h1>
+    <section class="content-card detail" aria-labelledby="detail-title">
+      <h2 id="detail-title">Repaso de derivadas</h2>
+      <p class="help">Programada</p>
+      <dl>
+        <dt>Fecha y hora</dt>
+        <dd>30 oct 2026 · 19:00</dd>
+        <dt>Duración</dt>
+        <dd>60 minutos</dd>
+        <dt>Descripción</dt>
+        <dd>Regla de la potencia y ejercicios prácticos.</dd>
+        <dt>Lugar o enlace</dt>
+        <dd>meet.google.com/abc-defg-hij</dd>
+      </dl>
+      <p class="help">El enlace se abre fuera de Yachani.</p>
+      <div class="actions">
+        <a mat-stroked-button routerLink="." [queryParams]="{ vista: null }" queryParamsHandling="merge"
+          >Volver a sesiones</a
+        >
+        @if (rol === 'tutor' || admin === 'si') {
+          <a mat-flat-button routerLink="." [queryParams]="{ vista: 'editar' }" queryParamsHandling="merge"
+            >Editar sesión</a
+          >
+        }
+      </div>
+      @if (rol === 'tutor' || admin === 'si') {
+        <button
+          mat-button
+          type="button"
+          class="text-action"
+          (click)="dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Cancelar sesión
+        </button>
+      }
+    </section>
+} @else if (vista === 'programar' || vista === 'editar') {
+    <header class="page-heading">
+      <h1>{{ vista === 'editar' ? 'Editar sesión' : 'Programar sesión' }}</h1>
+      <p>Define el tema, la fecha y dónde se realizará el encuentro.</p>
+    </header>
+    <div class="form-layout">
+      <form class="content-card" [formGroup]="form" aria-label="Datos de la sesión">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+          <mat-label>Tema</mat-label>
+          <input matInput formControlName="tema" maxlength="150" placeholder="Ej.: Repaso de derivadas" required />
+          @if (form.controls.tema.touched && form.controls.tema.invalid) {
+            <mat-error>Escribe el tema de la sesión.</mat-error>
+          } @else {
+            <mat-hint>Hasta 150 caracteres.</mat-hint>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+          <mat-label>Descripción</mat-label>
+          <textarea
+            matInput
+            formControlName="descripcion"
+            rows="4"
+            maxlength="500"
+            placeholder="Ej.: Repasaremos conceptos y resolveremos ejercicios paso a paso."
+          ></textarea>
+          @if (form.controls.descripcion.touched && form.controls.descripcion.invalid) {
+            <mat-error>La descripción admite hasta 500 caracteres.</mat-error>
+          } @else {
+            <mat-hint>Hasta 500 caracteres.</mat-hint>
+          }
+        </mat-form-field>
+
+        <fieldset class="date-time">
+          <legend>Fecha y hora de inicio *</legend>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+            <mat-label>Fecha</mat-label>
+            <input matInput formControlName="fecha" [matDatepicker]="fechaPicker" [min]="hoy" placeholder="dd/mm/aaaa" required />
+            <mat-datepicker-toggle matIconSuffix [for]="fechaPicker" />
+            <mat-datepicker #fechaPicker />
+            @if (form.controls.fecha.touched && form.controls.fecha.invalid) {
+              <mat-error>La fecha y hora deben ser posteriores al momento actual.</mat-error>
+            } @else {
+              <mat-hint>Hora local de Lima.</mat-hint>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+            <mat-label>Hora</mat-label>
+            <input matInput formControlName="hora" [matTimepicker]="horaPicker" placeholder="hh:mm" required />
+            <mat-timepicker-toggle matIconSuffix [for]="horaPicker" />
+            <mat-timepicker #horaPicker />
+            @if (form.controls.hora.touched && form.controls.hora.invalid) {
+              <mat-error>Indica la hora de inicio.</mat-error>
+            }
+          </mat-form-field>
+        </fieldset>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+          <mat-label>Duración en minutos</mat-label>
+          <input matInput type="number" formControlName="duracion" min="15" max="480" placeholder="Ej.: 60" required />
+          @if (form.controls.duracion.touched && form.controls.duracion.invalid) {
+            <mat-error>La duración debe estar entre 15 y 480 minutos.</mat-error>
+          } @else {
+            <mat-hint>Entre 15 y 480 minutos.</mat-hint>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+          <mat-label>Lugar o enlace</mat-label>
+          <input matInput formControlName="lugar" maxlength="200" placeholder="Ej.: meet.google.com/abc-defg-hij" />
+          @if (form.controls.lugar.touched && form.controls.lugar.invalid) {
+            <mat-error>El lugar o enlace admite hasta 200 caracteres.</mat-error>
+          } @else {
+            <mat-hint>Hasta 200 caracteres.</mat-hint>
+          }
+        </mat-form-field>
+
+        <div class="actions">
+          <a mat-stroked-button routerLink="." [queryParams]="{ vista: null }" queryParamsHandling="merge"
+            >Cancelar</a
+          >
+          <button
+            mat-flat-button
+            type="button"
+            [disabled]="form.invalid"
+            routerLink="."
+            [queryParams]="{ vista: null, sesiones: vista === 'editar' ? 'actualizada' : 'programada' }"
+            queryParamsHandling="merge"
+          >
+            {{ vista === 'editar' ? 'Guardar cambios' : 'Programar sesión' }}
+          </button>
+        </div>
+      </form>
+
+      <aside class="content-card tip" aria-labelledby="tip-title">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
+        <h2 id="tip-title">Un encuentro bien organizado</h2>
+        <p>Usa un tema concreto y revisa que el lugar o enlace sea correcto antes de guardar.</p>
+        <p class="help">Los estudiantes consultarán estos datos en la sesión y en sus recordatorios.</p>
+      </aside>
+    </div>
+} @else {
+    <header class="page-heading row">
+      <div>
+        <h1>Sesiones de estudio</h1>
+        <p>Consulta los próximos encuentros del grupo.</p>
+      </div>
+      @if (rol === 'tutor' || admin === 'si') {
+        <a
+          mat-flat-button
+          routerLink="."
+          [queryParams]="{ vista: 'programar', sesiones: null }"
+          queryParamsHandling="merge"
+          >Programar sesión</a
+        >
+      }
+    </header>
+
+    @if (sesiones === 'programada' || sesiones === 'actualizada' || sesiones === 'cancelada') {
+      <div class="notice success" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+        <div>
+          @switch (sesiones) {
+            @case ('programada') {
+              <p class="notice-title">Sesión programada</p>
+              <p>El encuentro ya aparece en las sesiones del grupo.</p>
+            }
+            @case ('actualizada') {
+              <p class="notice-title">Sesión actualizada</p>
+              <p>Se guardaron los cambios y se notificó a los estudiantes.</p>
+            }
+            @default {
+              <p class="notice-title">Sesión cancelada</p>
+              <p>El encuentro ya no aparece entre las sesiones programadas.</p>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    @if (sesiones === 'vacio' || sesiones === 'cancelada') {
+      <section class="content-card empty-state">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
+        <h2>No hay sesiones programadas</h2>
+        <p>Programa el próximo encuentro para tu grupo.</p>
+        @if (rol === 'tutor' || admin === 'si') {
+          <a
+            mat-flat-button
+            routerLink="."
+            [queryParams]="{ vista: 'programar', sesiones: null }"
+            queryParamsHandling="merge"
+            >Programar sesión</a
+          >
+        }
+      </section>
+    } @else {
+      <article class="content-card session">
+        <div class="card-heading">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
+          <h2>Repaso de derivadas</h2>
+        </div>
+        <p class="when">30 oct 2026 · 19:00 · 60 minutos</p>
+        <p class="muted">Regla de la potencia y ejercicios prácticos.</p>
+        <p class="link">Enlace: meet.google.com/abc-defg-hij</p>
+        <a
+          mat-stroked-button
+          routerLink="."
+          [queryParams]="{ vista: 'detalle', sesiones: null }"
+          queryParamsHandling="merge"
+          aria-label="Ver sesión Repaso de derivadas"
+          >Ver sesión</a
+        >
+        @if (rol === 'tutor' || admin === 'si') {
+          <div class="session-actions">
+            <a
+              mat-stroked-button
+              routerLink="."
+              [queryParams]="{ vista: 'editar', sesiones: null }"
+              queryParamsHandling="merge"
+              >Editar</a
+            >
+            <button
+              mat-button
+              type="button"
+              (click)="dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+            >
+              Cancelar
+            </button>
+          </div>
+        }
+      </article>
+      <section class="content-card reminder" aria-labelledby="reminder-title">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+        <h2 id="reminder-title">Un aviso antes de comenzar</h2>
+        <p class="muted">
+          Los estudiantes reciben un recordatorio dentro de la plataforma aproximadamente 60 minutos
+          antes de la sesión.
+        </p>
+      </section>
+    }
+}
+
+<ng-template #cancelarDialog>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Cancelar esta sesión?</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>“Repaso de derivadas” dejará de aparecer en las sesiones programadas del grupo.</p>
+      <p class="dialog-label">Fecha de la sesión</p>
+      <p class="dialog-value">30 oct 2026 · 19:00</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        class="danger"
+        mat-dialog-close
+        routerLink="."
+        [queryParams]="{ vista: null, sesiones: 'cancelada' }"
+        queryParamsHandling="merge"
+      >
+        Cancelar sesión
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
