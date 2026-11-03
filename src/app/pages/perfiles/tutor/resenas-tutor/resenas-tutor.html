@@ -1,0 +1,121 @@
+<mat-card appearance="outlined" class="content-card profile-card">
+  <div class="identity">
+    <span class="avatar" aria-hidden="true">CR</span>
+    <div class="identity-copy">
+      <h2>Carlos Ríos</h2>
+      <span class="role">Tutor</span>
+    </div>
+  </div>
+  <p class="email">u20231t456&#64;upc.edu.pe</p>
+  <p>Comparte conocimientos y acompaña a otros estudiantes.</p>
+</mat-card>
+<header class="reviews-heading">
+  <div>
+    <h1>Reseñas de Carlos</h1>
+    <p>Experiencias de estudiantes de sus grupos.</p>
+  </div>
+  <button
+    mat-flat-button
+    (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+  >
+    Escribir reseña
+  </button>
+</header>
+@if (estado === 'vacio') {
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+    <h2>Este tutor aún no tiene reseñas</h2>
+    <p>Si participas en uno de sus grupos, puedes compartir tu experiencia.</p>
+    <button
+      mat-flat-button
+      (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+    >
+      Escribir reseña
+    </button>
+  </mat-card>
+} @else {
+  <mat-card appearance="outlined" class="content-card rating-summary">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+    <strong>4,8 de 5</strong>
+    <span>5 reseñas</span>
+  </mat-card>
+  <div class="reviews-grid">
+    @for (resena of resenas; track resena.autor) {
+      <mat-card appearance="outlined" class="content-card review-card">
+        <div class="review-head">
+          <span class="avatar small" aria-hidden="true">{{ resena.iniciales }}</span>
+          <div class="review-author">
+            <strong>{{ resena.autor }}</strong>
+            <span>{{ resena.fecha }}</span>
+          </div>
+        </div>
+        <div class="stars" aria-label="5 de 5 estrellas">
+          @for (estrella of estrellas; track estrella) {
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+          }
+        </div>
+        <p class="review-text">{{ resena.comentario }}</p>
+      </mat-card>
+    }
+  </div>
+  <p class="help">Se muestran las 10 reseñas mejor calificadas; en empate, las más recientes.</p>
+}
+<ng-template #resenaDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Reseñar a Carlos Ríos</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>Comparte una experiencia respetuosa y útil para otros estudiantes.</p>
+      <form [formGroup]="resenaForm">
+        <div class="star-field">
+          <span class="field-label">Calificación *</span>
+          <div class="star-picker" role="group" aria-label="Calificación">
+            @for (estrella of estrellas; track estrella) {
+              <button
+                mat-icon-button
+                type="button"
+                [attr.aria-label]="estrella + ' de 5 estrellas'"
+                (click)="resenaForm.controls.calificacion.setValue(estrella)"
+              >
+                <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+              </button>
+            }
+          </div>
+          <small>5 de 5 estrellas</small>
+        </div>
+        <mat-form-field appearance="outline">
+          <mat-label>Comentario</mat-label>
+          <textarea
+            matInput
+            formControlName="comentario"
+            rows="4"
+            placeholder="¿Cómo fue estudiar con este tutor?"
+            required
+          ></textarea>
+          <mat-hint>Hasta 500 caracteres.</mat-hint>
+          <mat-error>
+            @if (resenaForm.controls.comentario.hasError('required')) {
+              Escribe tu comentario para publicar.
+            } @else {
+              Máximo permitido: 500 caracteres.
+            }
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles/otro-tutor/resenas"
+        [disabled]="resenaForm.invalid"
+        >Publicar reseña</a
+      >
+    </mat-dialog-actions>
+  </div>
+</ng-template>

@@ -1,0 +1,52 @@
+@if (estado === 'no-disponible') {
+  <h1>Perfil no disponible</h1>
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
+    <h2>No encontramos este perfil</h2>
+    <p>Puede que el usuario ya no esté disponible.</p>
+    <a mat-flat-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
+  </mat-card>
+} @else {
+  <header class="page-heading">
+    <h1>Perfil de Carlos</h1>
+    <p>Conoce cómo estudia y participa en Yachani.</p>
+  </header>
+  <mat-card appearance="outlined" class="content-card profile-card">
+    <div class="identity">
+      <span class="avatar" aria-hidden="true">CR</span>
+      <div class="identity-copy">
+        <h2>Carlos Ríos</h2>
+        <span class="role">Tutor</span>
+      </div>
+    </div>
+    <p class="email">u20231t456&#64;upc.edu.pe</p>
+    <p>Comparte conocimientos y acompaña a otros estudiantes.</p>
+  </mat-card>
+  <div class="columns">
+    <mat-card appearance="outlined" class="content-card">
+      <h2>Sobre mí</h2>
+      <p class="about-text">
+        Me gusta explicar los conceptos de cálculo con ejemplos cotidianos y resolver dudas paso a
+        paso. Estudio contigo hasta que puedas aplicar cada idea por tu cuenta.
+      </p>
+      <dl>
+        <div>
+          <dt>Método de enseñanza</dt>
+          <dd>Resolución de ejercicios</dd>
+        </div>
+      </dl>
+    </mat-card>
+    <mat-card appearance="outlined" class="content-card">
+      <h2>Lo que dicen sus estudiantes</h2>
+      <div class="rating">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+        <strong>4,8</strong>
+        <span>· 5 reseñas</span>
+      </div>
+      <div class="rating-actions">
+        <a mat-stroked-button routerLink="/perfiles/otro-tutor/resenas">Ver reseñas</a>
+        <a mat-flat-button routerLink="/perfiles/otro-tutor/resenas">Escribir reseña</a>
+      </div>
+    </mat-card>
+  </div>
+}
