@@ -1,11 +1,29 @@
 <section class="card code-card" aria-labelledby="code-title">
   <p class="eyebrow">Código enviado</p>
   <h1 id="code-title">Revisa tu correo</h1>
-  <p class="description">Ingresa el código de seis dígitos que enviamos a:</p>
+
+  <p class="description">
+    Si el correo está registrado, recibirás un código de seis dígitos en:
+  </p>
+
   @if (destinatario) {
     <p class="destinatario">{{ destinatario }}</p>
   }
-  <form [formGroup]="form" #codigoForm="ngForm" (ngSubmit)="verificar()">
+
+  @if (errorCodigo()) {
+    <p role="alert">{{ errorCodigo() }}</p>
+  }
+
+  @if (mensajeReenvio()) {
+    <p role="status">{{ mensajeReenvio() }}</p>
+  }
+
+  <form
+    [formGroup]="form"
+    #codigoForm="ngForm"
+    (ngSubmit)="verificar()"
+    [attr.aria-busy]="verificando() || reenviando()"
+  >
     <div
       class="digits"
       role="group"
@@ -25,7 +43,10 @@
           [attr.aria-label]="'Dígito ' + (i + 1)"
           [attr.aria-invalid]="
             form.controls[i.toString()].invalid &&
-            (form.controls[i.toString()].dirty || form.controls[i.toString()].touched)
+            (
+              form.controls[i.toString()].dirty ||
+              form.controls[i.toString()].touched
+            )
           "
           (input)="escribir(i, $event)"
           (paste)="pegar(i, $event)"
@@ -33,28 +54,69 @@
         />
       }
     </div>
+
     <div id="code-error" class="code-error" aria-live="polite">
-      @if (form.invalid && (codigoForm.submitted || (previsualizacion && estado === 'error'))) {
+      @if (
+        form.invalid &&
+        (
+          codigoForm.submitted ||
+          (previsualizacion && estado === 'error')
+        )
+      ) {
         <mat-error>Completa los seis dígitos del código</mat-error>
       }
     </div>
-    <p class="hint">El código vencerá en 10 minutos.</p>
-    <button mat-flat-button class="primary" type="submit">Verificar código</button>
-    <button mat-button class="secondary" type="button">Reenviar código</button>
+
+    <p class="hint">El código es válido durante 10 minutos desde su emisión.</p>
+
+    <button
+      mat-flat-button
+      class="primary"
+      type="submit"
+      [disabled]="verificando() || reenviando()"
+    >
+      {{ verificando() ? 'Verificando…' : 'Verificar código' }}
+    </button>
+
+    <button
+      mat-button
+      class="secondary"
+      type="button"
+      [disabled]="verificando() || reenviando()"
+      (click)="reenviar()"
+    >
+      {{ reenviando() ? 'Reenviando…' : 'Reenviar código' }}
+    </button>
   </form>
-  <a class="back" routerLink="/auth/iniciar-sesion">← Volver a iniciar sesión</a>
+
+  <a class="back" routerLink="/auth/iniciar-sesion">
+    ← Volver a iniciar sesión
+  </a>
+
   @if (previsualizacion) {
     <nav class="preview" aria-label="Previsualización del flujo">
-      <span>Previsualización</span
-      ><a routerLink="/auth/recuperar-contrasena" [queryParams]="{ previsualizacion: true }"
-        >Correo</a
-      ><a
+      <span>Previsualización</span>
+
+      <a
+        routerLink="/auth/recuperar-contrasena"
+        [queryParams]="{ previsualizacion: true }"
+      >
+        Correo
+      </a>
+
+      <a
         routerLink="/auth/verificar-codigo"
         [queryParams]="{ previsualizacion: true, estado: 'error' }"
-        >Ver errores</a
-      ><a routerLink="/auth/restablecer-contrasena" [queryParams]="{ previsualizacion: true }"
-        >Nueva contraseña</a
       >
+        Ver errores
+      </a>
+
+      <a
+        routerLink="/auth/restablecer-contrasena"
+        [queryParams]="{ previsualizacion: true }"
+      >
+        Nueva contraseña
+      </a>
     </nav>
   }
 </section>
