@@ -2,102 +2,185 @@
   <h1>Mi perfil</h1>
   <p>Mantén tu información clara y actualizada.</p>
 </header>
-<mat-card appearance="outlined" class="content-card profile-card">
-  <div class="identity">
-    <span class="avatar" aria-hidden="true">LC</span>
-    <div class="identity-copy">
-      <h2>Leicy Cahuana</h2>
-      <span class="role">Estudiante</span>
-    </div>
+
+@if (cargando()) {
+  <p role="status">Cargando tu perfil…</p>
+} @else if (errorCarga()) {
+  <div role="alert">
+    <p>{{ errorCarga() }}</p>
+    <button mat-stroked-button type="button" (click)="cargarPerfil()">
+      Reintentar
+    </button>
   </div>
-  <p class="email">u20231e777&#64;upc.edu.pe</p>
-  <p>Universidad Peruana de Ciencias Aplicadas · Ingeniería de Software</p>
-</mat-card>
-<mat-tab-group class="profile-tabs" animationDuration="0ms" mat-stretch-tabs="false">
+}
+
+@if (perfil(); as datos) {
+  <mat-card appearance="outlined" class="content-card profile-card">
+    <div class="identity">
+      <span class="avatar" aria-hidden="true">{{ iniciales }}</span>
+
+      <div class="identity-copy">
+        <h2>{{ datos.nombres }} {{ datos.apellidos }}</h2>
+        <span class="role">Estudiante</span>
+      </div>
+    </div>
+
+    <p class="email">{{ datos.correo }}</p>
+
+    <p>
+      {{ datos.universidad || 'Universidad pendiente' }}
+      ·
+      {{ datos.carrera || 'Carrera pendiente' }}
+    </p>
+  </mat-card>
+}
+
+<mat-tab-group
+  class="profile-tabs"
+  animationDuration="0ms"
+  mat-stretch-tabs="false"
+>
   <mat-tab label="Académico">
-    <div class="columns">
-      <mat-card appearance="outlined" class="content-card">
-        <h2>Datos académicos</h2>
-        <dl>
-          <div>
-            <dt>Universidad</dt>
-            <dd>Universidad Peruana de Ciencias Aplicadas</dd>
-          </div>
-          <div>
-            <dt>Carrera</dt>
-            <dd>Ingeniería de Software</dd>
-          </div>
-        </dl>
-        <button
-          mat-stroked-button
-          class="card-action"
-          (click)="dialog.open(academicoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
-        >
-          Editar información
-        </button>
-      </mat-card>
-      <mat-card appearance="outlined" class="content-card">
-        <h2>Cursos y conocimientos</h2>
-        @for (curso of ['Cálculo I', 'Ingeniería de Software']; track curso) {
-          <div class="course">
-            <div class="course-copy">
-              <strong>{{ curso }}</strong>
-              <span>Nivel Intermedio</span>
+    @if (perfil(); as datos) {
+      <div class="columns">
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Datos académicos</h2>
+
+          <dl>
+            <div>
+              <dt>Universidad</dt>
+              <dd>{{ datos.universidad || 'Sin registrar' }}</dd>
             </div>
-            <button
-              mat-icon-button
-              [attr.aria-label]="'Editar ' + curso"
-              (click)="
-                editarCursoForm.controls.curso.setValue(curso);
-                dialog.open(editarCursoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })
-              "
-            >
-              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">edit</mat-icon>
-            </button>
-          </div>
-        }
-        <button
-          mat-stroked-button
-          class="card-action"
-          (click)="dialog.open(agregarCursoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
-        >
-          Agregar curso
-        </button>
-      </mat-card>
-    </div>
-  </mat-tab>
-  <mat-tab label="Preferencias">
-    <div class="columns">
-      <mat-card appearance="outlined" class="content-card">
-        <h2>Así prefiero aprender</h2>
-        <dl>
-          <div>
-            <dt>Método preferido</dt>
-            <dd>Resolución de ejercicios</dd>
-          </div>
-          <div>
-            <dt>Modalidad preferida</dt>
-            <dd>Virtual</dd>
-          </div>
-        </dl>
-        <button
-          mat-stroked-button
-          class="card-action"
-          (click)="dialog.open(preferenciasDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
-        >
-          Editar preferencias
-        </button>
-      </mat-card>
-      <mat-card appearance="outlined" class="content-card">
-        <h2>Temas de interés</h2>
-        <ul class="topics" aria-label="Temas de interés">
-          @for (tema of ['Cálculo', 'Ingeniería de Software', 'Inteligencia artificial']; track tema) {
-            <li>{{ tema }}</li>
+
+            <div>
+              <dt>Carrera</dt>
+              <dd>{{ datos.carrera || 'Sin registrar' }}</dd>
+            </div>
+          </dl>
+
+          <button
+            mat-stroked-button
+            class="card-action"
+            type="button"
+            (click)="
+              dialog.open(academicoDialog, {
+                width: '600px',
+                maxWidth: 'calc(100vw - 32px)'
+              })
+            "
+          >
+            Editar información
+          </button>
+        </mat-card>
+
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Cursos y conocimientos</h2>
+
+          @for (curso of datos.conocimientos; track curso.idConocimiento) {
+            <div class="course">
+              <div class="course-copy">
+                <strong>{{ curso.curso }}</strong>
+                <span>Nivel {{ curso.nivel }}</span>
+              </div>
+
+              <button
+                mat-icon-button
+                type="button"
+                [attr.aria-label]="'Editar ' + curso.curso"
+                (click)="
+                  editarCursoForm.reset({
+                    curso: curso.curso,
+                    nivel: curso.nivel
+                  });
+                  dialog.open(editarCursoDialog, {
+                    width: '600px',
+                    maxWidth: 'calc(100vw - 32px)'
+                  })
+                "
+              >
+                <mat-icon
+                  fontSet="material-symbols-rounded"
+                  aria-hidden="true"
+                >
+                  edit
+                </mat-icon>
+              </button>
+            </div>
+          } @empty {
+            <p>Aún no tienes cursos registrados.</p>
           }
-        </ul>
-        <p class="help">Estas preferencias ayudan a orientar la búsqueda de grupos.</p>
-      </mat-card>
-    </div>
+
+          <button
+            mat-stroked-button
+            class="card-action"
+            type="button"
+            (click)="
+              agregarCursoForm.reset();
+              dialog.open(agregarCursoDialog, {
+                width: '600px',
+                maxWidth: 'calc(100vw - 32px)'
+              })
+            "
+          >
+            Agregar curso
+          </button>
+        </mat-card>
+      </div>
+    }
+  </mat-tab>
+
+  <mat-tab label="Preferencias">
+    @if (perfil(); as datos) {
+      <div class="columns">
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Así prefiero aprender</h2>
+
+          <dl>
+            <div>
+              <dt>Método preferido</dt>
+              <dd>{{ datos.metodoPreferido || 'Sin registrar' }}</dd>
+            </div>
+
+            <div>
+              <dt>Modalidad preferida</dt>
+              <dd>{{ datos.modalidadPreferida || 'Sin registrar' }}</dd>
+            </div>
+          </dl>
+
+          <button
+            mat-stroked-button
+            class="card-action"
+            type="button"
+            (click)="
+              dialog.open(preferenciasDialog, {
+                width: '600px',
+                maxWidth: 'calc(100vw - 32px)'
+              })
+            "
+          >
+            Editar preferencias
+          </button>
+        </mat-card>
+
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Temas de interés</h2>
+
+          <ul class="topics" aria-label="Temas de interés">
+            @for (tema of datos.temasInteres; track tema) {
+              <li>{{ tema }}</li>
+            }
+          </ul>
+
+          @if (!datos.temasInteres.length) {
+            <p>Aún no tienes temas de interés registrados.</p>
+          }
+
+          <p class="help">
+            Estas preferencias ayudan a orientar la búsqueda de grupos.
+          </p>
+        </mat-card>
+      </div>
+    }
   </mat-tab>
   <mat-tab label="Resúmenes">
     <header class="summaries-heading">
@@ -108,7 +191,7 @@
       <button
         mat-flat-button
         (click)="
-          resumenForm.controls.titulo.setValue('Guía de límites');
+resumenForm.reset();
           dialog.open(resumenDialog, {
             width: '600px',
             maxWidth: 'calc(100vw - 32px)',
@@ -119,7 +202,7 @@
         Publicar resumen
       </button>
     </header>
-    @if (resumenes === 'vacio') {
+    @if (misResumenes.length === 0) {
       <mat-card appearance="outlined" class="content-card empty-state">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">description</mat-icon>
         <h2>Aún no tienes resúmenes</h2>

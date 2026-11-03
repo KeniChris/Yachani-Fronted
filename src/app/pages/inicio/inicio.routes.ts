@@ -1,25 +1,44 @@
-﻿import { Routes } from '@angular/router';
-
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+﻿import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    // Mismo query param que recibe AppLayout; los datos de una ruta hija no configuran al padre.
     canMatch: [
-      () => inject(Router).getCurrentNavigation()?.extractedUrl.queryParams['rol'] !== 'tutor',
+      () => {
+        const usuario = inject(AuthService).usuario();
+
+        if (!usuario) {
+          return inject(Router).parseUrl('/auth/iniciar-sesion');
+        }
+
+        return usuario.tipoUsuario === 'ESTUDIANTE';
+      },
     ],
     loadComponent: () =>
-      import('./inicio-estudiante/inicio-estudiante').then((m) => m.InicioEstudiante),
+      import('./inicio-estudiante/inicio-estudiante').then(
+        (m) => m.InicioEstudiante,
+      ),
   },
   {
     path: '',
     pathMatch: 'full',
     canMatch: [
-      () => inject(Router).getCurrentNavigation()?.extractedUrl.queryParams['rol'] === 'tutor',
+      () => {
+        const usuario = inject(AuthService).usuario();
+
+        if (!usuario) {
+          return inject(Router).parseUrl('/auth/iniciar-sesion');
+        }
+
+        return usuario.tipoUsuario === 'TUTOR';
+      },
     ],
-    loadComponent: () => import('./inicio-tutor/inicio-tutor').then((m) => m.InicioTutor),
+    loadComponent: () =>
+      import('./inicio-tutor/inicio-tutor').then(
+        (m) => m.InicioTutor,
+      ),
   },
 ];

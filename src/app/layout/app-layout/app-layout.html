@@ -1,14 +1,19 @@
 <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
+
 <ng-template #accountIdentity>
-  @let cuenta = usuario || usuariosEjemplo[rol === 'tutor' ? 'tutor' : 'estudiante'];
-  <span class="avatar" aria-hidden="true">{{
-    cuenta.iniciales || usuariosEjemplo[rol === 'tutor' ? 'tutor' : 'estudiante'].iniciales
-  }}</span>
-  <span class="identity"
-    ><span class="user-name">{{ cuenta.nombre }}</span>
-    <span class="user-role">{{ cuenta.rol || (rol === 'tutor' ? 'Tutor' : 'Estudiante') }}</span>
-  </span>
+  @if (usuario; as cuenta) {
+    <span class="avatar" aria-hidden="true">
+      {{ cuenta.iniciales }}
+    </span>
+    <span class="identity">
+      <span class="user-name">{{ cuenta.nombre }}</span>
+      <span class="user-role">
+        {{ cuenta.rol || (rol === 'tutor' ? 'Tutor' : 'Estudiante') }}
+      </span>
+    </span>
+  }
 </ng-template>
+
 <ng-template #navigationContent>
   <a
     class="brand-link"
@@ -63,6 +68,7 @@
     /></a>
   </div>
 </ng-template>
+
 <ng-template #routeTitle>
   @if (ruta) {
     <span>{{ ruta }}</span>
@@ -113,9 +119,11 @@
     >
   }
 </ng-template>
+
 <aside class="sidebar yachani-dark" aria-label="Barra lateral">
   <ng-container [ngTemplateOutlet]="navigationContent" />
 </aside>
+
 <mat-sidenav-container class="shell" [hasBackdrop]="true">
   <mat-sidenav
     #menu
@@ -139,6 +147,7 @@
       <ng-container [ngTemplateOutlet]="navigationContent" />
     </div>
   </mat-sidenav>
+
   <mat-sidenav-content>
     <mat-toolbar class="topbar">
       <button
@@ -179,7 +188,9 @@
         <a mat-menu-item routerLink="/perfiles" queryParamsHandling="preserve">Mi perfil</a>
       </mat-menu>
     </mat-toolbar>
+
     <main id="contenido-principal" tabindex="-1"><router-outlet /></main>
+
     <nav class="mobile-navigation" aria-label="Navegaci&#243;n m&#243;vil">
       @for (item of mobileNavigation[rol === 'tutor' ? 'tutor' : 'estudiante']; track item.path) {
         <a

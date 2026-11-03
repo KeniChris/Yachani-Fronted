@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-inicio-tutor',
@@ -12,8 +13,16 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './inicio-tutor.css',
 })
 export class InicioTutor {
-  // Entradas vacías hasta que la integración proporcione datos; no dependen del rol visual.
-  @Input({ transform: (valor: unknown) => (Array.isArray(valor) ? valor : []) }) grupos: readonly {
+  private readonly authService = inject(AuthService);
+
+  get nombre(): string {
+    return this.authService.usuario()?.nombres.trim().split(/\s+/)[0] ?? '';
+  }
+
+  @Input({
+    transform: (valor: unknown) => (Array.isArray(valor) ? valor : []),
+  })
+  grupos: readonly {
     id: string;
     nombre: string;
     descripcion?: string;
