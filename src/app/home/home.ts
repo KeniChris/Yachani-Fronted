@@ -1,5 +1,14 @@
-import { afterNextRender, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { textoRequerido } from '../core/services/recursos-ui';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -31,14 +40,19 @@ export class Home implements OnDestroy {
   indicador = { izquierda: 0, arriba: 0, ancho: 0 };
   private resizeObserver?: ResizeObserver;
 
-  constructor(private host: ElementRef<HTMLElement>, private changeDetector: ChangeDetectorRef) {
+  constructor(
+    private host: ElementRef<HTMLElement>,
+    private changeDetector: ChangeDetectorRef,
+  ) {
     afterNextRender(() => {
       this.actualizarSeccion();
       this.resizeObserver = new ResizeObserver(() => this.actualizarIndicador());
       const nav = this.pageNavigation?.nativeElement;
       if (nav) {
         this.resizeObserver.observe(nav);
-        nav.querySelectorAll('[data-anchor]').forEach((label) => this.resizeObserver!.observe(label));
+        nav
+          .querySelectorAll('[data-anchor]')
+          .forEach((label) => this.resizeObserver!.observe(label));
       }
     });
   }
@@ -52,7 +66,10 @@ export class Home implements OnDestroy {
       const section = this.host.nativeElement.querySelector<HTMLElement>('#' + link.anchor);
       if (section && section.getBoundingClientRect().top <= limite) activa = link.anchor;
     }
-    if (window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+    if (
+      window.scrollY > 0 &&
+      window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2
+    ) {
       activa = 'contacto';
     }
     this.seccionActiva = activa;
@@ -60,13 +77,19 @@ export class Home implements OnDestroy {
   }
 
   irASeccion(event: MouseEvent, anchor: string): void {
-    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+      return;
     const section = this.host.nativeElement.querySelector<HTMLElement>('#' + anchor);
     if (!section) return;
     event.preventDefault();
     this.seccionActiva = anchor;
     this.actualizarIndicador();
-    section.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+    section.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'instant'
+        : 'smooth',
+      block: 'start',
+    });
   }
 
   private actualizarIndicador(): void {
@@ -75,7 +98,11 @@ export class Home implements OnDestroy {
     if (!nav || !label) return;
     const parent = nav.getBoundingClientRect();
     const rect = label.getBoundingClientRect();
-    this.indicador = { izquierda: rect.left - parent.left, arriba: rect.bottom - parent.top + 6, ancho: rect.width };
+    this.indicador = {
+      izquierda: rect.left - parent.left,
+      arriba: rect.bottom - parent.top + 6,
+      ancho: rect.width,
+    };
     this.changeDetector.markForCheck();
   }
 
@@ -86,13 +113,13 @@ export class Home implements OnDestroy {
     rol: new FormControl('estudiante', { nonNullable: true }),
   });
   readonly contactForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    nombre: new FormControl('', { nonNullable: true, validators: textoRequerido }),
     correo: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
     }),
-    asunto: new FormControl('', { nonNullable: true, validators: Validators.required }),
-    mensaje: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    asunto: new FormControl('', { nonNullable: true, validators: textoRequerido }),
+    mensaje: new FormControl('', { nonNullable: true, validators: textoRequerido }),
   });
   readonly navigation = [
     { label: 'Inicio', anchor: 'inicio' },
@@ -186,9 +213,9 @@ export class Home implements OnDestroy {
     },
   ];
   readonly chapters = [
-    { time: '0:00', label: 'Regístrate' },
-    { time: '0:35', label: 'Busca un grupo' },
-    { time: '1:10', label: 'Únete y aprende' },
+    { time: '1', label: 'Regístrate' },
+    { time: '2', label: 'Busca un grupo' },
+    { time: '3', label: 'Únete y aprende' },
   ];
   readonly audiences = [
     {
@@ -210,23 +237,49 @@ export class Home implements OnDestroy {
   readonly questions: readonly { pregunta: string; respuesta: string }[] = [
     {
       pregunta: '¿Qué puedo hacer en Yachani?',
-      respuesta: 'Puedes encontrar grupos de estudio, compartir materiales, conversar con tus compañeros y repasar con flashcards.',
+      respuesta:
+        'Puedes encontrar grupos de estudio, compartir materiales, conversar con tus compañeros y repasar con flashcards.',
     },
     {
       pregunta: '¿Quién puede ser tutor?',
-      respuesta: 'Los estudiantes que desean compartir sus conocimientos y acompañar a otros pueden registrarse como estudiantes tutores y organizar grupos de estudio.',
+      respuesta:
+        'Los estudiantes que desean compartir sus conocimientos y acompañar a otros pueden registrarse como estudiantes tutores y organizar grupos de estudio.',
     },
     {
       pregunta: '¿Cómo puedo unirme a un grupo de estudio?',
-      respuesta: 'Regístrate, busca un grupo por curso o tema y revisa sus detalles. Si tiene cupos disponibles, podrás unirte directamente o enviar una solicitud, según su configuración.',
+      respuesta:
+        'Regístrate, busca un grupo por curso o tema y revisa sus detalles. Si tiene cupos disponibles, envía una solicitud para que quien administra el grupo la revise.',
     },
     {
       pregunta: '¿Cómo funciona la recomendación con IA?',
-      respuesta: 'Yachani considera tus preferencias, temas de interés y método de estudio para recomendarte grupos que se adapten mejor a tu perfil.',
+      respuesta:
+        'La recomendación con IA está prevista para una próxima entrega. Mientras tanto, puedes buscar grupos y aplicar los filtros disponibles.',
     },
     {
       pregunta: '¿Qué formatos de archivo puedo subir?',
-      respuesta: 'Puedes compartir materiales y resúmenes en formatos permitidos por la plataforma, como PDF, DOCX, PNG y JPG.',
+      respuesta:
+        'Puedes compartir PDF, DOCX, PPTX, XLSX, PNG, JPG o JPEG. Cada envío permite hasta 5 archivos de 10 MB cada uno.',
+    },
+  ];
+  prepararCorreo(): void {
+    this.contactForm.markAllAsTouched();
+    if (this.contactForm.invalid) return;
+    const datos = this.contactForm.getRawValue();
+    const cuerpo = `Nombre: ${datos.nombre.trim()}\nCorreo: ${datos.correo.trim()}\n\n${datos.mensaje.trim()}`;
+    window.location.href = `mailto:yachani.soporte@gmail.com?subject=${encodeURIComponent(datos.asunto.trim())}&body=${encodeURIComponent(cuerpo)}`;
+  }
+  readonly testimonials = [
+    {
+      text: 'Antes coordinábamos todo por WhatsApp y se perdían los archivos. Con Yachani encontré un grupo de Cálculo y aprobé con 16.',
+      role: 'Estudiante · Ing. de Sistemas, UPC',
+    },
+    {
+      text: 'Las flashcards del grupo me salvaron en los parciales. Repasamos juntos todas las noches antes del examen.',
+      role: 'Estudiante · Ing. de Software, UPC',
+    },
+    {
+      text: 'Como tutora puedo organizar mis sesiones, compartir guías y ver cómo avanza cada estudiante.',
+      role: 'Tutora · Física I, UPC',
     },
   ];
   readonly contact = [

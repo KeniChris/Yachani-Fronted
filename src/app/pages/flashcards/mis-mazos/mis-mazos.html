@@ -3,26 +3,43 @@
     <h1>Mis mazos</h1>
     <p>Tus borradores y mazos publicados, siempre en un mismo lugar.</p>
   </div>
-  <a mat-flat-button routerLink="crear" queryParamsHandling="preserve">Crear mazo</a>
+  <a mat-flat-button routerLink="crear">Crear mazo</a>
 </header>
+@if (cargando()) {
+  <p role="status">Cargando mazos y progreso…</p>
+}
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+  <button mat-button (click)="cargar()">Reintentar</button>
+}
 <div class="deck-grid">
-  @for (mazo of mazos; track mazo.id) {
+  @for (m of mazos(); track m.idMazo) {
     <article class="deck-card">
       <div class="deck-banner">
         <img src="/icons/flashcards/style.svg" alt="" width="24" height="24" /><span
-          >{{ mazo.tarjetas }} tarjetas</span
+          >{{ m.cantidadTarjetas }} tarjetas</span
         >
       </div>
-      <h2>{{ mazo.titulo }}</h2>
-      <p>{{ mazo.descripcion }}</p>
-      <small>{{ rol === 'tutor' ? 'Carlos Ríos' : 'Leicy Cahuana' }} · {{ mazo.estado }}</small
-      ><small>{{ mazo.avance }}</small>
-      <mat-progress-bar
-        mode="determinate"
-        [value]="mazo.progreso"
-        [attr.aria-label]="'Progreso de ' + mazo.titulo"
-      />
-      <a mat-stroked-button [routerLink]="[mazo.id]" queryParamsHandling="preserve">Ver mazo</a>
+      <h2>{{ m.titulo }}</h2>
+      <p>{{ m.descripcion }}</p>
+      <small>{{ m.autor }} · {{ m.estado === 'PUBLICADO' ? 'Publicado' : 'Borrador' }}</small>
+      @if (progresos()[m.idMazo]; as p) {
+        <small
+          >{{ p.tarjetasVistas }} de {{ p.totalTarjetas }} revisadas ·
+          {{ p.porcentajeRevisado }} %</small
+        ><mat-progress-bar
+          mode="determinate"
+          [value]="p.porcentajeRevisado"
+          [attr.aria-label]="'Progreso de ' + m.titulo"
+        />
+      } @else {
+        <small>{{ cargando() ? 'Consultando avance…' : 'Avance no disponible' }}</small>
+      }
+      <a mat-stroked-button [routerLink]="[m.idMazo]">Ver mazo</a>
     </article>
+  } @empty {
+    @if (!cargando() && !error()) {
+      <p>Todavía no tienes mazos. Crea uno y agrega tus primeras tarjetas.</p>
+    }
   }
 </div>

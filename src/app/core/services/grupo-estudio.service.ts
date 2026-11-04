@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs';
+import { PaginaGrupos, TAMANO_PAGINA_MAXIMO } from '../models/pagina.models';
+import { todasLasPaginas } from './paginas-api';
 import { environment } from '../../../environments/environment';
 import {
   CrearGrupoRequest,
@@ -11,7 +12,6 @@ import {
   SolicitudPendienteResponse,
   SolicitudResponse,
 } from '../models/grupo-estudio.models';
-import { PaginaGrupos, TAMANO_PAGINA_MAXIMO } from '../models/pagina.models';
 
 // idGrupo=1 ("Dominando Cálculo") es el grupo sembrado en la base de ejemplo.
 export const ID_GRUPO_DEMO = 1;
@@ -41,11 +41,11 @@ export class GrupoEstudioService {
   }
 
   listarMisGrupos(idUsuario: number) {
-    return this.http
-      .get<PaginaGrupos<GrupoEstudioResponse>>(this.gruposUrl, {
-        params: { idUsuario, size: TAMANO_PAGINA_MAXIMO },
-      })
-      .pipe(map((r) => r.content));
+    return todasLasPaginas<GrupoEstudioResponse>((page) =>
+      this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/mis-grupos`, {
+        params: { page, size: TAMANO_PAGINA_MAXIMO },
+      }),
+    );
   }
 
   obtenerGrupo(idGrupo: number) {
@@ -53,22 +53,17 @@ export class GrupoEstudioService {
   }
 
   buscarGrupos(query: string) {
-    return this.http
-      .get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/buscar`, {
-        params: { query, size: TAMANO_PAGINA_MAXIMO },
-      })
-      .pipe(map((r) => r.content));
+    return todasLasPaginas<GrupoEstudioResponse>((page) =>
+      this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/buscar`, {
+        params: { query, page, size: TAMANO_PAGINA_MAXIMO },
+      }),
+    );
   }
 
-  // IMPORTANTE: 'curso' y 'metodoEstudio' se envían siempre, aunque 'curso' vaya vacío.
-  // Si cualquiera de los dos llega nulo, el backend responde 500
-  // ("function lower(bytea) does not exist"): Postgres no puede inferir el tipo del
-  // parámetro nulo en lower(?). Con 'curso' vacío el LIKE '%%' actúa como "cualquiera".
   filtrarGrupos(filtros: FiltrarGruposParams) {
-    const params: Record<string, string | number> = {
+    const params: Record<string, string> = {
       curso: filtros.curso ?? '',
       metodoEstudio: filtros.metodoEstudio ?? '',
-      size: TAMANO_PAGINA_MAXIMO,
     };
 
     if (filtros.cantidadIntegrantes !== undefined) {
@@ -79,9 +74,11 @@ export class GrupoEstudioService {
       params['tipoGrupo'] = filtros.tipoGrupo;
     }
 
-    return this.http
-      .get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/filtrar`, { params })
-      .pipe(map((r) => r.content));
+    return todasLasPaginas<GrupoEstudioResponse>((page) =>
+      this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/filtrar`, {
+        params: { ...params, page, size: TAMANO_PAGINA_MAXIMO },
+      }),
+    );
   }
 
   actualizarCapacidad(idGrupo: number, nuevaCapacidad: number) {
@@ -111,20 +108,21 @@ export class GrupoEstudioService {
   }
 
   listarSolicitudes(idGrupo: number) {
-    return this.http
-      .get<PaginaGrupos<SolicitudPendienteResponse>>(`${this.gruposUrl}/${idGrupo}/solicitudes`, {
-        params: { size: TAMANO_PAGINA_MAXIMO },
-      })
-      .pipe(map((r) => r.content));
+    return todasLasPaginas<SolicitudPendienteResponse>((page) =>
+      this.http.get<PaginaGrupos<SolicitudPendienteResponse>>(
+        `${this.gruposUrl}/${idGrupo}/solicitudes`,
+        { params: { page, size: TAMANO_PAGINA_MAXIMO } },
+      ),
+    );
   }
 
   // Solicitudes que envió el estudiante, para la sección "Mis solicitudes".
   listarMisSolicitudes(idEstudiante: number) {
-    return this.http
-      .get<PaginaGrupos<MiSolicitudResponse>>(`${this.gruposUrl}/solicitudes`, {
-        params: { idEstudiante, size: TAMANO_PAGINA_MAXIMO },
-      })
-      .pipe(map((r) => r.content));
+    return todasLasPaginas<MiSolicitudResponse>((page) =>
+      this.http.get<PaginaGrupos<MiSolicitudResponse>>(`${this.gruposUrl}/solicitudes`, {
+        params: { page, size: TAMANO_PAGINA_MAXIMO },
+      }),
+    );
   }
 
   solicitarUnirse(idGrupo: number, idEstudiante: number) {

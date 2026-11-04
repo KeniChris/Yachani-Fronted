@@ -1,51 +1,52 @@
-import { Component, Input, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatIconModule } from '@angular/material/icon';
-import {
-  GrupoEstudioService,
-  idGrupoDesdeSlug,
-} from '../../core/services/grupo-estudio.service';
-import { GrupoEstudioResponse } from '../../core/models/grupo-estudio.models';
-
+import { Component, computed, inject } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, startWith } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { ContextoGrupoService } from '../../core/services/contexto-grupo.service';
 @Component({
   selector: 'app-grupo-layout',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, MatTabsModule, MatIconModule],
+  providers: [ContextoGrupoService],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, MatButtonModule, MatMenuModule],
   templateUrl: './grupo-layout.html',
   styleUrl: './grupo-layout.css',
 })
 export class GrupoLayout {
-  // Grupo activo según el parámetro de ruta :grupoId (slug). Conectado a la API real:
-  // GET /api/grupos/{idGrupo}. La app es zoneless: el estado que cambia tras una respuesta
-  // HTTP tiene que ser signal(), si no la cabecera no se refresca.
-  private readonly grupoResponse = signal<GrupoEstudioResponse | null>(null);
-  @Input() set grupoId(valor: string) {
-    const idGrupo = idGrupoDesdeSlug(valor);
-    if (idGrupo === null) {
-      this.grupoResponse.set(null);
-      return;
-    }
-    this.api.obtenerGrupo(idGrupo).subscribe({
-      next: (grupo) => this.grupoResponse.set(grupo),
-      error: () => this.grupoResponse.set(null),
-    });
-  }
-  get grupo() {
-    const g = this.grupoResponse();
-    return {
-      nombre: g?.nombre ?? 'Grupo de estudio',
-      detalle: g ? `${g.metodoEstudio} · ${g.integrantesActuales} de ${g.capacidadMaxima} integrantes` : '',
-    };
-  }
-  readonly tabs = [
-    { label: 'Chat', path: 'chat', icon: 'forum' },
-    { label: 'Temas y materiales', path: 'recursos', icon: 'folder' },
-    { label: 'Sesiones', path: 'sesiones', icon: 'calendar_month' },
-    { label: 'Avisos', path: 'avisos', icon: 'campaign' },
-    { label: 'Flashcards', path: 'flashcards', icon: 'style' },
-    { label: 'Integrantes', path: 'integrantes', icon: 'groups' },
-    { label: 'Solicitudes', path: 'solicitudes', icon: 'person_add' },
+  readonly contexto = inject(ContextoGrupoService);
+  private readonly router = inject(Router);
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => this.router.url),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
+  private readonly secciones = [
+    { label: 'Chat', path: 'chat' },
+    { label: 'Temas y materiales', path: 'recursos' },
+    { label: 'Sesiones', path: 'sesiones' },
+    { label: 'Avisos', path: 'avisos' },
+    { label: 'Flashcards', path: 'flashcards' },
+    { label: 'Integrantes', path: 'integrantes' },
+    { label: 'Solicitudes', path: 'solicitudes' },
   ];
-  constructor(private readonly api: GrupoEstudioService) {}
+  readonly tabs = computed(() =>
+    this.secciones.filter((t) => t.path !== 'solicitudes' || this.contexto.administrador()),
+  );
+  readonly seleccion = computed(
+    () =>
+      this.tabs().find((t) => this.url().split('?')[0].split('/')[3] === t.path) ?? {
+        label: 'Configuración del grupo',
+        path: 'configuracion',
+      },
+  );
+  readonly detalle = computed(() => {
+    const g = this.contexto.grupo();
+    return g
+      ? `${g.metodoEstudio} · ${g.tipoGrupo === 'TUTOR' ? 'Tutor:' : 'Creado por:'} ${g.nombreCreador}`
+      : '';
+  });
 }

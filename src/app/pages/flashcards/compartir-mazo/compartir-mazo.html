@@ -1,102 +1,97 @@
-﻿<div class="dialog-shell">
+<div class="dialog-shell">
   <div class="dialog-heading">
-    <h2>{{ recorrido.selectedIndex === 0 ? 'Compartir un mazo' : 'Compartir en un grupo' }}</h2>
-    <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+    <h2>{{ paso() === 1 ? 'Compartir un mazo' : 'Compartir en un grupo' }}</h2>
+    <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
       <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
     </button>
   </div>
   <mat-dialog-content>
-    <mat-stepper
-      #recorrido
-      class="sharing-flow"
-      [selectedIndex]="data.elegir ? 0 : 1"
-      aria-label="Compartir mazo"
-    >
-      <mat-step>
-        <p class="intro">Elige uno de tus mazos personales o crea uno nuevo.</p>
-        <article class="deck-card">
-          <div class="deck-banner">
-            <img src="/icons/flashcards/style.svg" alt="" width="24" height="24" /><span
-              >4 tarjetas</span
+    @if (cargando()) {
+      <p role="status">Cargando tus mazos y grupos…</p>
+    }
+    @if (error()) {
+      <p role="alert">{{ error() }}</p>
+    }
+    @if (!cargando() && paso() === 1) {
+      <p class="intro">Elige uno de tus mazos personales con tarjetas o crea uno nuevo.</p>
+      <mat-form-field appearance="outline"
+        ><mat-label>Mazo</mat-label
+        ><mat-select [value]="seleccionado()" (selectionChange)="seleccionado.set($event.value)">
+          @for (m of mazos(); track m.idMazo) {
+            <mat-option [value]="m.idMazo"
+              >{{ m.titulo }} · {{ m.cantidadTarjetas }} tarjetas</mat-option
             >
-          </div>
-          <h3>
-            {{ data.contexto === 'estudiantes' ? 'Conceptos de UML' : 'Fórmulas de derivadas' }}
-          </h3>
-          <p>Reglas y ejemplos para tu próximo repaso.</p>
-          <small>Creado por ti · Publicado</small><small>3 de 4 revisadas · 75 %</small
-          ><mat-progress-bar mode="determinate" [value]="75" aria-label="75 % revisado" /><a
-            mat-stroked-button
-            mat-dialog-close
-            [routerLink]="['/flashcards', data.contexto === 'estudiantes' ? 'uml' : 'formulas']"
-            [queryParams]="{ rol: data.rol, contexto: data.contexto }"
-            >Ver mazo</a
-          >
-        </article>
-        <div class="actions">
-          <a
-            mat-stroked-button
-            mat-dialog-close
-            routerLink="/flashcards/crear"
-            [queryParams]="{ rol: data.rol }"
-            >Crear uno nuevo</a
-          ><button mat-flat-button matStepperNext>Elegir este mazo</button>
-        </div>
-      </mat-step>
-      <mat-step>
-        <p class="intro">
-          {{
-            data.titulo ||
-              (data.contexto === 'estudiantes' ? 'Conceptos de UML' : 'Fórmulas de derivadas')
-          }}
-          · 4 tarjetas
-        </p>
+          }
+        </mat-select></mat-form-field
+      >
+      @if (!mazos().length) {
+        <p>Todavía no tienes mazos con tarjetas para compartir.</p>
+      }
+      <div class="actions">
+        <a mat-stroked-button mat-dialog-close routerLink="/flashcards/crear">Crear uno nuevo</a
+        ><button mat-flat-button [disabled]="!mazo()" (click)="paso.set(2)">
+          Elegir este mazo
+        </button>
+      </div>
+    }
+    @if (!cargando() && paso() === 2) {
+      @if (mazo(); as m) {
+        <p class="intro">{{ m.titulo }} · {{ m.cantidadTarjetas }} tarjetas</p>
         <ol class="steps" aria-label="Creación del mazo">
           <li><span>1</span>Datos del mazo</li>
           <li><span>2</span>Tarjetas</li>
           <li class="current" aria-current="step"><span>3</span>Compartir</li>
         </ol>
-        <div class="mobile-step"><span class="badge">Paso 3 de 3</span> Compartir</div>
-        <form class="form-panel" [formGroup]="form">
+        <div class="mobile-step"><span class="badge">Paso 3 de 3</span>Compartir</div>
+        <form class="form-panel" [formGroup]="form" (ngSubmit)="guardar()">
           <mat-form-field appearance="outline"
             ><mat-label>Grupo</mat-label
-            ><mat-select formControlName="grupo" required
-              ><mat-option value="demo">{{
-                data.contexto === 'estudiantes'
-                  ? 'Ingeniería de Software: repasos'
-                  : 'Dominando Cálculo'
-              }}</mat-option></mat-select
-            ><mat-hint>Solo los grupos en los que puedes publicar recursos.</mat-hint>
-            @if (form.controls.grupo.touched && form.controls.grupo.invalid) {
-              <mat-error>Elige un grupo.</mat-error>
-            }
-          </mat-form-field>
-          <mat-form-field appearance="outline"
+            ><mat-select formControlName="grupo" required>
+              @for (g of grupos(); track g.idGrupo) {
+                <mat-option [value]="g.idGrupo">{{ g.nombre }}</mat-option>
+              }</mat-select
+            ><mat-hint>Solo los grupos en los que puedes publicar recursos.</mat-hint
+            ><mat-error>Elige un grupo.</mat-error></mat-form-field
+          ><mat-form-field appearance="outline"
             ><mat-label>Tema del grupo</mat-label
             ><mat-select formControlName="tema" required>
-              @for (
-                tema of data.contexto === 'estudiantes' ? temasEstudiantes : temas;
-                track tema
-              ) {
-                <mat-option [value]="tema">{{ tema }}</mat-option>
+              @for (t of temas(); track t.idTema) {
+                <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
               }</mat-select
-            ><mat-hint>El tema debe pertenecer al grupo elegido.</mat-hint>
-            @if (form.controls.tema.touched && form.controls.tema.invalid) {
-              <mat-error>Selecciona un tema para publicar.</mat-error>
-            }
-          </mat-form-field>
+            ><mat-hint>El tema debe pertenecer al grupo elegido.</mat-hint
+            ><mat-error>Selecciona un tema.</mat-error></mat-form-field
+          >
+          @if (cargandoTemas()) {
+            <p role="status">Cargando temas…</p>
+          }
+          @if (errorTemas()) {
+            <p role="alert">{{ errorTemas() }}</p>
+          }
+          @if (form.controls.grupo.value && !cargandoTemas() && !errorTemas() && !temas().length) {
+            <p>El grupo todavía no tiene temas. Debe crearse uno antes de compartir el mazo.</p>
+          }
+          @if (!grupos().length) {
+            <p>No tienes grupos con permiso para publicar.</p>
+          }
           <small
             >Se comparte el mismo mazo. Los cambios del autor se reflejan donde esté
             publicado.</small
           >
           <div class="actions">
-            <button type="button" mat-stroked-button mat-dialog-close>Cancelar</button
-            ><button type="button" mat-flat-button [disabled]="form.invalid" mat-dialog-close>
-              Compartir mazo
+            <button type="button" mat-stroked-button mat-dialog-close [disabled]="guardando()">
+              Cancelar</button
+            ><button
+              type="submit"
+              mat-flat-button
+              [disabled]="form.invalid || guardando() || cargandoTemas()"
+            >
+              {{ guardando() ? 'Compartiendo…' : 'Compartir mazo' }}
             </button>
           </div>
         </form>
-      </mat-step>
-    </mat-stepper>
+      } @else {
+        <p>El mazo no está disponible o todavía no tiene tarjetas.</p>
+      }
+    }
   </mat-dialog-content>
 </div>
