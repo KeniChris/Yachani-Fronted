@@ -163,6 +163,15 @@ mat-icon img {
 }
 .topbar-profile .identity {
   width: 150px;
+  overflow: hidden;
+}
+/* Un nombre largo se salía de la caja y estiraba la página: de ahí la barra de
+   desplazamiento horizontal. Se recorta con puntos suspensivos. */
+.topbar-profile .user-name,
+.topbar-profile .user-role {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .topbar-profile .user-role {
   color: var(--color-muted);

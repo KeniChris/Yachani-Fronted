@@ -1,0 +1,49 @@
+@for (recordatorio of recordatorios; track recordatorio.sesion.idSesion) {
+  <aside
+    class="reminder"
+    [class.en-curso]="recordatorio.enCurso"
+    role="status"
+    aria-live="polite"
+  >
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+      {{ recordatorio.enCurso ? "play_circle" : "alarm" }}
+    </mat-icon>
+    <div class="reminder-copy">
+      <p class="reminder-title">
+        {{ recordatorio.enCurso ? "Tu sesión está en curso" : recordatorio.texto }}
+      </p>
+      <p>
+        <strong>{{ recordatorio.sesion.tema }}</strong>
+        @if (mostrarGrupo) {
+          · {{ recordatorio.sesion.nombreGrupo }}
+        }
+      </p>
+      <p class="help">
+        {{ recordatorio.sesion.fechaHoraInicio | date: "HH:mm" }} ·
+        {{ recordatorio.sesion.duracionMinutos }} minutos
+        @if (recordatorio.sesion.lugar) {
+          · {{ recordatorio.sesion.lugar }}
+        }
+      </p>
+    </div>
+    <div class="reminder-actions">
+      @if (esEnlace(recordatorio.sesion.lugar)) {
+        <a
+          mat-flat-button
+          [href]="recordatorio.sesion.lugar"
+          target="_blank"
+          rel="noopener"
+          [attr.aria-label]="'Unirse a ' + recordatorio.sesion.tema"
+          >Unirse</a
+        >
+      }
+      <a
+        mat-stroked-button
+        [routerLink]="['/grupos', recordatorio.sesion.idGrupo, 'sesiones']"
+        [queryParams]="{ vista: 'detalle', idSesion: recordatorio.sesion.idSesion }"
+        queryParamsHandling="merge"
+        >Ver sesión</a
+      >
+    </div>
+  </aside>
+}

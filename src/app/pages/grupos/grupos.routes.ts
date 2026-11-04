@@ -31,8 +31,12 @@ export const routes: Routes = [
     path: 'crear-con-ia',
     loadComponent: () => import('./gestion/crear-con-ia').then((m) => m.CrearConIa),
   },
-  // Figma no tiene una pantalla global de solicitudes: se abre la del grupo de ejemplo.
-  { path: 'solicitudes', pathMatch: 'full', redirectTo: 'dominando-calculo/solicitudes' },
+  // Las solicitudes de ingreso de TODOS mis grupos, fuera del layout de un grupo:
+  // cada tarjeta dice a qué grupo pertenece.
+  {
+    path: 'solicitudes',
+    loadComponent: () => import('./solicitudes/solicitudes').then((m) => m.Solicitudes),
+  },
   {
     path: ':grupoId',
     loadComponent: () =>
@@ -56,10 +60,8 @@ export const routes: Routes = [
         path: 'integrantes',
         loadComponent: () => import('./integrantes/integrantes').then((m) => m.Integrantes),
       },
-      {
-        path: 'solicitudes',
-        loadComponent: () => import('./solicitudes/solicitudes').then((m) => m.Solicitudes),
-      },
+      // Los enlaces antiguos a las solicitudes de un grupo llevan a la lista general.
+      { path: 'solicitudes', pathMatch: 'full', redirectTo: '/grupos/solicitudes' },
       { path: 'avisos', loadComponent: () => import('./avisos/avisos').then((m) => m.Avisos) },
       {
         path: 'configuracion',

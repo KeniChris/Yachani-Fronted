@@ -158,6 +158,9 @@
     }
   </header>
 
+  <!-- Aviso antes de comenzar: aparece en los 60 min previos, como el recordatorio. -->
+  <app-recordatorio-sesion [sesiones]="sesiones()" />
+
   @if (aviso.clave()) {
     <div
       class="notice success temporal"

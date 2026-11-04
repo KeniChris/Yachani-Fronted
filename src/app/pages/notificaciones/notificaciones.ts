@@ -5,11 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NotificacionService } from '../../core/services/notificacion.service';
 import {
+  NotificacionResponse,
   NotificacionSesionResponse,
-  NotificacionSolicitudResponse,
   NotificacionVista,
 } from '../../core/models/notificacion.models';
 import { SesionUsuarioService } from '../../core/services/sesion-usuario.service';
+import { crearAvisoTemporal } from '../../core/services/aviso-temporal';
 
 @Component({
   selector: 'app-notificaciones',
@@ -28,12 +29,14 @@ export class Notificaciones implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal(false);
   readonly lista = signal<NotificacionVista[]>([]);
-  readonly avisoLeida = signal(false);
+  // El conteo lo da el backend (GET /notificaciones/no-leidas/conteo), no la página
+  // cargada: así cuadra aunque haya más notificaciones de las que caben en una página.
+  readonly sinLeer = signal(0);
+  // Confirmaciones que se desvanecen a los 3 s ('una' | 'todas').
+  readonly aviso = crearAvisoTemporal();
+  readonly marcando = signal(false);
   get idUsuario() {
     return this.sesion.idUsuario(this.rol);
-  }
-  get sinLeer() {
-    return this.lista().filter((n) => !n.leida).length;
   }
   get recordatorio() {
     return this.lista().find((n) => n.clave === `sesion-${this.idNotificacion}`)?.sesion ?? null;
@@ -48,14 +51,14 @@ export class Notificaciones implements OnInit {
   cargar() {
     this.cargando.set(true);
     this.error.set(false);
-    const idUsuario = this.idUsuario;
-    this.api.listarDeSolicitudes(idUsuario).subscribe({
-      next: (solicitudes) => {
-        this.combinar(solicitudes, null);
-        // Las de sesión son solo para estudiantes: si el usuario es tutor el backend
-        // responde con error y la lista se queda con las de solicitudes.
-        this.api.listarDeSesiones(idUsuario).subscribe({
-          next: (sesiones) => this.combinar(solicitudes, sesiones),
+    this.api.listar().subscribe({
+      next: (bandeja) => {
+        this.combinar(bandeja, null);
+        // Los datos del encuentro (fecha, hora, lugar) solo están en la ruta antigua de
+        // sesiones, y es solo para estudiantes: si el usuario es tutor el backend
+        // responde con error y la lista se queda con la bandeja general.
+        this.api.listarDeSesiones(this.idUsuario).subscribe({
+          next: (sesiones) => this.combinar(bandeja, sesiones),
           error: () => this.cargando.set(false),
         });
       },
@@ -64,62 +67,76 @@ export class Notificaciones implements OnInit {
         this.cargando.set(false);
       },
     });
+    this.api.contarNoLeidas().subscribe({
+      next: (cantidad) => this.sinLeer.set(cantidad),
+    });
   }
   private combinar(
-    solicitudes: NotificacionSolicitudResponse[],
+    bandeja: NotificacionResponse[],
     sesiones: NotificacionSesionResponse[] | null,
   ) {
-    const deSolicitudes: NotificacionVista[] = solicitudes.map((n) => ({
-      clave: `solicitud-${n.idNotificacion}`,
+    // El backend ya manda título y ruta listos, así que la pantalla no los inventa.
+    const generales: NotificacionVista[] = bandeja.map((n) => ({
+      clave: `bandeja-${n.idNotificacion}`,
       idNotificacion: n.idNotificacion,
-      titulo: this.tituloSolicitud(n.tipo),
+      titulo: n.titulo,
       texto: n.mensaje,
       fecha: n.fechaCreacion,
-      accion: n.tipo === 'SOLICITUD_RECHAZADA' ? 'Explorar' : 'Ver grupo',
-      enlace: this.enlaceSolicitud(n),
+      accion: this.accion(n),
+      enlace: n.ruta,
       leida: n.leida,
       marcable: true,
       sesion: null,
     }));
-    const deSesiones: NotificacionVista[] = (sesiones ?? []).map((n) => ({
-      clave: `sesion-${n.idNotificacion}`,
-      idNotificacion: n.idNotificacion,
-      titulo: n.titulo,
-      texto: `${n.tema} · ${n.grupo}`,
-      fecha: n.fechaCreacion,
-      accion: 'Ver sesión',
-      enlace: ['/notificaciones'],
-      leida: true,
-      marcable: false,
-      sesion: n,
-    }));
+    // Las de la ruta de sesiones que ya están en la bandeja general no se repiten.
+    const yaEstan = new Set(bandeja.map((n) => n.idSesion).filter((id) => id !== null));
+    const deSesiones: NotificacionVista[] = (sesiones ?? [])
+      .filter((n) => !yaEstan.has(n.idSesion))
+      .map((n) => ({
+        clave: `sesion-${n.idNotificacion}`,
+        idNotificacion: n.idNotificacion,
+        titulo: n.titulo,
+        texto: `${n.tema} · ${n.grupo}`,
+        fecha: n.fechaCreacion,
+        accion: 'Ver sesión',
+        enlace: '/notificaciones',
+        leida: true,
+        marcable: false,
+        sesion: n,
+      }));
     this.lista.set(
-      [...deSolicitudes, ...deSesiones].sort((a, b) => b.fecha.localeCompare(a.fecha)),
+      [...generales, ...deSesiones].sort((a, b) => b.fecha.localeCompare(a.fecha)),
     );
     this.cargando.set(false);
   }
-  private tituloSolicitud(tipo: string): string {
-    if (tipo === 'SOLICITUD_RECIBIDA') return 'Nueva solicitud de ingreso';
-    if (tipo === 'SOLICITUD_ACEPTADA') return 'Solicitud aceptada';
-    if (tipo === 'SOLICITUD_RECHAZADA') return 'Solicitud rechazada';
-    return 'Notificación';
-  }
-  private enlaceSolicitud(n: NotificacionSolicitudResponse): unknown[] {
-    if (n.tipo === 'SOLICITUD_RECHAZADA' || n.idGrupo === null) {
-      return ['/grupos/descubrimiento'];
-    }
-    // Al creador le interesa la bandeja de solicitudes; al estudiante, el grupo.
-    return n.tipo === 'SOLICITUD_RECIBIDA'
-      ? ['/grupos', n.idGrupo, 'solicitudes']
-      : ['/grupos', n.idGrupo];
+  private accion(n: NotificacionResponse): string {
+    if (n.tipo === 'SOLICITUD_RECIBIDA') return 'Ver solicitudes';
+    if (n.tipo === 'SOLICITUD_RECHAZADA' || n.idGrupo === null) return 'Explorar grupos';
+    if (n.idSesion !== null) return 'Ver sesión';
+    return 'Ver grupo';
   }
   marcarComoLeida(notificacion: NotificacionVista) {
-    if (!notificacion.marcable) return;
-    this.api.marcarComoLeida(notificacion.idNotificacion, this.idUsuario).subscribe({
+    if (!notificacion.marcable || this.marcando()) return;
+    this.marcando.set(true);
+    this.api.marcarComoLeida(notificacion.idNotificacion).subscribe({
       next: () => {
-        this.avisoLeida.set(true);
+        this.marcando.set(false);
+        this.aviso.mostrar('una');
         this.cargar();
       },
+      error: () => this.marcando.set(false),
+    });
+  }
+  marcarTodas() {
+    if (this.marcando() || this.sinLeer() === 0) return;
+    this.marcando.set(true);
+    this.api.marcarTodasComoLeidas().subscribe({
+      next: () => {
+        this.marcando.set(false);
+        this.aviso.mostrar('todas');
+        this.cargar();
+      },
+      error: () => this.marcando.set(false),
     });
   }
 }

@@ -3,13 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  NotificacionResponse,
   NotificacionSesionResponse,
-  NotificacionSolicitudResponse,
 } from '../models/notificacion.models';
 import { PaginaGrupos, TAMANO_PAGINA_MAXIMO } from '../models/pagina.models';
 
-// El backend tiene dos fuentes de notificaciones: las de solicitudes de grupo
-// (/notificaciones) y las de sesiones (/estudiantes/{id}/notificaciones).
+// El backend tiene dos fuentes: la bandeja general paginada (/notificaciones) y la ruta
+// antigua de sesiones (/estudiantes/{id}/notificaciones), que es la única con los datos
+// del encuentro. No se envía idUsuario: el token identifica a quien consulta, y mandar
+// el de otra persona responde 403.
 @Injectable({
   providedIn: 'root',
 })
@@ -17,20 +19,31 @@ export class NotificacionService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  listarDeSolicitudes(idUsuario: number) {
+  listar() {
     return this.http
-      .get<PaginaGrupos<NotificacionSolicitudResponse>>(`${this.apiUrl}/notificaciones`, {
-        params: { idUsuario, size: TAMANO_PAGINA_MAXIMO },
+      .get<PaginaGrupos<NotificacionResponse>>(`${this.apiUrl}/notificaciones`, {
+        params: { size: TAMANO_PAGINA_MAXIMO, sort: 'fechaCreacion,desc' },
       })
-      .pipe(map((r) => r.content));
+      .pipe(map((pagina) => pagina.content));
   }
 
-  marcarComoLeida(idNotificacion: number, idUsuario: number) {
-    return this.http.patch<NotificacionSolicitudResponse>(
+  contarNoLeidas() {
+    return this.http
+      .get<{ cantidad: number }>(`${this.apiUrl}/notificaciones/no-leidas/conteo`)
+      .pipe(map((r) => r.cantidad));
+  }
+
+  marcarComoLeida(idNotificacion: number) {
+    return this.http.patch<NotificacionResponse>(
       `${this.apiUrl}/notificaciones/${idNotificacion}/leida`,
       {},
-      { params: { idUsuario } },
     );
+  }
+
+  marcarTodasComoLeidas() {
+    return this.http
+      .patch<{ actualizadas: number }>(`${this.apiUrl}/notificaciones/leidas`, {})
+      .pipe(map((r) => r.actualizadas));
   }
 
   listarDeSesiones(idEstudiante: number) {

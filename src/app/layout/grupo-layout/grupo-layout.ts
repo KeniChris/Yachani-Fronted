@@ -45,7 +45,6 @@ export class GrupoLayout {
     { label: 'Avisos', path: 'avisos', icon: 'campaign' },
     { label: 'Flashcards', path: 'flashcards', icon: 'style' },
     { label: 'Integrantes', path: 'integrantes', icon: 'groups' },
-    { label: 'Solicitudes', path: 'solicitudes', icon: 'person_add' },
   ];
   constructor(private readonly api: GrupoEstudioService) {}
 }
