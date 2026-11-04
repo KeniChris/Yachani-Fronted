@@ -1071,6 +1071,9 @@ app-home {
   .hero-action-hint {
     margin-top: 12px;
   }
+  .video-controls > img {
+    transform: rotate(90deg);
+  }
   .testimonials .panel {
     display: flex;
     flex-direction: column;
