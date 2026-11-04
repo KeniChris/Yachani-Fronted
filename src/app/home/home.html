@@ -71,14 +71,16 @@
           >
             <mat-button-toggle value="estudiante"
               ><picture
-                ><source media="(max-width: 767px)" srcset="/landing/mobile-student.svg" />
-                <img src="/landing/student.svg" alt="" /></picture
+                ><img
+                  [src]="tutor ? '/landing/mobile-student.svg' : '/landing/student.svg'"
+                  alt="" /></picture
               >Estudiante</mat-button-toggle
             >
             <mat-button-toggle value="tutor"
               ><picture
-                ><source media="(max-width: 767px)" srcset="/landing/mobile-tutor.svg" />
-                <img src="/landing/tutor.svg" alt="" /></picture
+                ><img
+                  [src]="tutor ? '/landing/mobile-tutor.svg' : '/landing/tutor.svg'"
+                  alt="" /></picture
               >Estudiante tutor</mat-button-toggle
             >
           </mat-button-toggle-group>

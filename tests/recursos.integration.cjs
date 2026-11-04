@@ -77,7 +77,8 @@ async function ir(page, path) {
 }
 async function seleccionar(page, label, opcion) {
   const dialog = page.getByRole('dialog');
-  const root = (await dialog.count()) ? dialog : page;
+  await ver(dialog);
+  const root = dialog;
   await root.getByRole('combobox', { name: label, exact: true }).click();
   await page.getByRole('option', { name: opcion, exact: true }).click();
 }
@@ -379,6 +380,14 @@ for (const [nombre, viewport] of [
     async (t) => {
       const { page } = await sesion(t, {}, viewport);
       await ir(page, '/');
+      await ver(page.getByRole('heading', { name: /Aprende a tu ritmo/ }));
+      await page.getByText('Estudiante tutor', { exact: true }).click();
+      await ver(page.getByRole('heading', { name: /Enseña a tu ritmo/ }));
+      await page.screenshot({
+        path: `test-results/Home-${nombre === 'móvil' ? 'movil' : 'escritorio'}-tutor.png`,
+        fullPage: true,
+      });
+      await page.locator('mat-button-toggle[value="estudiante"]').click();
       await ver(page.getByRole('heading', { name: /Aprende a tu ritmo/ }));
       assert.equal(await page.locator('.testimonials .panel').count(), 3);
       await ver(page.getByText('Videotutorial · Próximamente', { exact: true }));
