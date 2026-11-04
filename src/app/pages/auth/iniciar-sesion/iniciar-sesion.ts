@@ -17,17 +17,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  finalize,
-  map,
-  Observable,
-  switchMap,
-  throwError,
-  timer,
-} from 'rxjs';
+import { finalize, timer } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
-import { PerfilEstudianteService } from '../../../core/services/perfil-estudiante.service';
-import { PerfilTutorService } from '../../../core/services/perfil-tutor.service';
 import {
   LoginRequest,
   UsuarioResponse,
@@ -49,8 +40,6 @@ import {
 })
 export class IniciarSesion {
   private readonly authService = inject(AuthService);
-  private readonly perfilEstudiante = inject(PerfilEstudianteService);
-  private readonly perfilTutor = inject(PerfilTutorService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -88,6 +77,12 @@ export class IniciarSesion {
     }
 
     this.errorLogin.set('');
+
+    const correo = this.form.controls.correo.value
+      .trim()
+      .toLowerCase();
+
+    this.form.controls.correo.setValue(correo);
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
@@ -97,29 +92,30 @@ export class IniciarSesion {
     const valores = this.form.getRawValue();
 
     const datos: LoginRequest = {
-      correo: valores.correo.trim().toLowerCase(),
+      correo: valores.correo,
       contrasena: valores.contrasena,
     };
-
-    let credencialesVerificadas = false;
 
     this.cargando.set(true);
 
     this.authService
       .iniciarSesion(datos)
       .pipe(
-        switchMap((usuario) => {
-          credencialesVerificadas = true;
-
-          return this.obtenerDestino(usuario).pipe(
-            map((destino) => ({ usuario, destino })),
-          );
-        }),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.cargando.set(false)),
       )
       .subscribe({
-        next: ({ usuario, destino }) => {
+        next: (usuario) => {
+          const destino = this.obtenerDestino(usuario);
+
+          if (!destino) {
+            this.authService.cerrarSesion();
+            this.errorLogin.set(
+              'No pudimos identificar el tipo de usuario de tu cuenta.',
+            );
+            return;
+          }
+
           this.form.reset();
           this.mostrarContrasena = false;
           this.usuarioValidado.set(usuario);
@@ -132,13 +128,6 @@ export class IniciarSesion {
             });
         },
         error: (error: unknown) => {
-          if (credencialesVerificadas) {
-            this.errorLogin.set(
-              'Tus credenciales son correctas, pero no pudimos consultar tu perfil. Vuelve a intentarlo.',
-            );
-            return;
-          }
-
           if (error instanceof HttpErrorResponse) {
             if (error.status === 401) {
               this.errorLogin.set(
@@ -162,49 +151,19 @@ export class IniciarSesion {
       });
   }
 
-  private obtenerDestino(usuario: UsuarioResponse): Observable<string> {
+  private obtenerDestino(usuario: UsuarioResponse): string | null {
     if (usuario.tipoUsuario === 'ESTUDIANTE') {
-      return this.perfilEstudiante
-        .consultarPerfil(usuario.idUsuario)
-        .pipe(
-          map((perfil) => {
-            const cursos = perfil.conocimientos ?? [];
-
-            const completo =
-              !!perfil.universidad?.trim() &&
-              !!perfil.carrera?.trim() &&
-              !!perfil.modalidadPreferida?.trim() &&
-              !!perfil.metodoPreferido?.trim() &&
-              cursos.length > 0 &&
-              cursos.every(
-                (curso) => !!curso.curso?.trim() && !!curso.nivel?.trim(),
-              );
-
-            return completo
-              ? '/inicio?rol=estudiante'
-              : '/configuracion-inicial/estudiante';
-          }),
-        );
+      return usuario.configuracionCompletada
+        ? '/inicio?rol=estudiante'
+        : '/configuracion-inicial/estudiante';
     }
 
     if (usuario.tipoUsuario === 'TUTOR') {
-      return this.perfilTutor
-        .consultarPerfil(usuario.idUsuario)
-        .pipe(
-          map((perfil) => {
-            const completo =
-              !!perfil.presentacion?.trim() &&
-              !!perfil.metodoEnsenanza?.trim();
-
-            return completo
-              ? '/inicio?rol=tutor'
-              : '/configuracion-inicial/tutor';
-          }),
-        );
+      return usuario.configuracionCompletada
+        ? '/inicio?rol=tutor'
+        : '/configuracion-inicial/tutor';
     }
 
-    return throwError(
-      () => new Error('Tipo de usuario no reconocido'),
-    );
+    return null;
   }
 }
