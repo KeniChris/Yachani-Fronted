@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   CrearGrupoRequest,
@@ -10,6 +11,7 @@ import {
   SolicitudPendienteResponse,
   SolicitudResponse,
 } from '../models/grupo-estudio.models';
+import { PaginaGrupos, TAMANO_PAGINA_MAXIMO } from '../models/pagina.models';
 
 // idGrupo=1 ("Dominando Cálculo") es el grupo sembrado en la base de ejemplo.
 export const ID_GRUPO_DEMO = 1;
@@ -39,7 +41,11 @@ export class GrupoEstudioService {
   }
 
   listarMisGrupos(idUsuario: number) {
-    return this.http.get<GrupoEstudioResponse[]>(this.gruposUrl, { params: { idUsuario } });
+    return this.http
+      .get<PaginaGrupos<GrupoEstudioResponse>>(this.gruposUrl, {
+        params: { idUsuario, size: TAMANO_PAGINA_MAXIMO },
+      })
+      .pipe(map((r) => r.content));
   }
 
   obtenerGrupo(idGrupo: number) {
@@ -47,9 +53,11 @@ export class GrupoEstudioService {
   }
 
   buscarGrupos(query: string) {
-    return this.http.get<GrupoEstudioResponse[]>(`${this.gruposUrl}/buscar`, {
-      params: { query },
-    });
+    return this.http
+      .get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/buscar`, {
+        params: { query, size: TAMANO_PAGINA_MAXIMO },
+      })
+      .pipe(map((r) => r.content));
   }
 
   // IMPORTANTE: 'curso' y 'metodoEstudio' se envían siempre, aunque 'curso' vaya vacío.
@@ -57,9 +65,10 @@ export class GrupoEstudioService {
   // ("function lower(bytea) does not exist"): Postgres no puede inferir el tipo del
   // parámetro nulo en lower(?). Con 'curso' vacío el LIKE '%%' actúa como "cualquiera".
   filtrarGrupos(filtros: FiltrarGruposParams) {
-    const params: Record<string, string> = {
+    const params: Record<string, string | number> = {
       curso: filtros.curso ?? '',
       metodoEstudio: filtros.metodoEstudio ?? '',
+      size: TAMANO_PAGINA_MAXIMO,
     };
 
     if (filtros.cantidadIntegrantes !== undefined) {
@@ -70,7 +79,9 @@ export class GrupoEstudioService {
       params['tipoGrupo'] = filtros.tipoGrupo;
     }
 
-    return this.http.get<GrupoEstudioResponse[]>(`${this.gruposUrl}/filtrar`, { params });
+    return this.http
+      .get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/filtrar`, { params })
+      .pipe(map((r) => r.content));
   }
 
   actualizarCapacidad(idGrupo: number, nuevaCapacidad: number) {
@@ -100,14 +111,20 @@ export class GrupoEstudioService {
   }
 
   listarSolicitudes(idGrupo: number) {
-    return this.http.get<SolicitudPendienteResponse[]>(`${this.gruposUrl}/${idGrupo}/solicitudes`);
+    return this.http
+      .get<PaginaGrupos<SolicitudPendienteResponse>>(`${this.gruposUrl}/${idGrupo}/solicitudes`, {
+        params: { size: TAMANO_PAGINA_MAXIMO },
+      })
+      .pipe(map((r) => r.content));
   }
 
   // Solicitudes que envió el estudiante, para la sección "Mis solicitudes".
   listarMisSolicitudes(idEstudiante: number) {
-    return this.http.get<MiSolicitudResponse[]>(`${this.gruposUrl}/solicitudes`, {
-      params: { idEstudiante },
-    });
+    return this.http
+      .get<PaginaGrupos<MiSolicitudResponse>>(`${this.gruposUrl}/solicitudes`, {
+        params: { idEstudiante, size: TAMANO_PAGINA_MAXIMO },
+      })
+      .pipe(map((r) => r.content));
   }
 
   solicitarUnirse(idGrupo: number, idEstudiante: number) {

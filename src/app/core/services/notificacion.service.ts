@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   NotificacionSesionResponse,
   NotificacionSolicitudResponse,
 } from '../models/notificacion.models';
+import { PaginaGrupos, TAMANO_PAGINA_MAXIMO } from '../models/pagina.models';
 
 // El backend tiene dos fuentes de notificaciones: las de solicitudes de grupo
 // (/notificaciones) y las de sesiones (/estudiantes/{id}/notificaciones).
@@ -16,9 +18,11 @@ export class NotificacionService {
   private readonly apiUrl = environment.apiUrl;
 
   listarDeSolicitudes(idUsuario: number) {
-    return this.http.get<NotificacionSolicitudResponse[]>(`${this.apiUrl}/notificaciones`, {
-      params: { idUsuario },
-    });
+    return this.http
+      .get<PaginaGrupos<NotificacionSolicitudResponse>>(`${this.apiUrl}/notificaciones`, {
+        params: { idUsuario, size: TAMANO_PAGINA_MAXIMO },
+      })
+      .pipe(map((r) => r.content));
   }
 
   marcarComoLeida(idNotificacion: number, idUsuario: number) {
