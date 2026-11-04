@@ -1,216 +1,175 @@
-﻿@let mazo =
-  mazoId === 'integrales'
-    ? mazos.integrales
-    : mazoId === 'limites'
-      ? mazos.limites
-      : mazoId === 'uml'
-        ? mazos.uml
-        : mazos.formulas;
-<header class="page-heading">
-  <div>
-    <h1>{{ mazo.titulo }}</h1>
-    <p>
-      {{
-        cardEditor.expanded ? 'Agrega preguntas y respuestas a tu mazo personal.' : mazo.descripcion
-      }}
-    </p>
-  </div>
-  @if (!cardEditor.expanded) {
-    <a mat-flat-button [routerLink]="['datos']" queryParamsHandling="preserve">Editar datos</a>
+@if (cargando()) {
+  <p role="status">Cargando mazo…</p>
+}
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+  @if (!detalle()) {
+    <button mat-button (click)="cargar()">Reintentar</button>
   }
-</header>
-@if (cardEditor.expanded) {
-  <ol class="steps" aria-label="Creación del mazo">
-    <li><span>1</span>Datos del mazo</li>
-    <li class="current" aria-current="step"><span>2</span>Tarjetas</li>
-    <li><span>3</span>Compartir</li>
-  </ol>
-  <div class="mobile-step"><span class="badge">Paso 2 de 3</span> Tarjetas</div>
-} @else {
+}
+@if (exito()) {
+  <p role="status">{{ exito() }}</p>
+}
+@if (mazo(); as m) {
+  <header class="page-heading">
+    <div>
+      <h1>{{ m.titulo }}</h1>
+      <p>{{ m.descripcion }}</p>
+    </div>
+    <a mat-flat-button [routerLink]="['/flashcards', id(), 'datos']">Editar datos</a>
+  </header>
   <div class="badges">
-    <span class="badge" [class.success]="mazoId !== 'integrales'">{{
-      mazoId === 'integrales' ? 'Borrador' : 'Publicado'
+    <span class="badge" [class.success]="m.estado === 'PUBLICADO'">{{
+      m.estado === 'PUBLICADO' ? 'Publicado' : 'Borrador'
     }}</span
-    ><span class="badge"
-      >{{ mazoId === 'integrales' ? '0' : mazoId === 'limites' ? '12' : '4' }} tarjetas</span
-    >
+    ><span class="badge">{{ tarjetas().length }} tarjetas</span>
   </div>
   <div class="actions deck-actions">
-    <button
-      mat-stroked-button
-      (click)="
-        form.reset({ tarjeta: null, pregunta: '¿Cuál es la derivada de x²?', respuesta: '2x' });
-        cardEditor.open()
-      "
-    >
-      {{ mazoId === 'integrales' ? 'Agregar tarjetas' : 'Agregar tarjeta' }}
-    </button>
-    @if (mazoId !== 'integrales') {
-      <a mat-flat-button routerLink="repaso" queryParamsHandling="preserve">Practicar</a>
+    <button mat-stroked-button (click)="editar()">Agregar tarjeta</button>
+    @if (tarjetas().length) {
+      <a mat-flat-button [routerLink]="['/flashcards', id(), 'repaso']">Practicar</a>
     }
-    <button
-      mat-stroked-button
-      [disabled]="mazoId === 'integrales'"
-      (click)="
-        dialog.open(compartirMazo, {
-          width: '600px',
-          maxWidth: 'calc(100vw - 32px)',
-          data: { titulo: mazo.titulo, contexto: contexto, rol: rol },
-        })
-      "
-    >
+    <button mat-stroked-button [disabled]="!tarjetas().length" (click)="compartir()">
       Compartir en un grupo
     </button>
-    @if (mazoId !== 'integrales') {
-      <button
-        mat-button
-        (click)="
-          dialog.open(retirarDialog, {
-            width: '600px',
-            maxWidth: 'calc(100vw - 32px)',
-            data: mazo.titulo,
-          })
-        "
-      >
-        Retirar publicación
-      </button>
+    @if (m.estado === 'PUBLICADO') {
+      <button mat-button (click)="abrir(retirarDialog)">Retirar publicación</button>
     }
   </div>
-  @if (mazoId !== 'integrales') {
+  @if (m.estado === 'PUBLICADO') {
     <a
       class="publication-link"
       mat-stroked-button
-      routerLink="publicaciones"
-      queryParamsHandling="preserve"
+      [routerLink]="['/flashcards', id(), 'publicaciones']"
       >Ver dónde se comparte</a
     >
   }
-}
-<mat-expansion-panel #cardEditor class="card-editor" [expanded]="editor === 'agregar'">
-  <form class="panel form-panel" [formGroup]="form">
-    <mat-form-field appearance="outline"
-      ><mat-label>Pregunta</mat-label
-      ><textarea matInput formControlName="pregunta" required rows="4" maxlength="1000"></textarea
-      ><mat-hint>Hasta 1000 caracteres.</mat-hint>
-      @if (form.controls.pregunta.touched && form.controls.pregunta.invalid) {
-        <mat-error>Ingresa la pregunta.</mat-error>
-      }
-    </mat-form-field>
-    <mat-form-field appearance="outline"
-      ><mat-label>Respuesta</mat-label
-      ><textarea matInput formControlName="respuesta" required rows="4" maxlength="1000"></textarea
-      ><mat-hint>Hasta 1000 caracteres.</mat-hint>
-      @if (form.controls.respuesta.touched && form.controls.respuesta.invalid) {
-        <mat-error>Ingresa la respuesta.</mat-error>
-      }
-    </mat-form-field>
-    <div class="actions">
-      <a mat-stroked-button routerLink="/flashcards" queryParamsHandling="preserve"
-        >Volver a mis mazos</a
-      ><button mat-flat-button type="button" [disabled]="form.invalid" (click)="cardEditor.close()">
-        {{ form.controls.tarjeta.value ? 'Guardar tarjeta' : 'Agregar tarjeta' }}
-      </button>
-    </div>
-  </form>
-</mat-expansion-panel>
-@if (cardEditor.expanded) {
-  <button
-    class="publication-link"
-    mat-stroked-button
-    [disabled]="mazoId === 'integrales'"
-    (click)="
-      dialog.open(compartirMazo, {
-        width: '600px',
-        maxWidth: 'calc(100vw - 32px)',
-        data: { titulo: mazo.titulo, contexto: contexto, rol: rol },
-      })
-    "
+  <mat-expansion-panel
+    class="card-editor"
+    [expanded]="editorAbierto()"
+    (closed)="editorAbierto.set(false)"
+    ><form class="panel form-panel" [formGroup]="form" (ngSubmit)="guardar()">
+      <mat-form-field appearance="outline"
+        ><mat-label>Pregunta</mat-label
+        ><textarea matInput formControlName="pregunta" required rows="4" maxlength="1000"></textarea
+        ><mat-hint>Hasta 1000 caracteres.</mat-hint
+        ><mat-error>Ingresa una pregunta de hasta 1000 caracteres.</mat-error></mat-form-field
+      ><mat-form-field appearance="outline"
+        ><mat-label>Respuesta</mat-label
+        ><textarea
+          matInput
+          formControlName="respuesta"
+          required
+          rows="4"
+          maxlength="1000"
+        ></textarea
+        ><mat-hint>Hasta 1000 caracteres.</mat-hint
+        ><mat-error>Ingresa una respuesta de hasta 1000 caracteres.</mat-error></mat-form-field
+      >
+      <div class="actions">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="editorAbierto.set(false)"
+          [disabled]="guardando()"
+        >
+          Cancelar edición</button
+        ><button mat-flat-button type="submit" [disabled]="form.invalid || guardando()">
+          {{
+            guardando()
+              ? 'Guardando…'
+              : form.controls.tarjeta.value
+                ? 'Guardar tarjeta'
+                : 'Agregar tarjeta'
+          }}
+        </button>
+      </div>
+    </form></mat-expansion-panel
   >
-    Compartir en un grupo
-  </button>
-}
-@if (mazoId === 'integrales') {
-  @if (!cardEditor.expanded) {
+  @if (!tarjetas().length && !editorAbierto()) {
     <section class="panel empty-state">
       <h2>Agrega tu primera tarjeta</h2>
       <p>Escribe una pregunta y su respuesta para continuar.</p>
-      <button mat-flat-button (click)="cardEditor.open()">Agregar tarjeta</button>
+      <button mat-flat-button (click)="editar()">Agregar tarjeta</button>
     </section>
   }
-} @else {
-  <section class="panel cards-panel" [class.editing]="cardEditor.expanded">
-    <h2>Tarjetas</h2>
-    @for (tarjeta of tarjetas; track tarjeta.numero) {
-      <article class="study-card">
-        <div class="card-heading">
-          <span>Tarjeta {{ tarjeta.numero }}</span
-          ><button
-            mat-icon-button
-            [attr.aria-label]="'Editar tarjeta ' + tarjeta.numero"
-            (click)="
-              form.setValue({
-                tarjeta: tarjeta.numero,
-                pregunta: tarjeta.pregunta,
-                respuesta: tarjeta.respuesta,
-              });
-              cardEditor.open()
-            "
-          >
-            <img src="/icons/flashcards/edit.svg" alt="" width="24" height="24" /></button
-          ><button
-            mat-icon-button
-            [attr.aria-label]="'Eliminar tarjeta ' + tarjeta.numero"
-            (click)="
-              dialog.open(eliminarDialog, {
-                width: '600px',
-                maxWidth: 'calc(100vw - 32px)',
-                data: tarjeta.pregunta,
-              })
-            "
-          >
-            <img src="/icons/flashcards/delete.svg" alt="" width="24" height="24" />
-          </button>
-        </div>
-        <p>{{ tarjeta.pregunta }}</p>
-        <p class="answer">{{ tarjeta.respuesta }}</p>
-      </article>
-    }
-  </section>
+  @if (tarjetas().length) {
+    <section class="panel cards-panel" [class.editing]="editorAbierto()">
+      <h2>Tarjetas</h2>
+      @if (ultimaPublicada()) {
+        <p>Para eliminar la última tarjeta, retira primero la publicación.</p>
+      }
+      @for (t of tarjetas(); track t.idTarjeta) {
+        <article class="study-card">
+          <div class="card-heading">
+            <span>Tarjeta {{ $index + 1 }}</span
+            ><button
+              mat-icon-button
+              [disabled]="guardando()"
+              [attr.aria-label]="'Editar tarjeta ' + ($index + 1)"
+              (click)="editar(t)"
+            >
+              <img src="/icons/flashcards/edit.svg" alt="" width="24" height="24" /></button
+            ><button
+              mat-icon-button
+              [disabled]="guardando() || ultimaPublicada()"
+              [attr.aria-label]="'Eliminar tarjeta ' + ($index + 1)"
+              (click)="abrir(eliminarDialog, t)"
+            >
+              <img src="/icons/flashcards/delete.svg" alt="" width="24" height="24" />
+            </button>
+          </div>
+          <p>{{ t.pregunta }}</p>
+          <p class="answer">{{ t.respuesta }}</p>
+        </article>
+      }
+    </section>
+  }
 }
-<ng-template #eliminarDialog let-pregunta
+<a mat-stroked-button routerLink="/flashcards">Volver a mis mazos</a>
+<ng-template #eliminarDialog let-t let-ref="dialogRef"
   ><div class="dialog-shell">
     <div class="dialog-heading">
       <h2>¿Eliminar esta tarjeta?</h2>
-      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+      <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
         <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
       </button>
     </div>
     <mat-dialog-content
       ><p>La tarjeta dejará de aparecer en el mazo.</p>
-      <p>{{ pregunta }}</p></mat-dialog-content
+      <p>{{ t.pregunta }}</p>
+      @if (errorDialogo()) {
+        <p role="alert">{{ errorDialogo() }}</p>
+      }</mat-dialog-content
     ><mat-dialog-actions
-      ><button mat-stroked-button mat-dialog-close>Conservar tarjeta</button
-      ><button mat-flat-button class="danger" mat-dialog-close>
+      ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">
+        Conservar tarjeta</button
+      ><button mat-flat-button class="danger" [disabled]="guardando()" (click)="eliminar(t, ref)">
         Eliminar tarjeta
       </button></mat-dialog-actions
     >
   </div></ng-template
 >
-<ng-template #retirarDialog let-titulo
+<ng-template #retirarDialog let-ref="dialogRef"
   ><div class="dialog-shell">
     <div class="dialog-heading">
       <h2>¿Retirar la publicación?</h2>
-      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+      <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
         <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
       </button>
     </div>
     <mat-dialog-content
       ><p>
-        {{ titulo }} volverá a borrador y dejará de estar disponible en todos sus grupos.
-      </p></mat-dialog-content
+        {{ mazo()?.titulo }} volverá a borrador y dejará de estar disponible en todos sus grupos.
+      </p>
+      @if (errorDialogo()) {
+        <p role="alert">{{ errorDialogo() }}</p>
+      }</mat-dialog-content
     ><mat-dialog-actions
-      ><button mat-stroked-button mat-dialog-close>Cancelar</button
-      ><button mat-flat-button mat-dialog-close>Retirar publicación</button></mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
+      ><button mat-flat-button [disabled]="guardando()" (click)="retirar(ref)">
+        Retirar publicación
+      </button></mat-dialog-actions
     >
   </div></ng-template
 >

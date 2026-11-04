@@ -3,49 +3,59 @@
     <h1>Mazos del grupo</h1>
     <p>Practica con los mazos compartidos en este grupo.</p>
   </div>
-  @if (rol === 'tutor' || publicaciones !== 'tutor' || contexto === 'estudiantes') {
-    <button
-      mat-flat-button
-      (click)="
-        dialog.open(compartirMazo, {
-          width: '600px',
-          maxWidth: 'calc(100vw - 32px)',
-          data: { elegir: true, contexto: contexto, rol: rol },
-        })
-      "
-    >
-      Compartir un mazo
-    </button>
+  @if (contexto.puedePublicar()) {
+    <button mat-flat-button (click)="compartir()">Compartir un mazo</button>
   }
 </header>
-<form class="topic-filter" [formGroup]="form">
-  <mat-form-field appearance="outline"
-    ><mat-label>Tema</mat-label
-    ><mat-select formControlName="tema"
-      ><mat-option value="Todos los temas">Todos los temas</mat-option>
-      @for (tema of contexto === 'estudiantes' ? temasEstudiantes : temas; track tema) {
-        <mat-option [value]="tema">{{ tema }}</mat-option>
-      }</mat-select
-    ><mat-hint>Elige un tema para ver sus mazos.</mat-hint></mat-form-field
-  >
-</form>
+@if (contexto.error()) {
+  <p role="alert">{{ contexto.error() }}</p>
+  <button mat-button (click)="contexto.recargar()">Reintentar acceso</button>
+}
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+  <button mat-button (click)="cargar()">Reintentar</button>
+}
+<mat-form-field class="topic-filter" appearance="outline"
+  ><mat-label>Tema</mat-label
+  ><mat-select [canSelectNullableOptions]="true" [formControl]="filtro"
+    ><mat-option [value]="null">Todos los temas</mat-option>
+    @for (t of temas(); track t.idTema) {
+      <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
+    }</mat-select
+  ><mat-hint>Elige un tema para ver sus mazos.</mat-hint></mat-form-field
+>
+@if (cargando()) {
+  <p role="status">Cargando mazos y progreso…</p>
+}
 <div class="deck-grid">
-  @for (mazo of contexto === 'estudiantes' ? mazosEstudiantes : mazos; track mazo.id) {
+  @for (p of mazos(); track p.idCompartido) {
+    @let m = p.mazo;
     <article class="deck-card">
       <div class="deck-banner">
         <img src="/icons/flashcards/style.svg" width="24" height="24" alt="" /><span
-          >{{ mazo.tarjetas }} tarjetas</span
+          >{{ m.cantidadTarjetas }} tarjetas</span
         >
       </div>
-      <h2>{{ mazo.titulo }}</h2>
-      <p>{{ mazo.descripcion }}</p>
-      <small>{{ publicaciones === 'tutor' ? 'Carlos Ríos' : mazo.autor }} · {{ mazo.tema }}</small
-      ><small>{{ mazo.avance }}</small
-      ><mat-progress-bar
-        mode="determinate"
-        [value]="mazo.progreso"
-        [attr.aria-label]="'Progreso de ' + mazo.titulo"
-      /><a mat-stroked-button [routerLink]="[mazo.id]" queryParamsHandling="preserve">Ver mazo</a>
+      <h2>{{ m.titulo }}</h2>
+      <p>{{ m.descripcion }}</p>
+      <small>{{ m.autor }} · {{ p.nombreTema }}</small>
+      @if (progresos()[m.idMazo]; as avance) {
+        <small
+          >{{ avance.tarjetasVistas }} de {{ avance.totalTarjetas }} revisadas ·
+          {{ avance.porcentajeRevisado }} %</small
+        ><mat-progress-bar
+          mode="determinate"
+          [value]="avance.porcentajeRevisado"
+          [attr.aria-label]="'Progreso de ' + m.titulo"
+        />
+      } @else {
+        <small>{{ cargando() ? 'Consultando avance…' : 'Avance no disponible' }}</small>
+      }
+      <a mat-stroked-button [routerLink]="[m.idMazo]">Ver mazo</a>
     </article>
+  } @empty {
+    @if (!cargando() && !error()) {
+      <p>Todavía no hay mazos compartidos{{ filtro.value ? ' en este tema' : '' }}.</p>
+    }
   }
 </div>

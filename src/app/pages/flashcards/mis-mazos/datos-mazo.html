@@ -1,46 +1,44 @@
-﻿<header class="page-heading">
+<header class="page-heading">
   <div>
-    <h1>{{ mazoId ? 'Editar datos del mazo' : 'Crear mazo' }}</h1>
+    <h1>{{ parametro() ? 'Editar datos del mazo' : 'Crear mazo' }}</h1>
     <p>Tu mazo es personal. Podrás compartirlo en tus grupos.</p>
   </div>
 </header>
-<ol class="steps" aria-label="Creación del mazo">
-  <li class="current" aria-current="step"><span>1</span>Datos del mazo</li>
-  <li><span>2</span>Tarjetas</li>
-  <li><span>3</span>Compartir</li>
-</ol>
-<div class="mobile-step"><span class="badge">Paso 1 de 3</span> Datos del mazo</div>
-<form class="panel form-panel" [formGroup]="form">
-  <mat-form-field appearance="outline"
-    ><mat-label>Título del mazo</mat-label
-    ><input matInput formControlName="titulo" required maxlength="120" /><mat-hint
-      >Hasta 120 caracteres.</mat-hint
+@if (cargando()) {
+  <p role="status">Cargando mazo…</p>
+}
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+}
+@if (listo()) {
+  <ol class="steps" aria-label="Creación del mazo">
+    <li class="current" aria-current="step"><span>1</span>Datos del mazo</li>
+    <li><span>2</span>Tarjetas</li>
+    <li><span>3</span>Compartir</li>
+  </ol>
+  <div class="mobile-step"><span class="badge">Paso 1 de 3</span>Datos del mazo</div>
+  <form class="panel form-panel" [formGroup]="form" (ngSubmit)="guardar()">
+    <mat-form-field appearance="outline"
+      ><mat-label>Título del mazo</mat-label
+      ><input matInput formControlName="titulo" required maxlength="120" /><mat-hint
+        >Hasta 120 caracteres.</mat-hint
+      ><mat-error>Escribe un título de hasta 120 caracteres.</mat-error></mat-form-field
+    ><mat-form-field appearance="outline"
+      ><mat-label>Descripción (opcional)</mat-label
+      ><textarea matInput formControlName="descripcion" rows="4" maxlength="500"></textarea
+      ><mat-hint>Hasta 500 caracteres.</mat-hint></mat-form-field
     >
-    @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
-      <mat-error>El título es obligatorio.</mat-error>
-    }
-  </mat-form-field>
-  <mat-form-field appearance="outline"
-    ><mat-label>Descripción (opcional)</mat-label
-    ><textarea matInput formControlName="descripcion" rows="4" maxlength="500"></textarea
-    ><mat-hint>Hasta 500 caracteres.</mat-hint>
-    @if (form.controls.descripcion.touched && form.controls.descripcion.invalid) {
-      <mat-error>La descripción admite hasta 500 caracteres.</mat-error>
-    }
-  </mat-form-field>
-  <div class="actions">
-    <a
-      mat-stroked-button
-      [routerLink]="mazoId ? ['/flashcards', mazoId] : ['/flashcards']"
-      queryParamsHandling="preserve"
-      >Cancelar</a
-    ><a
-      mat-flat-button
-      [disabled]="form.invalid"
-      [routerLink]="['/flashcards', mazoId || 'formulas']"
-      [queryParams]="mazoId ? {} : { editor: 'agregar' }"
-      queryParamsHandling="merge"
-      >{{ mazoId ? 'Guardar cambios' : 'Crear y agregar tarjetas' }}</a
-    >
-  </div>
-</form>
+    <div class="actions">
+      <a
+        mat-stroked-button
+        [routerLink]="id() ? ['/flashcards', id()] : ['/flashcards']"
+        [disabled]="guardando()"
+        >Cancelar</a
+      ><button mat-flat-button type="submit" [disabled]="form.invalid || guardando()">
+        {{ guardando() ? 'Guardando…' : id() ? 'Guardar cambios' : 'Crear y agregar tarjetas' }}
+      </button>
+    </div>
+  </form>
+} @else if (!cargando()) {
+  <a mat-stroked-button routerLink="/flashcards">Volver a mis mazos</a>
+}
