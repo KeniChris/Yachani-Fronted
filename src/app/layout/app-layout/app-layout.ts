@@ -1,7 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import {  Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -31,6 +31,15 @@ import { Brand } from '../brand/brand';
 })
 export class AppLayout {
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+cerrarSesion(): void {
+  this.authService.cerrarSesion();
+
+  void this.router.navigateByUrl('/auth/iniciar-sesion', {
+    replaceUrl: true,
+  });
+}
 
 get rol(): 'estudiante' | 'tutor' {
   return this.authService.usuario()?.tipoUsuario === 'TUTOR'

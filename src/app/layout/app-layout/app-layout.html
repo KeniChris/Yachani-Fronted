@@ -184,8 +184,23 @@
       >
         <ng-container [ngTemplateOutlet]="accountIdentity" />
       </button>
+
       <mat-menu #profileMenu="matMenu">
-        <a mat-menu-item routerLink="/perfiles" queryParamsHandling="preserve">Mi perfil</a>
+        <a
+          mat-menu-item
+          routerLink="/perfiles"
+          queryParamsHandling="preserve"
+        >
+          Mi perfil
+        </a>
+
+        <button
+          mat-menu-item
+          type="button"
+          (click)="cerrarSesion()"
+        >
+          Cerrar sesión
+        </button>
       </mat-menu>
     </mat-toolbar>
 

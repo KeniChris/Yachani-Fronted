@@ -28,4 +28,11 @@ export class PerfilTutorService {
       datos,
     );
   }
+
+  guardarConfiguracion(datos: TutorPerfilRequest) {
+    return this.http.put<TutorPerfilResponse>(
+      `${environment.apiUrl}/usuarios/me/configuracion/tutor`,
+      datos,
+    );
+  }
 }

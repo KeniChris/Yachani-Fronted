@@ -203,4 +203,23 @@ export class AuthService {
       this.cerrarSesion();
     }
   }
+
+  actualizarEstadoConfiguracion(
+  idUsuario: number,
+  configuracionCompletada: boolean,
+): void {
+  const sesion = this.sesionActual();
+
+  if (!sesion || sesion.usuario.idUsuario !== idUsuario) {
+    return;
+  }
+
+  this.guardarSesion({
+    ...sesion,
+    usuario: {
+      ...sesion.usuario,
+      configuracionCompletada,
+    },
+  });
+}
 }

@@ -26,10 +26,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { concatMap, finalize, from, switchMap, tap, toArray } from 'rxjs';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { PerfilEstudianteService } from '../../../core/services/perfil-estudiante.service';
 import {
+  ConfiguracionEstudianteRequest,
   ConocimientoAcademicoResponse,
   PerfilAcademicoResponse,
 } from '../../../core/models/perfil-estudiante.models';
@@ -170,6 +171,11 @@ export class ConfiguracionEstudiante implements OnInit {
   }
 
   cargarPerfil(): void {
+    if (!this.authService.estaAutenticado()) {
+      void this.router.navigateByUrl('/auth/iniciar-sesion');
+      return;
+    }
+
     const usuario = this.authService.usuario();
 
     if (!usuario) {
@@ -255,23 +261,19 @@ export class ConfiguracionEstudiante implements OnInit {
   }
 
   agregarCurso(): void {
-    if (this.guardando()) return;
+    if (this.guardando()) {
+      return;
+    }
 
     this.cursos.push(this.crearCurso());
   }
 
   eliminarCurso(index: number): void {
-    if (this.guardando()) return;
-
-    const curso = this.cursos.at(index);
-
-    if (curso.controls.idConocimiento.value !== null) {
-      this.errorGuardado.set(
-        'Este curso ya está guardado. El backend actual no dispone de una operación para eliminarlo.',
-      );
+    if (this.guardando()) {
       return;
     }
 
+    // El curso se retira del backend cuando se guarda la lista completa.
     this.cursos.removeAt(index);
     this.cursos.markAsTouched();
   }
@@ -279,13 +281,17 @@ export class ConfiguracionEstudiante implements OnInit {
   siguiente(): void {
     this.academico.markAllAsTouched();
 
-    if (this.academico.invalid) return;
+    if (this.academico.invalid) {
+      return;
+    }
 
     this.paso = 2;
   }
 
   agregarTema(): void {
-    if (this.guardando()) return;
+    if (this.guardando()) {
+      return;
+    }
 
     const control = this.preferencias.controls.tema;
     control.markAsTouched();
@@ -297,7 +303,9 @@ export class ConfiguracionEstudiante implements OnInit {
 
     control.updateValueAndValidity();
 
-    if (control.invalid) return;
+    if (control.invalid) {
+      return;
+    }
 
     this.temas.push(control.value.trim());
     control.reset('');
@@ -305,7 +313,9 @@ export class ConfiguracionEstudiante implements OnInit {
   }
 
   eliminarTema(index: number): void {
-    if (this.guardando()) return;
+    if (this.guardando()) {
+      return;
+    }
 
     this.temas.splice(index, 1);
     this.preferencias.controls.tema.updateValueAndValidity();
@@ -348,7 +358,14 @@ export class ConfiguracionEstudiante implements OnInit {
 
     this.preferencias.markAllAsTouched();
 
-    if (this.preferencias.invalid) return;
+    if (this.preferencias.invalid) {
+      return;
+    }
+
+    if (!this.authService.estaAutenticado()) {
+      void this.router.navigateByUrl('/auth/iniciar-sesion');
+      return;
+    }
 
     const usuario = this.authService.usuario();
 
@@ -357,17 +374,16 @@ export class ConfiguracionEstudiante implements OnInit {
       return;
     }
 
-    const idUsuario = usuario.idUsuario;
     const academico = this.academico.getRawValue();
     const preferencias = this.preferencias.getRawValue();
 
-    // Captura las filas para conservar sus identificadores al guardar.
-    const filas = this.cursos.controls.map((formulario) => ({
-      formulario,
-      valores: formulario.getRawValue(),
-    }));
-
-    const datosPreferencias = {
+    const datos: ConfiguracionEstudianteRequest = {
+      universidad: academico.universidad.trim(),
+      carrera: academico.carrera.trim(),
+      conocimientos: academico.cursos.map((curso) => ({
+        curso: curso.nombre.trim(),
+        nivel: curso.nivel,
+      })),
       modalidadPreferida: preferencias.modalidad,
       metodoPreferido: preferencias.metodo,
       temasInteres: [...this.temas],
@@ -377,64 +393,9 @@ export class ConfiguracionEstudiante implements OnInit {
     this.academico.disable();
     this.preferencias.disable();
 
-    // Consulta primero los cursos existentes para evitar duplicados
-    // si una petición anterior llegó al servidor pero se perdió su respuesta.
     this.perfilService
-      .consultarPerfil(idUsuario)
+      .guardarConfiguracion(datos)
       .pipe(
-        switchMap((perfil) =>
-          this.perfilService
-            .guardarAcademico(idUsuario, {
-              universidad: academico.universidad.trim(),
-              carrera: academico.carrera.trim(),
-            })
-            .pipe(
-              switchMap(() =>
-                from(filas).pipe(
-                  concatMap(({ formulario, valores }) => {
-                    const existente = perfil.conocimientos.find(
-                      (curso) =>
-                        this.normalizar(curso.curso) ===
-                        this.normalizar(valores.nombre),
-                    );
-
-                    const idConocimiento =
-                      valores.idConocimiento ??
-                      existente?.idConocimiento;
-
-                    const datos = {
-                      curso: valores.nombre.trim(),
-                      nivel: valores.nivel,
-                    };
-
-                    const peticion =
-                      idConocimiento != null
-                        ? this.perfilService.actualizarCurso(
-                            idUsuario,
-                            idConocimiento,
-                            datos,
-                          )
-                        : this.perfilService.registrarCurso(idUsuario, datos);
-
-                    return peticion.pipe(
-                      tap((curso) => {
-                        formulario.controls.idConocimiento.setValue(
-                          curso.idConocimiento,
-                        );
-                      }),
-                    );
-                  }),
-                  toArray(),
-                ),
-              ),
-            ),
-        ),
-        switchMap(() =>
-          this.perfilService.guardarPreferencias(
-            idUsuario,
-            datosPreferencias,
-          ),
-        ),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.academico.enable();
@@ -443,16 +404,29 @@ export class ConfiguracionEstudiante implements OnInit {
         }),
       )
       .subscribe({
-        next: () => {
+        next: (perfil) => {
+          this.rellenarPerfil(perfil);
+
+          this.authService.actualizarEstadoConfiguracion(
+            perfil.idUsuario,
+            perfil.configuracionCompletada,
+          );
+
+          if (!perfil.configuracionCompletada) {
+            this.errorGuardado.set(
+              'El servidor aún indica que tu configuración está incompleta. Revisa los datos requeridos.',
+            );
+            return;
+          }
+
           this.guardado.set(true);
         },
         error: (error: HttpErrorResponse) => {
           this.errorGuardado.set(
             this.mensajeError(
               error,
-              'No pudimos completar el guardado.',
-            ) +
-              ' Algunos datos pueden haberse guardado. Puedes volver a intentarlo.',
+              'No pudimos completar el guardado. Vuelve a intentarlo.',
+            ),
           );
         },
       });

@@ -56,6 +56,8 @@ export class ConfiguracionTutor implements OnInit {
   readonly guardado = signal(false);
   readonly errorGuardado = signal('');
 
+  paso: 1 | 2 = 1;
+
   readonly metodos = [
     'Visual',
     'Práctico',
@@ -64,6 +66,23 @@ export class ConfiguracionTutor implements OnInit {
     'Resolución de ejercicios',
     'Debate',
   ];
+
+  readonly academico = new FormGroup({
+    universidad: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.maxLength(120),
+        Validators.pattern(/\S/),
+      ],
+    }),
+    carrera: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.maxLength(120),
+        Validators.pattern(/\S/),
+      ],
+    }),
+  });
 
   readonly perfil = new FormGroup({
     presentacion: new FormControl('', {
@@ -97,6 +116,11 @@ export class ConfiguracionTutor implements OnInit {
   }
 
   cargarPerfil(): void {
+    if (!this.authService.estaAutenticado()) {
+      void this.router.navigateByUrl('/auth/iniciar-sesion');
+      return;
+    }
+
     const usuario = this.authService.usuario();
 
     if (!usuario) {
@@ -120,7 +144,12 @@ export class ConfiguracionTutor implements OnInit {
       )
       .subscribe({
         next: (datos) => {
-          this.perfil.patchValue({
+          this.academico.reset({
+            universidad: datos.universidad ?? '',
+            carrera: datos.carrera ?? '',
+          });
+
+          this.perfil.reset({
             presentacion: datos.presentacion ?? '',
             metodo: datos.metodoEnsenanza ?? '',
           });
@@ -136,6 +165,20 @@ export class ConfiguracionTutor implements OnInit {
       });
   }
 
+  siguiente(): void {
+    if (this.guardando()) {
+      return;
+    }
+
+    this.academico.markAllAsTouched();
+
+    if (this.academico.invalid) {
+      return;
+    }
+
+    this.paso = 2;
+  }
+
   finalizar(): void {
     if (
       this.previsualizacion ||
@@ -148,9 +191,21 @@ export class ConfiguracionTutor implements OnInit {
     }
 
     this.errorGuardado.set('');
+    this.academico.markAllAsTouched();
+
+    if (this.academico.invalid) {
+      this.paso = 1;
+      return;
+    }
+
     this.perfil.markAllAsTouched();
 
     if (this.perfil.invalid) {
+      return;
+    }
+
+    if (!this.authService.estaAutenticado()) {
+      void this.router.navigateByUrl('/auth/iniciar-sesion');
       return;
     }
 
@@ -161,25 +216,52 @@ export class ConfiguracionTutor implements OnInit {
       return;
     }
 
+    const academico = this.academico.getRawValue();
     const valores = this.perfil.getRawValue();
 
     this.guardando.set(true);
+    this.academico.disable();
     this.perfil.disable();
 
     this.perfilService
-      .guardarPerfil(usuario.idUsuario, {
+      .guardarConfiguracion({
+        universidad: academico.universidad.trim() || null,
+        carrera: academico.carrera.trim() || null,
         presentacion: valores.presentacion.trim(),
         metodoEnsenanza: valores.metodo,
       })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
+          this.academico.enable();
           this.perfil.enable();
           this.guardando.set(false);
         }),
       )
       .subscribe({
-        next: () => {
+        next: (datos) => {
+          this.academico.patchValue({
+            universidad: datos.universidad ?? '',
+            carrera: datos.carrera ?? '',
+          });
+
+          this.perfil.patchValue({
+            presentacion: datos.presentacion ?? '',
+            metodo: datos.metodoEnsenanza ?? '',
+          });
+
+          this.authService.actualizarEstadoConfiguracion(
+            datos.idUsuario,
+            datos.configuracionCompletada,
+          );
+
+          if (!datos.configuracionCompletada) {
+            this.errorGuardado.set(
+              'El servidor aún indica que tu configuración está incompleta. Revisa tu presentación y método de enseñanza.',
+            );
+            return;
+          }
+
           this.guardado.set(true);
         },
         error: (error: HttpErrorResponse) => {
