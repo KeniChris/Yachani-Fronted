@@ -26,7 +26,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { PerfilEstudianteService } from '../../../../core/services/perfil-estudiante.service';
-import { PerfilAcademicoResponse } from '../../../../core/models/perfil-estudiante.models';
+import {
+  ConocimientoAcademicoResponse,
+  PerfilAcademicoResponse,
+} from '../../../../core/models/perfil-estudiante.models';
 import { crearAvisoTemporal } from '../../../../core/services/aviso-temporal';
 
 @Component({
@@ -61,6 +64,8 @@ export class MiPerfil implements OnInit {
   readonly guardando = signal(false);
   readonly errorGuardado = signal('');
   readonly avisoGuardado = crearAvisoTemporal();
+  // Curso que se está editando en el diálogo "Editar curso".
+  private idCursoEditando: number | null = null;
 
   get usuario() {
     return this.authService.usuario();
@@ -198,6 +203,100 @@ export class MiPerfil implements OnInit {
       modalidad: datos?.modalidadPreferida ?? '',
       temas: (datos?.temasInteres ?? []).join(', '),
     });
+  }
+
+  prepararAgregarCurso(): void {
+    this.errorGuardado.set('');
+    this.agregarCursoForm.reset();
+  }
+
+  prepararEditarCurso(curso: ConocimientoAcademicoResponse): void {
+    this.errorGuardado.set('');
+    this.idCursoEditando = curso.idConocimiento;
+    this.editarCursoForm.reset({
+      curso: curso.curso,
+      nivel: curso.nivel,
+    });
+  }
+
+  agregarCurso(): void {
+    const usuario = this.authService.usuario();
+
+    if (!usuario || this.agregarCursoForm.invalid || this.guardando()) {
+      return;
+    }
+
+    const { curso, nivel } = this.agregarCursoForm.getRawValue();
+
+    this.guardando.set(true);
+    this.errorGuardado.set('');
+
+    this.perfilService
+      .registrarCurso(usuario.idUsuario, { curso: curso.trim(), nivel })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.guardando.set(false)),
+      )
+      .subscribe({
+        next: (nuevo) => {
+          this.perfil.update((datos) =>
+            datos
+              ? { ...datos, conocimientos: [...datos.conocimientos, nuevo] }
+              : datos,
+          );
+          this.dialog.closeAll();
+          this.avisoGuardado.mostrar();
+        },
+        error: (error: HttpErrorResponse) => this.mostrarErrorGuardado(error),
+      });
+  }
+
+  guardarCurso(): void {
+    const usuario = this.authService.usuario();
+    const idConocimiento = this.idCursoEditando;
+
+    if (
+      !usuario ||
+      idConocimiento === null ||
+      this.editarCursoForm.invalid ||
+      this.guardando()
+    ) {
+      return;
+    }
+
+    const { curso, nivel } = this.editarCursoForm.getRawValue();
+
+    this.guardando.set(true);
+    this.errorGuardado.set('');
+
+    this.perfilService
+      .actualizarCurso(usuario.idUsuario, idConocimiento, {
+        curso: curso.trim(),
+        nivel,
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.guardando.set(false)),
+      )
+      .subscribe({
+        next: (actualizado) => {
+          this.perfil.update((datos) =>
+            datos
+              ? {
+                  ...datos,
+                  conocimientos: datos.conocimientos.map((c) =>
+                    c.idConocimiento === actualizado.idConocimiento
+                      ? actualizado
+                      : c,
+                  ),
+                }
+              : datos,
+          );
+          this.dialog.closeAll();
+          this.avisoGuardado.mostrar();
+        },
+        error: (error: HttpErrorResponse) => this.mostrarErrorGuardado(error),
+      });
   }
 
   guardarAcademico(): void {
