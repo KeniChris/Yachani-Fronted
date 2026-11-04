@@ -19,5 +19,18 @@ export interface UsuarioResponse {
   apellidos: string;
   correo: string;
   tipoUsuario: TipoUsuario;
-  mensaje: string;
+  mensaje: string | null;
+  configuracionCompletada: boolean;
+}
+
+export interface LoginResponse extends UsuarioResponse {
+  accessToken: string;
+  tokenType: string;
+  expiresIn: number;
+}
+
+export interface SesionGuardada {
+  usuario: UsuarioResponse;
+  accessToken: string;
+  venceEn: number;
 }

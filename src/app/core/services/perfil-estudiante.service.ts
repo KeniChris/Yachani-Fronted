@@ -2,12 +2,15 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import {
+  ConfiguracionEstudianteRequest,
   ConocimientoAcademicoRequest,
   ConocimientoAcademicoResponse,
   PerfilAcademicoRequest,
   PerfilAcademicoResponse,
   PreferenciasEstudioRequest,
 } from '../models/perfil-estudiante.models';
+
+
 
 @Injectable({
   providedIn: 'root',
@@ -65,4 +68,11 @@ export class PerfilEstudianteService {
       datos,
     );
   }
+
+  guardarConfiguracion(datos: ConfiguracionEstudianteRequest) {
+  return this.http.put<PerfilAcademicoResponse>(
+    `${environment.apiUrl}/usuarios/me/configuracion/estudiante`,
+    datos,
+  );
+}
 }

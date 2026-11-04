@@ -31,4 +31,14 @@ export interface PerfilAcademicoResponse {
   metodoPreferido: string | null;
   temasInteres: string[];
   conocimientos: ConocimientoAcademicoResponse[];
+  configuracionCompletada: boolean;
+}
+
+export interface ConfiguracionEstudianteRequest {
+  universidad: string;
+  carrera: string;
+  conocimientos: ConocimientoAcademicoRequest[];
+  modalidadPreferida: string;
+  metodoPreferido: string;
+  temasInteres: string[];
 }

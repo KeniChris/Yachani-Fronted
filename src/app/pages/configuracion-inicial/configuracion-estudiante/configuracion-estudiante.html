@@ -279,10 +279,7 @@
                     class="delete-course"
                     type="button"
                     [attr.aria-label]="'Eliminar curso ' + (i + 1)"
-                    [disabled]="
-                      guardando() ||
-                      curso.controls.idConocimiento.value !== null
-                    "
+                    [disabled]="guardando()"
                     (click)="eliminarCurso(i)"
                   >
                     <mat-icon

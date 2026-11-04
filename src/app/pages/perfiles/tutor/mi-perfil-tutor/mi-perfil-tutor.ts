@@ -99,6 +99,10 @@ export class MiPerfilTutor implements OnInit {
   }
 
   cargarPerfil(): void {
+    if (!this.authService.estaAutenticado()) {
+  void this.router.navigateByUrl('/auth/iniciar-sesion');
+  return;
+}
     const usuario = this.authService.usuario();
 
     if (!usuario) {
