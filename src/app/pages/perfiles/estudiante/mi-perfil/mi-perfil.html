@@ -3,6 +3,17 @@
   <p>Mantén tu información clara y actualizada.</p>
 </header>
 
+@if (avisoGuardado.clave()) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="avisoGuardado.desvaneciendo()"
+    role="status"
+  >
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+    <p>Cambios guardados.</p>
+  </div>
+}
+
 @if (cargando()) {
   <p role="status">Cargando tu perfil…</p>
 } @else if (errorCarga()) {
@@ -63,6 +74,7 @@
             class="card-action"
             type="button"
             (click)="
+              prepararAcademico();
               dialog.open(academicoDialog, {
                 width: '600px',
                 maxWidth: 'calc(100vw - 32px)'
@@ -88,10 +100,7 @@
                 type="button"
                 [attr.aria-label]="'Editar ' + curso.curso"
                 (click)="
-                  editarCursoForm.reset({
-                    curso: curso.curso,
-                    nivel: curso.nivel
-                  });
+                  prepararEditarCurso(curso);
                   dialog.open(editarCursoDialog, {
                     width: '600px',
                     maxWidth: 'calc(100vw - 32px)'
@@ -115,7 +124,7 @@
             class="card-action"
             type="button"
             (click)="
-              agregarCursoForm.reset();
+              prepararAgregarCurso();
               dialog.open(agregarCursoDialog, {
                 width: '600px',
                 maxWidth: 'calc(100vw - 32px)'
@@ -152,6 +161,7 @@
             class="card-action"
             type="button"
             (click)="
+              prepararPreferencias();
               dialog.open(preferenciasDialog, {
                 width: '600px',
                 maxWidth: 'calc(100vw - 32px)'
@@ -309,18 +319,27 @@
           <mat-error>Ingresa tu carrera.</mat-error>
         </mat-form-field>
       </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
     </mat-dialog-content>
 
     <mat-dialog-actions>
       <button mat-stroked-button mat-dialog-close>Cancelar</button>
-      <a
+      <button
         mat-flat-button
-        mat-dialog-close
-        routerLink="/perfiles"
-        [disabled]="academicoForm.invalid"
+        type="button"
+        [disabled]="academicoForm.invalid || guardando()"
+        (click)="guardarAcademico()"
       >
         Guardar cambios
-      </a>
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>
@@ -368,18 +387,27 @@
           <mat-hint>Separa tus temas con comas.</mat-hint>
         </mat-form-field>
       </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
     </mat-dialog-content>
 
     <mat-dialog-actions>
       <button mat-stroked-button mat-dialog-close>Cancelar</button>
-      <a
+      <button
         mat-flat-button
-        mat-dialog-close
-        routerLink="/perfiles"
-        [disabled]="preferenciasForm.invalid"
+        type="button"
+        [disabled]="preferenciasForm.invalid || guardando()"
+        (click)="guardarPreferencias()"
       >
         Guardar cambios
-      </a>
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>
@@ -416,18 +444,27 @@
           <mat-error>Selecciona un nivel.</mat-error>
         </mat-form-field>
       </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
     </mat-dialog-content>
 
     <mat-dialog-actions>
       <button mat-stroked-button mat-dialog-close>Cancelar</button>
-      <a
+      <button
         mat-flat-button
-        mat-dialog-close
-        routerLink="/perfiles"
-        [disabled]="agregarCursoForm.invalid"
+        type="button"
+        [disabled]="agregarCursoForm.invalid || guardando()"
+        (click)="agregarCurso()"
       >
         Agregar curso
-      </a>
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>
@@ -464,18 +501,27 @@
           <mat-error>Selecciona un nivel.</mat-error>
         </mat-form-field>
       </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
     </mat-dialog-content>
 
     <mat-dialog-actions>
       <button mat-stroked-button mat-dialog-close>Cancelar</button>
-      <a
+      <button
         mat-flat-button
-        mat-dialog-close
-        routerLink="/perfiles"
-        [disabled]="editarCursoForm.invalid"
+        type="button"
+        [disabled]="editarCursoForm.invalid || guardando()"
+        (click)="guardarCurso()"
       >
         Guardar cambios
-      </a>
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>
