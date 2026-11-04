@@ -145,11 +145,15 @@ export class Sesiones implements OnInit {
     const hora = f.hora!;
     const inicio = new Date(fecha);
     inicio.setHours(hora.getHours(), hora.getMinutes(), 0, 0);
+    // Hora local sin "Z" (p. ej. 2026-11-15T19:00:00): el backend la interpreta en America/Lima.
+    const dos = (n: number) => String(n).padStart(2, '0');
+    const fechaHoraInicio =
+      `${inicio.getFullYear()}-${dos(inicio.getMonth() + 1)}-${dos(inicio.getDate())}` +
+      `T${dos(inicio.getHours())}:${dos(inicio.getMinutes())}:00`;
     return {
-      idTutor: this.idUsuario,
       tema: f.tema,
       descripcion: f.descripcion,
-      fechaHoraInicio: inicio.toISOString(),
+      fechaHoraInicio,
       duracionMinutos: f.duracion!,
       lugar: f.lugar,
     };
@@ -184,7 +188,7 @@ export class Sesiones implements OnInit {
   }
   cancelar(idSesion: number) {
     this.errorAccion.set('');
-    this.api.cancelarSesion(this.idGrupo, idSesion, this.idUsuario).subscribe({
+    this.api.cancelarSesion(this.idGrupo, idSesion).subscribe({
       next: () => {
         this.cargar();
         this.vistaSignal.set('');
