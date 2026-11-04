@@ -35,7 +35,10 @@
   }
   <mat-form-field class="filter" appearance="outline"
     ><mat-label>Tema</mat-label
-    ><mat-select [value]="idTema()" (selectionChange)="filtrar($event.value)"
+    ><mat-select
+      [canSelectNullableOptions]="true"
+      [value]="idTema()"
+      (selectionChange)="filtrar($event.value)"
       ><mat-option [value]="null">Todos los temas</mat-option>
       @for (t of temas(); track t.idTema) {
         <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
@@ -96,6 +99,10 @@
   @if (idTema()) {
     <section class="deck-panel">
       <h2>Flashcards de este tema</h2>
+      @if (errorMazos()) {
+        <p role="alert">{{ errorMazos() }}</p>
+        <button mat-button (click)="cargar()">Reintentar flashcards</button>
+      }
       @for (p of mazos(); track p.idCompartido) {
         <div>
           <mat-icon fontSet="material-symbols-rounded">style</mat-icon
@@ -109,7 +116,9 @@
           >
         </div>
       } @empty {
-        <p>Todavía no hay mazos compartidos en este tema.</p>
+        @if (!errorMazos() && !cargando()) {
+          <p>Todavía no hay mazos compartidos en este tema.</p>
+        }
       }
     </section>
   }
@@ -126,7 +135,7 @@
       ><p>Comparte archivos para estudiar con tu grupo.</p>
       <mat-form-field appearance="outline"
         ><mat-label>Tema (opcional)</mat-label
-        ><mat-select [formControl]="temaSubida"
+        ><mat-select [canSelectNullableOptions]="true" [formControl]="temaSubida"
           ><mat-option [value]="null">Sin tema</mat-option>
           @for (t of temas(); track t.idTema) {
             <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
@@ -172,7 +181,13 @@
     ><mat-dialog-actions
       ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
       ><button mat-flat-button [disabled]="!!errorArchivos() || guardando()" (click)="subir(ref)">
-        {{ guardando() ? 'Publicando…' : 'Publicar ' + archivos().length + ' archivos' }}
+        {{
+          guardando()
+            ? 'Publicando…'
+            : archivos().length === 1
+              ? 'Publicar archivo'
+              : 'Publicar ' + archivos().length + ' archivos'
+        }}
       </button></mat-dialog-actions
     >
   </div></ng-template
@@ -225,7 +240,7 @@
       ><p>{{ m.nombreArchivo }}</p>
       <mat-form-field appearance="outline"
         ><mat-label>Tema</mat-label
-        ><mat-select [formControl]="temaCambio"
+        ><mat-select [canSelectNullableOptions]="true" [formControl]="temaCambio"
           ><mat-option [value]="null">Sin tema</mat-option>
           @for (t of temas(); track t.idTema) {
             <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>

@@ -36,6 +36,10 @@ async function sesion(t, opciones = {}, viewport = { width: 1440, height: 1000 }
   page.on('pageerror', (e) => errores.push(e.message));
   t.after(async () => {
     const nombre = t.name.replace(/[^a-zA-Z0-9]/g, '-').slice(0, 80);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(
+      () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+    );
     await page.screenshot({ path: `test-results/${nombre}.png`, fullPage: true }).catch(() => {});
     const geometria = await page
       .evaluate(() => ({
@@ -51,6 +55,7 @@ async function sesion(t, opciones = {}, viewport = { width: 1440, height: 1000 }
           .map((i) => ({
             src: i.currentSrc,
             natural: [i.naturalWidth, i.naturalHeight],
+            css: [getComputedStyle(i).width, getComputedStyle(i).height],
             rect: i.getBoundingClientRect().toJSON(),
           })),
       }))
@@ -154,16 +159,14 @@ test(
     await ir(page, '/grupos/7/recursos/materiales');
     await page.getByRole('button', { name: 'Subir materiales', exact: true }).click();
     const dialog = page.getByRole('dialog');
-    await dialog
-      .locator('input[type=file]')
-      .setInputFiles({
-        name: 'programa.exe',
-        mimeType: 'application/octet-stream',
-        buffer: Buffer.from('archivo de prueba'),
-      });
+    await dialog.locator('input[type=file]').setInputFiles({
+      name: 'programa.exe',
+      mimeType: 'application/octet-stream',
+      buffer: Buffer.from('archivo de prueba'),
+    });
     await ver(dialog.getByRole('alert'));
     assert.equal(
-      await dialog.getByRole('button', { name: 'Publicar 1 archivos', exact: true }).isDisabled(),
+      await dialog.getByRole('button', { name: 'Publicar archivo', exact: true }).isDisabled(),
       true,
     );
     assert.equal(
@@ -317,14 +320,12 @@ test(
     await page.getByRole('menuitem', { name: 'Flashcards', exact: true }).click();
     await page.waitForURL(/\/grupos\/7\/flashcards$/);
     await ver(page.getByRole('heading', { name: 'Derivadas esenciales', exact: true }));
-    const medida = await page
-      .locator('app-grupo-layout .group-card')
-      .evaluate((el) => ({
-        ancho: el.getBoundingClientRect().width,
-        imgs: [...el.querySelectorAll('img')]
-          .filter((i) => i.getBoundingClientRect().width)
-          .map((i) => ({ width: i.width, height: i.height, naturalWidth: i.naturalWidth })),
-      }));
+    const medida = await page.locator('app-grupo-layout .group-card').evaluate((el) => ({
+      ancho: el.getBoundingClientRect().width,
+      imgs: [...el.querySelectorAll('img')]
+        .filter((i) => i.getBoundingClientRect().width)
+        .map((i) => ({ width: i.width, height: i.height, naturalWidth: i.naturalWidth })),
+    }));
     assert.ok(medida.ancho <= 390);
     assert.ok(medida.imgs.every((i) => i.width === 24 && i.height === 24 && i.naturalWidth === 24));
     assert.equal(
@@ -409,3 +410,23 @@ for (const [nombre, viewport] of [
     },
   );
 }
+
+// Un fallo en las flashcards del tema no debe ocultar los archivos disponibles.
+test(
+  'Materiales: conserva los archivos cuando falla la consulta de mazos del tema',
+  { timeout: 60000 },
+  async (t) => {
+    const { s, context, page } = await sesion(t, { materiales: 1 });
+    await context.route('**/api/grupos/7/mazos?*', (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({ mensaje: 'Fallo temporal' }),
+      }),
+    );
+    await login(page, s);
+    await ir(page, '/grupos/7/recursos/materiales?idTema=21');
+    await ver(page.getByRole('button', { name: 'Opciones de Guía 1.pdf', exact: true }));
+    await ver(page.getByRole('button', { name: 'Reintentar flashcards', exact: true }));
+  },
+);

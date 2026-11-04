@@ -463,10 +463,6 @@ dd {
     font-size: 20px;
     line-height: 28px;
   }
-  .navbar .landing-brand img {
-    width: 30px;
-    height: auto;
-  }
   .navbar .login-arrow {
     margin-left: 4px;
   }

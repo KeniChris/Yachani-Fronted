@@ -18,7 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { Observable, Subscription, forkJoin, of } from 'rxjs';
+import { Observable, Subscription, catchError, forkJoin, of } from 'rxjs';
 import { ContextoGrupoService } from '../../../core/services/contexto-grupo.service';
 import { RecursosApiService } from '../../../core/services/recursos-api.service';
 import { FlashcardsApiService } from '../../../core/services/flashcards-api.service';
@@ -79,6 +79,7 @@ export class Materiales {
   readonly nombreTema = computed(
     () => this.temas().find((t) => t.idTema === this.idTema())?.nombre ?? 'Materiales del grupo',
   );
+  readonly errorMazos = signal('');
   readonly cargando = signal(false);
   readonly error = signal('');
   readonly exito = signal('');
@@ -108,10 +109,19 @@ export class Materiales {
     if (!id) return;
     this.cargando.set(true);
     this.error.set('');
+    this.errorMazos.set('');
+    this.mazos.set([]);
     this.carga = forkJoin({
       temas: this.api.temas(id),
       materiales: this.api.materiales(id, this.pagina(), this.tamano(), tema),
-      mazos: tema ? this.flash.delGrupo(id, tema) : of([] as MazoCompartidoResponse[]),
+      mazos: tema
+        ? this.flash.delGrupo(id, tema).pipe(
+            catchError((e) => {
+              this.errorMazos.set(errorApi(e));
+              return of([] as MazoCompartidoResponse[]);
+            }),
+          )
+        : of([] as MazoCompartidoResponse[]),
     })
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
