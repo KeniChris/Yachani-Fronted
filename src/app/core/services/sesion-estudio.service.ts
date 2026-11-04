@@ -25,11 +25,10 @@ export class SesionEstudioService {
     );
   }
 
-  cancelarSesion(idGrupo: number, idSesion: number, idTutor: number) {
+  cancelarSesion(idGrupo: number, idSesion: number) {
     return this.http.patch<SesionEstudioResponse>(
       `${this.gruposUrl}/${idGrupo}/sesiones/${idSesion}/cancelar`,
       {},
-      { params: { idTutor } },
     );
   }
 }
