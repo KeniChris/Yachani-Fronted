@@ -1,3 +1,35 @@
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  font: var(--font-secondary);
+}
+.notice.success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+.notice.success mat-icon {
+  color: var(--color-success);
+}
+.notice.temporal {
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
+}
+.notice.temporal.desvaneciendo {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .notice.temporal {
+    transition: none;
+  }
+}
+.profile-dialog .alert {
+  margin-top: var(--space-4);
+}
 .topics {
   display: flex;
   flex-direction: column;
