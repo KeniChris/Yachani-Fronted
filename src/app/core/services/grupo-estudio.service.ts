@@ -1,5 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { PaginaGrupos } from '../models/recursos.models';
+import { todasLasPaginas } from './paginas-api';
 import { environment } from '../../../environments/environment';
 import {
   CrearGrupoRequest,
@@ -39,7 +41,7 @@ export class GrupoEstudioService {
   }
 
   listarMisGrupos(idUsuario: number) {
-    return this.http.get<GrupoEstudioResponse[]>(this.gruposUrl, { params: { idUsuario } });
+    return todasLasPaginas<GrupoEstudioResponse>(page => this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/mis-grupos`, { params: { page, size: 100 } }));
   }
 
   obtenerGrupo(idGrupo: number) {
@@ -47,15 +49,9 @@ export class GrupoEstudioService {
   }
 
   buscarGrupos(query: string) {
-    return this.http.get<GrupoEstudioResponse[]>(`${this.gruposUrl}/buscar`, {
-      params: { query },
-    });
+    return todasLasPaginas<GrupoEstudioResponse>(page => this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/buscar`, { params: { query, page, size: 100 } }));
   }
 
-  // IMPORTANTE: 'curso' y 'metodoEstudio' se envían siempre, aunque 'curso' vaya vacío.
-  // Si cualquiera de los dos llega nulo, el backend responde 500
-  // ("function lower(bytea) does not exist"): Postgres no puede inferir el tipo del
-  // parámetro nulo en lower(?). Con 'curso' vacío el LIKE '%%' actúa como "cualquiera".
   filtrarGrupos(filtros: FiltrarGruposParams) {
     const params: Record<string, string> = {
       curso: filtros.curso ?? '',
@@ -70,7 +66,7 @@ export class GrupoEstudioService {
       params['tipoGrupo'] = filtros.tipoGrupo;
     }
 
-    return this.http.get<GrupoEstudioResponse[]>(`${this.gruposUrl}/filtrar`, { params });
+    return todasLasPaginas<GrupoEstudioResponse>(page => this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/filtrar`, { params: { ...params, page, size: 100 } }));
   }
 
   actualizarCapacidad(idGrupo: number, nuevaCapacidad: number) {
@@ -100,14 +96,12 @@ export class GrupoEstudioService {
   }
 
   listarSolicitudes(idGrupo: number) {
-    return this.http.get<SolicitudPendienteResponse[]>(`${this.gruposUrl}/${idGrupo}/solicitudes`);
+    return todasLasPaginas<SolicitudPendienteResponse>(page => this.http.get<PaginaGrupos<SolicitudPendienteResponse>>(`${this.gruposUrl}/${idGrupo}/solicitudes`, { params: { page, size: 100 } }));
   }
 
   // Solicitudes que envió el estudiante, para la sección "Mis solicitudes".
   listarMisSolicitudes(idEstudiante: number) {
-    return this.http.get<MiSolicitudResponse[]>(`${this.gruposUrl}/solicitudes`, {
-      params: { idEstudiante },
-    });
+    return todasLasPaginas<MiSolicitudResponse>(page => this.http.get<PaginaGrupos<MiSolicitudResponse>>(`${this.gruposUrl}/solicitudes`, { params: { page, size: 100 } }));
   }
 
   solicitarUnirse(idGrupo: number, idEstudiante: number) {

@@ -1,54 +1,5 @@
-<header class="page-heading">
-  <div>
-    <h1>Dónde se comparte</h1>
-    <p>{{ mazoId === 'uml' ? 'Conceptos de UML' : 'Fórmulas de derivadas' }}</p>
-  </div>
-  <button
-    mat-flat-button
-    (click)="
-      dialog.open(compartirMazo, {
-        width: '600px',
-        maxWidth: 'calc(100vw - 32px)',
-        data: { contexto: contexto, rol: rol },
-      })
-    "
-  >
-    Compartir en otro grupo
-  </button>
-</header>
-<article class="panel publication">
-  <h2>
-    {{ contexto === 'estudiantes' ? 'Ingeniería de Software: repasos' : 'Dominando Cálculo' }}
-  </h2>
-  <p>Tema: {{ contexto === 'estudiantes' ? 'Diagramas UML' : 'Reglas de derivación' }}</p>
-  <small>Compartido el 28 oct 2026</small
-  ><button
-    mat-stroked-button
-    (click)="dialog.open(retirarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
-  >
-    Retirar de este grupo
-  </button>
-</article>
-<a mat-stroked-button [routerLink]="['/flashcards', mazoId]" queryParamsHandling="preserve"
-  >Volver al mazo</a
->
-<ng-template #retirarDialog
-  ><div class="dialog-shell">
-    <div class="dialog-heading">
-      <h2>¿Retirar el mazo de este grupo?</h2>
-      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
-        <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
-      </button>
-    </div>
-    <mat-dialog-content
-      ><p>
-        {{ mazoId === 'uml' ? 'Conceptos de UML' : 'Fórmulas de derivadas' }} dejará de estar
-        disponible en
-        {{ contexto === 'estudiantes' ? 'Ingeniería de Software: repasos' : 'Dominando Cálculo' }}.
-      </p></mat-dialog-content
-    ><mat-dialog-actions
-      ><button mat-stroked-button mat-dialog-close>Cancelar</button
-      ><button mat-flat-button mat-dialog-close>Retirar de este grupo</button></mat-dialog-actions
-    >
-  </div></ng-template
->
+<header class="page-heading"><div><h1>Dónde se comparte</h1><p>{{titulo()}}</p></div><button mat-flat-button [disabled]="cargando()||!!error()" (click)="compartir()">Compartir en otro grupo</button></header>
+@if(cargando()){<p role="status">Cargando publicaciones…</p>}@if(error()){<p role="alert">{{error()}}</p><button mat-button (click)="cargar()">Reintentar</button>}@if(exito()){<p role="status">{{exito()}}</p>}
+@for(p of publicaciones();track p.idCompartido){<article class="panel publication"><h2>{{p.nombreGrupo}}</h2><p>Tema: {{p.nombreTema}}</p>@if(p.miembro){<button mat-stroked-button (click)="abrir(retirarDialog,p)">Retirar de este grupo</button>}@else{<small>Ya no perteneces al grupo. Puedes retirar la publicación de todos los grupos desde tu mazo personal.</small>}</article>}@empty{@if(!cargando()&&!error()){<p>Este mazo todavía no está compartido en ningún grupo.</p>}}
+<a mat-stroked-button [routerLink]="['/flashcards',id()]">Volver al mazo</a>
+<ng-template #retirarDialog let-p let-ref="dialogRef"><div class="dialog-shell"><div class="dialog-heading"><h2>¿Retirar el mazo de este grupo?</h2><button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo"><img src="/icons/flashcards/close.svg" alt="" width="24" height="24"></button></div><mat-dialog-content><p>{{titulo()}} dejará de estar disponible en {{p.nombreGrupo}}.</p>@if(errorDialogo()){<p role="alert">{{errorDialogo()}}</p>}</mat-dialog-content><mat-dialog-actions><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button><button mat-flat-button [disabled]="guardando()" (click)="retirar(p,ref)">Retirar de este grupo</button></mat-dialog-actions></div></ng-template>
