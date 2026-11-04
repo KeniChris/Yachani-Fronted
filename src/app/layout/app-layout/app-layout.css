@@ -270,3 +270,18 @@ main {
     border-radius: 0;
   }
 }
+
+/* Punto de notificaciones sin leer sobre la campanita. */
+.notification-link {
+  position: relative;
+}
+.notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-primary);
+}

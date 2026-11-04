@@ -167,7 +167,9 @@
         class="notification-link"
         routerLink="/notificaciones"
         queryParamsHandling="preserve"
-        aria-label="Notificaciones"
+        [attr.aria-label]="
+          sinLeer() > 0 ? 'Notificaciones, ' + sinLeer() + ' sin leer' : 'Notificaciones'
+        "
       >
         <mat-icon class="desktop-notification"
           ><img src="/icons/topbar/notifications.svg" alt="" width="24" height="24"
@@ -175,6 +177,9 @@
         <mat-icon class="mobile-notification"
           ><img src="/icons/mobile/notifications.svg" alt="" width="24" height="24"
         /></mat-icon>
+        @if (sinLeer() > 0) {
+          <span class="notification-dot" aria-hidden="true"></span>
+        }
       </a>
       <button
         type="button"
