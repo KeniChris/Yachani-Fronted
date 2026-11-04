@@ -39,38 +39,48 @@
       >Ver mis grupos</a
     >
   </header>
-  @if (grupos.length) {
+  @if (cargando()) {
+    <mat-card appearance="outlined" class="content-card empty-state">
+      <p>Cargando tus grupos…</p>
+    </mat-card>
+  } @else if (error()) {
+    <mat-card appearance="outlined" class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+      <p>No pudimos cargar tus grupos</p>
+      <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+    </mat-card>
+  } @else if (grupos().length) {
     <div class="group-grid">
-      @for (grupo of grupos; track grupo.id) {
+      @for (grupo of grupos(); track grupo.idGrupo) {
         <mat-card appearance="outlined" class="content-card">
           <div class="card-heading">
             <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
             <h3>{{ grupo.nombre }}</h3>
           </div>
-          @if (grupo.descripcion) {
-            <p class="group-description">{{ grupo.descripcion }}</p>
-          }
-          @if (grupo.responsable) {
-            <p class="group-responsible">{{ grupo.responsable }}</p>
-          }
-          @if (grupo.detalle) {
-            <p class="group-detail">{{ grupo.detalle }}</p>
-          }
-
+          <p class="group-description">{{ grupo.descripcion }}</p>
+          <p class="group-responsible">{{ responsable(grupo) }}</p>
+          <p class="group-detail">{{ detalle(grupo) }}</p>
           <a
             mat-stroked-button
             class="group-action"
-            [routerLink]="['/grupos', grupo.id]"
+            [routerLink]="['/grupos', grupo.idGrupo]"
             [queryParams]="{ rol: 'estudiante' }"
+            [attr.aria-label]="'Ver grupo ' + grupo.nombre"
             >Ver grupo</a
           >
         </mat-card>
       }
     </div>
   } @else {
-    <mat-card appearance="outlined" class="content-card empty-state"
-      ><mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
-      <p>Aún no tienes grupos</p></mat-card
-    >
+    <mat-card appearance="outlined" class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+      <p>Aún no tienes grupos</p>
+      <a mat-flat-button routerLink="/grupos/descubrimiento" queryParamsHandling="preserve"
+        >Explorar grupos</a
+      >
+      <a mat-stroked-button routerLink="/grupos/gestion" queryParamsHandling="preserve"
+        >Ver grupos</a
+      >
+    </mat-card>
   }
 </section>

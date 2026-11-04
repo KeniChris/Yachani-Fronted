@@ -1,50 +1,64 @@
 @if (vista === 'recordatorio') {
   <h1>Recordatorio de sesión</h1>
-  <section class="content-card reminder" aria-labelledby="reminder-title">
-    <h2 id="reminder-title">Tu sesión empieza pronto</h2>
-    <p class="help">Repaso de derivadas</p>
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
-    <dl>
-      <dt>Fecha y hora</dt>
-      <dd>30 oct 2026 · 19:00</dd>
-      <dt>Duración</dt>
-      <dd>60 minutos</dd>
-      <dt>Lugar o enlace</dt>
-      <dd>meet.google.com/abc-defg-hij</dd>
-    </dl>
-    <p class="help">Recibiste este recordatorio aproximadamente 60 minutos antes del encuentro.</p>
-    <a
-      mat-flat-button
-      routerLink="/grupos/dominando-calculo/sesiones"
-      [queryParams]="{ vista: 'detalle', notificaciones: null }"
-      queryParamsHandling="merge"
-      >Ver sesión</a
-    >
-    <a
-      mat-stroked-button
-      routerLink="."
-      [queryParams]="{ vista: null, notificaciones: null }"
-      queryParamsHandling="merge"
-      >Volver a notificaciones</a
-    >
-  </section>
+  @if (recordatorio; as r) {
+    <section class="content-card reminder" aria-labelledby="reminder-title">
+      <h2 id="reminder-title">{{ r.titulo }}</h2>
+      <p class="help">{{ r.tema }}</p>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+      <dl>
+        <dt>Fecha y hora</dt>
+        <dd>{{ r.fecha }} · {{ r.hora }}</dd>
+        <dt>Grupo</dt>
+        <dd>{{ r.grupo }}</dd>
+        <dt>Lugar o enlace</dt>
+        <dd>{{ r.lugar }}</dd>
+      </dl>
+      <p class="help">Recibiste este recordatorio antes del encuentro.</p>
+      <a
+        mat-flat-button
+        routerLink="/notificaciones"
+        [queryParams]="{ vista: null, idNotificacion: null }"
+        queryParamsHandling="merge"
+        >Volver a notificaciones</a
+      >
+    </section>
+  } @else {
+    <section class="content-card empty-state">
+      <p>No encontramos este recordatorio.</p>
+      <a
+        mat-flat-button
+        routerLink="/notificaciones"
+        [queryParams]="{ vista: null, idNotificacion: null }"
+        queryParamsHandling="merge"
+        >Volver a notificaciones</a
+      >
+    </section>
+  }
 } @else {
   <header class="page-heading">
     <h1>Notificaciones</h1>
     <p>Mantente al tanto de tus grupos y sesiones.</p>
   </header>
 
-  @if (notificaciones === 'vacio') {
+  @if (cargando()) {
+    <section class="content-card empty-state">
+      <p>Cargando notificaciones…</p>
+    </section>
+  } @else if (error()) {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+      <h2>No pudimos cargar tus notificaciones</h2>
+      <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+    </section>
+  } @else if (lista().length === 0) {
     <section class="content-card empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
       <h2>Estás al día</h2>
       <p>Las novedades de tus grupos y los recordatorios aparecerán aquí.</p>
-      <a mat-flat-button routerLink="/inicio" [queryParams]="{ notificaciones: null }" queryParamsHandling="merge"
-        >Volver al inicio</a
-      >
+      <a mat-flat-button routerLink="/inicio">Volver al inicio</a>
     </section>
   } @else {
-    @if (notificaciones === 'leida') {
+    @if (avisoLeida()) {
       <div class="notice success" role="status">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
         <div>
@@ -53,41 +67,37 @@
         </div>
       </div>
     }
-    <span class="badge">{{ notificaciones === 'leida' ? 1 : 2 }} sin leer</span>
+    <span class="badge">{{ sinLeer }} sin leer</span>
     <p class="help">Revisa las novedades de tus grupos y los recordatorios de sesión.</p>
     <ul class="list">
-      @for (
-        notificacion of lista[rol === 'tutor' ? 'tutor' : 'estudiante'];
-        track notificacion.texto;
-        let primera = $first
-      ) {
-        @let leida = notificacion.leida || (primera && notificaciones === 'leida');
+      @for (notificacion of lista(); track notificacion.clave) {
         <li class="content-card item">
           <div class="item-body">
             <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
             <div class="item-copy">
               <h2>{{ notificacion.titulo }}</h2>
               <p>{{ notificacion.texto }}</p>
-              <p class="help">{{ notificacion.fecha }}</p>
-              <a
-                mat-button
-                [routerLink]="notificacion.enlace"
-                [queryParams]="{ vista: notificacion.vista, notificaciones: null }"
-                queryParamsHandling="merge"
-                >{{ notificacion.accion }}</a
-              >
+              <p class="help">{{ notificacion.fecha | date: "d MMM y · HH:mm" }}</p>
+              @if (notificacion.sesion) {
+                <a
+                  mat-button
+                  routerLink="/notificaciones"
+                  [queryParams]="{ vista: 'recordatorio', idNotificacion: notificacion.idNotificacion }"
+                  queryParamsHandling="merge"
+                  >{{ notificacion.accion }}</a
+                >
+              } @else {
+                <a mat-button [routerLink]="notificacion.enlace">{{ notificacion.accion }}</a>
+              }
             </div>
           </div>
-          <span class="badge" [class.read]="leida">{{ leida ? 'Leída' : 'Sin leer' }}</span>
-          @if (!leida) {
-            <a
-              mat-button
-              class="mark"
-              routerLink="."
-              [queryParams]="{ notificaciones: 'leida' }"
-              queryParamsHandling="merge"
-              >Marcar como leída</a
-            >
+          <span class="badge" [class.read]="notificacion.leida">{{
+            notificacion.leida ? 'Leída' : 'Sin leer'
+          }}</span>
+          @if (!notificacion.leida && notificacion.marcable) {
+            <button mat-button class="mark" type="button" (click)="marcarComoLeida(notificacion)">
+              Marcar como leída
+            </button>
           }
         </li>
       }
