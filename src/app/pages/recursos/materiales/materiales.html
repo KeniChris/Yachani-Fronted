@@ -1,19 +1,267 @@
-@if(!contexto.idGrupo()){<app-seleccionar-grupo />} @else {
-<nav class="resource-tabs" aria-label="Recursos del grupo"><a mat-stroked-button routerLink="../temas">Temas</a><a mat-flat-button routerLink="../materiales" aria-current="page">Materiales</a></nav>
-@if(idTema()){<a class="breadcrumb" mat-button routerLink="../temas"><mat-icon fontSet="material-symbols-rounded">arrow_back</mat-icon>Temas / {{nombreTema()}}</a>}
-<div class="page-heading"><div><h1>{{nombreTema()}}</h1><p>Encuentra y descarga los archivos compartidos.</p></div>@if(contexto.puedePublicar()){<button mat-flat-button (click)="abrir(subirDialog,undefined,true)">Subir materiales</button>}</div>
-@if(contexto.error()){<p role="alert">{{contexto.error()}}</p><button mat-button (click)="contexto.recargar()">Reintentar acceso</button>}
-@if(error()){<p role="alert">{{error()}}</p><button mat-button (click)="cargar()">Reintentar</button>}@if(exito()){<p role="status">{{exito()}}</p>}
-<mat-form-field class="filter" appearance="outline"><mat-label>Tema</mat-label><mat-select [value]="idTema()" (selectionChange)="filtrar($event.value)"><mat-option [value]="null">Todos los temas</mat-option>@for(t of temas();track t.idTema){<mat-option [value]="t.idTema">{{t.nombre}}</mat-option>}</mat-select></mat-form-field>
-<section class="files-panel" aria-labelledby="files-title"><div class="files-heading"><h2 id="files-title">Materiales compartidos</h2><span class="badge">{{total()}} archivos</span></div>
-@if(cargando()){<p role="status">Cargando materiales…</p>} @else if(!error()){@for(m of materiales();track m.idMaterial){
-<article class="file-row"><mat-icon fontSet="material-symbols-rounded">{{icono(m.nombreArchivo)}}</mat-icon><button class="file-info" (click)="abrir(detalleDialog,m)"><strong>{{m.nombreArchivo}}</strong><span>{{m.autor}} · {{bytes(m.tamanoArchivo)}} · {{fecha(m.fechaPublicacion)}}</span></button><button mat-icon-button [attr.aria-label]="'Descargar '+m.nombreArchivo" (click)="descargar(m)"><mat-icon fontSet="material-symbols-rounded">download</mat-icon></button><button mat-icon-button [matMenuTriggerFor]="opciones" [attr.aria-label]="'Opciones de '+m.nombreArchivo"><mat-icon fontSet="material-symbols-rounded">more_vert</mat-icon></button><mat-menu #opciones="matMenu"><button mat-menu-item (click)="abrir(detalleDialog,m)">Ver detalle</button>@if(propio(m)){<button mat-menu-item (click)="abrir(cambiarDialog,m)">Cambiar tema</button>}@if(puedeEliminar(m)){<button mat-menu-item (click)="abrir(eliminarDialog,m)">Eliminar material</button>}</mat-menu></article>
-}@empty{<p>Todavía no hay materiales{{idTema() ? ' en este tema' : ' en el grupo'}}.</p>}}
-<mat-paginator [length]="total()" [pageIndex]="pagina()" [pageSize]="tamano()" [pageSizeOptions]="[5,10,25,50]" (page)="cambiarPagina($event)" aria-label="Paginación de materiales" />
-</section>
-@if(idTema()){<section class="deck-panel"><h2>Flashcards de este tema</h2>@for(p of mazos();track p.idCompartido){<div><mat-icon fontSet="material-symbols-rounded">style</mat-icon><span><strong>{{p.mazo.titulo}}</strong><small>{{p.mazo.autor}} · {{p.mazo.cantidadTarjetas}} tarjetas</small></span><a mat-stroked-button [routerLink]="['/grupos',contexto.idGrupo(),'flashcards',p.mazo.idMazo]">Ver mazo</a></div>}@empty{<p>Todavía no hay mazos compartidos en este tema.</p>}</section>}
+@if (!contexto.idGrupo()) {
+  <app-seleccionar-grupo />
+} @else {
+  <nav class="resource-tabs" aria-label="Recursos del grupo">
+    <a mat-stroked-button routerLink="../temas">Temas</a
+    ><a mat-flat-button routerLink="../materiales" aria-current="page">Materiales</a>
+  </nav>
+  @if (idTema()) {
+    <a class="breadcrumb" mat-button routerLink="../temas"
+      ><mat-icon fontSet="material-symbols-rounded">arrow_back</mat-icon>Temas /
+      {{ nombreTema() }}</a
+    >
+  }
+  <div class="page-heading">
+    <div>
+      <h1>{{ nombreTema() }}</h1>
+      <p>Encuentra y descarga los archivos compartidos.</p>
+    </div>
+    @if (contexto.puedePublicar()) {
+      <button mat-flat-button (click)="abrir(subirDialog, undefined, true)">
+        Subir materiales
+      </button>
+    }
+  </div>
+  @if (contexto.error()) {
+    <p role="alert">{{ contexto.error() }}</p>
+    <button mat-button (click)="contexto.recargar()">Reintentar acceso</button>
+  }
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+    <button mat-button (click)="cargar()">Reintentar</button>
+  }
+  @if (exito()) {
+    <p role="status">{{ exito() }}</p>
+  }
+  <mat-form-field class="filter" appearance="outline"
+    ><mat-label>Tema</mat-label
+    ><mat-select [value]="idTema()" (selectionChange)="filtrar($event.value)"
+      ><mat-option [value]="null">Todos los temas</mat-option>
+      @for (t of temas(); track t.idTema) {
+        <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <section class="files-panel" aria-labelledby="files-title">
+    <div class="files-heading">
+      <h2 id="files-title">Materiales compartidos</h2>
+      <span class="badge">{{ total() }} archivos</span>
+    </div>
+    @if (cargando()) {
+      <p role="status">Cargando materiales…</p>
+    } @else if (!error()) {
+      @for (m of materiales(); track m.idMaterial) {
+        <article class="file-row">
+          <mat-icon fontSet="material-symbols-rounded">{{ icono(m.nombreArchivo) }}</mat-icon
+          ><button class="file-info" (click)="abrir(detalleDialog, m)">
+            <strong>{{ m.nombreArchivo }}</strong
+            ><span
+              >{{ m.autor }} · {{ bytes(m.tamanoArchivo) }} · {{ fecha(m.fechaPublicacion) }}</span
+            ></button
+          ><button
+            mat-icon-button
+            [attr.aria-label]="'Descargar ' + m.nombreArchivo"
+            (click)="descargar(m)"
+          >
+            <mat-icon fontSet="material-symbols-rounded">download</mat-icon></button
+          ><button
+            mat-icon-button
+            [matMenuTriggerFor]="opciones"
+            [attr.aria-label]="'Opciones de ' + m.nombreArchivo"
+          >
+            <mat-icon fontSet="material-symbols-rounded">more_vert</mat-icon></button
+          ><mat-menu #opciones="matMenu"
+            ><button mat-menu-item (click)="abrir(detalleDialog, m)">Ver detalle</button>
+            @if (propio(m)) {
+              <button mat-menu-item (click)="abrir(cambiarDialog, m)">Cambiar tema</button>
+            }
+            @if (puedeEliminar(m)) {
+              <button mat-menu-item (click)="abrir(eliminarDialog, m)">Eliminar material</button>
+            }
+          </mat-menu>
+        </article>
+      } @empty {
+        <p>Todavía no hay materiales{{ idTema() ? ' en este tema' : ' en el grupo' }}.</p>
+      }
+    }
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="pagina()"
+      [pageSize]="tamano()"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      (page)="cambiarPagina($event)"
+      aria-label="Paginación de materiales"
+    />
+  </section>
+  @if (idTema()) {
+    <section class="deck-panel">
+      <h2>Flashcards de este tema</h2>
+      @for (p of mazos(); track p.idCompartido) {
+        <div>
+          <mat-icon fontSet="material-symbols-rounded">style</mat-icon
+          ><span
+            ><strong>{{ p.mazo.titulo }}</strong
+            ><small>{{ p.mazo.autor }} · {{ p.mazo.cantidadTarjetas }} tarjetas</small></span
+          ><a
+            mat-stroked-button
+            [routerLink]="['/grupos', contexto.idGrupo(), 'flashcards', p.mazo.idMazo]"
+            >Ver mazo</a
+          >
+        </div>
+      } @empty {
+        <p>Todavía no hay mazos compartidos en este tema.</p>
+      }
+    </section>
+  }
 }
-<ng-template #subirDialog let-ref="dialogRef"><div class="resource-dialog"><div class="dialog-heading"><h2>Subir materiales</h2><button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div><mat-dialog-content><p>Comparte archivos para estudiar con tu grupo.</p><mat-form-field appearance="outline"><mat-label>Tema (opcional)</mat-label><mat-select [formControl]="temaSubida"><mat-option [value]="null">Sin tema</mat-option>@for(t of temas();track t.idTema){<mat-option [value]="t.idTema">{{t.nombre}}</mat-option>}</mat-select></mat-form-field><div class="upload-zone"><mat-icon fontSet="material-symbols-rounded">upload</mat-icon><strong>Selecciona los archivos</strong><small>PDF, DOCX, PPTX, XLSX, PNG, JPG o JPEG. Máximo 5 archivos de 10 MB cada uno.</small><label class="file-picker" for="resource-files">Elegir archivos</label><input id="resource-files" type="file" (change)="elegir($event)" [disabled]="guardando()" multiple accept=".pdf,.docx,.pptx,.xlsx,.png,.jpg,.jpeg"></div>@for(a of archivos();track $index){<div class="selected-file"><mat-icon fontSet="material-symbols-rounded">{{icono(a.name)}}</mat-icon><span><strong>{{a.name}}</strong><small>{{bytes(a.size)}}</small></span><button mat-icon-button [disabled]="guardando()" [attr.aria-label]="'Quitar '+a.name" (click)="quitar($index)"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div>}@if(archivos().length && errorArchivos()){<p role="alert">{{errorArchivos()}}</p>}@if(errorDialogo()){<p role="alert">{{errorDialogo()}}</p>}</mat-dialog-content><mat-dialog-actions><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button><button mat-flat-button [disabled]="!!errorArchivos() || guardando()" (click)="subir(ref)">{{guardando() ? 'Publicando…' : 'Publicar '+archivos().length+' archivos'}}</button></mat-dialog-actions></div></ng-template>
-<ng-template #detalleDialog let-m><div class="resource-dialog"><div class="dialog-heading"><h2>{{m.nombreArchivo}}</h2><button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div><mat-dialog-content><div class="file-metadata"><p>Tema: {{m.nombreTema || 'Sin tema'}}</p><p>Autor: {{m.autor}}</p><p>Formato: {{m.tipoArchivo}} · Tamaño: {{bytes(m.tamanoArchivo)}}</p><p>Publicado: {{fecha(m.fechaPublicacion)}}</p></div><div class="detail-actions"><button mat-flat-button (click)="descargar(m)">Descargar archivo</button>@if(propio(m)){<button mat-stroked-button mat-dialog-close (click)="abrir(cambiarDialog,m)">Cambiar tema</button>}@if(puedeEliminar(m)){<button mat-button class="danger-text" mat-dialog-close (click)="abrir(eliminarDialog,m)">Eliminar material</button>}</div></mat-dialog-content></div></ng-template>
-<ng-template #cambiarDialog let-m let-ref="dialogRef"><div class="resource-dialog"><div class="dialog-heading"><h2>Cambiar tema</h2><button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div><mat-dialog-content><p>{{m.nombreArchivo}}</p><mat-form-field appearance="outline"><mat-label>Tema</mat-label><mat-select [formControl]="temaCambio"><mat-option [value]="null">Sin tema</mat-option>@for(t of temas();track t.idTema){<mat-option [value]="t.idTema">{{t.nombre}}</mat-option>}</mat-select></mat-form-field>@if(errorDialogo()){<p role="alert">{{errorDialogo()}}</p>}</mat-dialog-content><mat-dialog-actions><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button><button mat-flat-button [disabled]="guardando()" (click)="mover(m,ref)">{{guardando()?'Guardando…':'Guardar cambios'}}</button></mat-dialog-actions></div></ng-template>
-<ng-template #eliminarDialog let-m let-ref="dialogRef"><div class="resource-dialog"><div class="dialog-heading"><h2>¿Eliminar este material?</h2><button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div><mat-dialog-content><p>{{m.nombreArchivo}} dejará de estar disponible en este grupo.</p>@if(errorDialogo()){<p role="alert">{{errorDialogo()}}</p>}</mat-dialog-content><mat-dialog-actions><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Conservar material</button><button mat-flat-button class="danger" [disabled]="guardando()" (click)="eliminar(m,ref)">{{guardando()?'Eliminando…':'Eliminar material'}}</button></mat-dialog-actions></div></ng-template>
+<ng-template #subirDialog let-ref="dialogRef"
+  ><div class="resource-dialog">
+    <div class="dialog-heading">
+      <h2>Subir materiales</h2>
+      <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>Comparte archivos para estudiar con tu grupo.</p>
+      <mat-form-field appearance="outline"
+        ><mat-label>Tema (opcional)</mat-label
+        ><mat-select [formControl]="temaSubida"
+          ><mat-option [value]="null">Sin tema</mat-option>
+          @for (t of temas(); track t.idTema) {
+            <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
+          }
+        </mat-select></mat-form-field
+      >
+      <div class="upload-zone">
+        <mat-icon fontSet="material-symbols-rounded">upload</mat-icon
+        ><strong>Selecciona los archivos</strong
+        ><small>PDF, DOCX, PPTX, XLSX, PNG, JPG o JPEG. Máximo 5 archivos de 10 MB cada uno.</small
+        ><label class="file-picker" for="resource-files">Elegir archivos</label
+        ><input
+          id="resource-files"
+          type="file"
+          (change)="elegir($event)"
+          [disabled]="guardando()"
+          multiple
+          accept=".pdf,.docx,.pptx,.xlsx,.png,.jpg,.jpeg"
+        />
+      </div>
+      @for (a of archivos(); track $index) {
+        <div class="selected-file">
+          <mat-icon fontSet="material-symbols-rounded">{{ icono(a.name) }}</mat-icon
+          ><span
+            ><strong>{{ a.name }}</strong
+            ><small>{{ bytes(a.size) }}</small></span
+          ><button
+            mat-icon-button
+            [disabled]="guardando()"
+            [attr.aria-label]="'Quitar ' + a.name"
+            (click)="quitar($index)"
+          >
+            <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+          </button>
+        </div>
+      }
+      @if (archivos().length && errorArchivos()) {
+        <p role="alert">{{ errorArchivos() }}</p>
+      }
+      @if (errorDialogo()) {
+        <p role="alert">{{ errorDialogo() }}</p>
+      }</mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
+      ><button mat-flat-button [disabled]="!!errorArchivos() || guardando()" (click)="subir(ref)">
+        {{ guardando() ? 'Publicando…' : 'Publicar ' + archivos().length + ' archivos' }}
+      </button></mat-dialog-actions
+    >
+  </div></ng-template
+>
+<ng-template #detalleDialog let-m
+  ><div class="resource-dialog">
+    <div class="dialog-heading">
+      <h2>{{ m.nombreArchivo }}</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content
+      ><div class="file-metadata">
+        <p>Tema: {{ m.nombreTema || 'Sin tema' }}</p>
+        <p>Autor: {{ m.autor }}</p>
+        <p>Formato: {{ m.tipoArchivo }} · Tamaño: {{ bytes(m.tamanoArchivo) }}</p>
+        <p>Publicado: {{ fecha(m.fechaPublicacion) }}</p>
+      </div>
+      <div class="detail-actions">
+        <button mat-flat-button (click)="descargar(m)">Descargar archivo</button>
+        @if (propio(m)) {
+          <button mat-stroked-button mat-dialog-close (click)="abrir(cambiarDialog, m)">
+            Cambiar tema
+          </button>
+        }
+        @if (puedeEliminar(m)) {
+          <button
+            mat-button
+            class="danger-text"
+            mat-dialog-close
+            (click)="abrir(eliminarDialog, m)"
+          >
+            Eliminar material
+          </button>
+        }
+      </div></mat-dialog-content
+    >
+  </div></ng-template
+>
+<ng-template #cambiarDialog let-m let-ref="dialogRef"
+  ><div class="resource-dialog">
+    <div class="dialog-heading">
+      <h2>Cambiar tema</h2>
+      <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>{{ m.nombreArchivo }}</p>
+      <mat-form-field appearance="outline"
+        ><mat-label>Tema</mat-label
+        ><mat-select [formControl]="temaCambio"
+          ><mat-option [value]="null">Sin tema</mat-option>
+          @for (t of temas(); track t.idTema) {
+            <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
+          }
+        </mat-select></mat-form-field
+      >
+      @if (errorDialogo()) {
+        <p role="alert">{{ errorDialogo() }}</p>
+      }</mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
+      ><button mat-flat-button [disabled]="guardando()" (click)="mover(m, ref)">
+        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+      </button></mat-dialog-actions
+    >
+  </div></ng-template
+>
+<ng-template #eliminarDialog let-m let-ref="dialogRef"
+  ><div class="resource-dialog">
+    <div class="dialog-heading">
+      <h2>¿Eliminar este material?</h2>
+      <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>{{ m.nombreArchivo }} dejará de estar disponible en este grupo.</p>
+      @if (errorDialogo()) {
+        <p role="alert">{{ errorDialogo() }}</p>
+      }</mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">
+        Conservar material</button
+      ><button mat-flat-button class="danger" [disabled]="guardando()" (click)="eliminar(m, ref)">
+        {{ guardando() ? 'Eliminando…' : 'Eliminar material' }}
+      </button></mat-dialog-actions
+    >
+  </div></ng-template
+>

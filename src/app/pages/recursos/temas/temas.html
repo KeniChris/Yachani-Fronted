@@ -1,12 +1,104 @@
-@if (!contexto.idGrupo()) { <app-seleccionar-grupo /> } @else {
-<nav class="resource-tabs" aria-label="Recursos del grupo"><a mat-flat-button routerLink="../temas" aria-current="page">Temas</a><a mat-stroked-button routerLink="../materiales">Materiales</a></nav>
-<div class="page-heading"><div><h1>Temas del grupo</h1><p>Organiza los recursos por lo que están estudiando.</p></div>@if(contexto.puedeGestionarTemas()){<button mat-flat-button (click)="abrir(temaDialog)">Crear tema</button>}</div>
-@if(contexto.error()){<p role="alert">{{contexto.error()}}</p><button mat-button (click)="contexto.recargar()">Reintentar acceso</button>}
-@if(error()){<p role="alert">{{error()}}</p><button mat-button (click)="cargar()">Reintentar</button>}
-@if(exito()){<p role="status">{{exito()}}</p>}
-@if(cargando()){<p role="status">Cargando temas…</p>} @else if(!error()){
-<p class="counter">{{temas().length}} temas</p>
-<div class="topic-grid">@for(tema of temas();track tema.idTema){<article class="topic-card"><div class="topic-heading"><mat-icon fontSet="material-symbols-rounded">folder</mat-icon><h2>{{tema.nombre}}</h2>@if(contexto.puedeGestionarTemas()){<button mat-icon-button [attr.aria-label]="'Editar '+tema.nombre" (click)="abrir(temaDialog,tema)"><mat-icon fontSet="material-symbols-rounded">edit</mat-icon></button>}</div><p>{{tema.descripcion || 'Sin descripción.'}}</p><a mat-stroked-button routerLink="../materiales" [queryParams]="{idTema:tema.idTema}">Ver materiales</a></article>} @empty {<p>Todavía no hay temas en este grupo.</p>}</div>}
-@if(contexto.administrador()){<a class="settings" mat-stroked-button [routerLink]="['/grupos',contexto.idGrupo(),'configuracion']">Configuración del grupo</a>}
+@if (!contexto.idGrupo()) {
+  <app-seleccionar-grupo />
+} @else {
+  <nav class="resource-tabs" aria-label="Recursos del grupo">
+    <a mat-flat-button routerLink="../temas" aria-current="page">Temas</a
+    ><a mat-stroked-button routerLink="../materiales">Materiales</a>
+  </nav>
+  <div class="page-heading">
+    <div>
+      <h1>Temas del grupo</h1>
+      <p>Organiza los recursos por lo que están estudiando.</p>
+    </div>
+    @if (contexto.puedeGestionarTemas()) {
+      <button mat-flat-button (click)="abrir(temaDialog)">Crear tema</button>
+    }
+  </div>
+  @if (contexto.error()) {
+    <p role="alert">{{ contexto.error() }}</p>
+    <button mat-button (click)="contexto.recargar()">Reintentar acceso</button>
+  }
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+    <button mat-button (click)="cargar()">Reintentar</button>
+  }
+  @if (exito()) {
+    <p role="status">{{ exito() }}</p>
+  }
+  @if (cargando()) {
+    <p role="status">Cargando temas…</p>
+  } @else if (!error()) {
+    <p class="counter">{{ temas().length }} temas</p>
+    <div class="topic-grid">
+      @for (tema of temas(); track tema.idTema) {
+        <article class="topic-card">
+          <div class="topic-heading">
+            <mat-icon fontSet="material-symbols-rounded">folder</mat-icon>
+            <h2>{{ tema.nombre }}</h2>
+            @if (contexto.puedeGestionarTemas()) {
+              <button
+                mat-icon-button
+                [attr.aria-label]="'Editar ' + tema.nombre"
+                (click)="abrir(temaDialog, tema)"
+              >
+                <mat-icon fontSet="material-symbols-rounded">edit</mat-icon>
+              </button>
+            }
+          </div>
+          <p>{{ tema.descripcion || 'Sin descripción.' }}</p>
+          <a mat-stroked-button routerLink="../materiales" [queryParams]="{ idTema: tema.idTema }"
+            >Ver materiales</a
+          >
+        </article>
+      } @empty {
+        <p>Todavía no hay temas en este grupo.</p>
+      }
+    </div>
+  }
+  @if (contexto.administrador()) {
+    <a
+      class="settings"
+      mat-stroked-button
+      [routerLink]="['/grupos', contexto.idGrupo(), 'configuracion']"
+      >Configuración del grupo</a
+    >
+  }
 }
-<ng-template #temaDialog let-ref="dialogRef"><div class="resource-dialog"><div class="dialog-heading"><h2>{{editando() ? 'Editar tema' : 'Crear tema'}}</h2><button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo"><mat-icon fontSet="material-symbols-rounded">close</mat-icon></button></div><mat-dialog-content><p>Dale un nombre claro para que el grupo encuentre sus recursos.</p><form [formGroup]="form" (ngSubmit)="guardar(ref)" id="tema-form"><mat-form-field appearance="outline"><mat-label>Nombre del tema</mat-label><input matInput formControlName="nombre" required maxlength="100"><mat-hint>Hasta 100 caracteres.</mat-hint><mat-error>Escribe un nombre de hasta 100 caracteres.</mat-error></mat-form-field><mat-form-field appearance="outline"><mat-label>Descripción (opcional)</mat-label><textarea matInput formControlName="descripcion" rows="3" maxlength="300"></textarea><mat-hint>Hasta 300 caracteres.</mat-hint></mat-form-field></form>@if(errorDialogo()){<p role="alert">{{errorDialogo()}}</p>}</mat-dialog-content><mat-dialog-actions><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button><button mat-flat-button type="submit" form="tema-form" [disabled]="form.invalid || guardando()">{{guardando() ? 'Guardando…' : 'Guardar tema'}}</button></mat-dialog-actions></div></ng-template>
+<ng-template #temaDialog let-ref="dialogRef"
+  ><div class="resource-dialog">
+    <div class="dialog-heading">
+      <h2>{{ editando() ? 'Editar tema' : 'Crear tema' }}</h2>
+      <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>Dale un nombre claro para que el grupo encuentre sus recursos.</p>
+      <form [formGroup]="form" (ngSubmit)="guardar(ref)" id="tema-form">
+        <mat-form-field appearance="outline"
+          ><mat-label>Nombre del tema</mat-label
+          ><input matInput formControlName="nombre" required maxlength="100" /><mat-hint
+            >Hasta 100 caracteres.</mat-hint
+          ><mat-error>Escribe un nombre de hasta 100 caracteres.</mat-error></mat-form-field
+        ><mat-form-field appearance="outline"
+          ><mat-label>Descripción (opcional)</mat-label
+          ><textarea matInput formControlName="descripcion" rows="3" maxlength="300"></textarea
+          ><mat-hint>Hasta 300 caracteres.</mat-hint></mat-form-field
+        >
+      </form>
+      @if (errorDialogo()) {
+        <p role="alert">{{ errorDialogo() }}</p>
+      }</mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
+      ><button
+        mat-flat-button
+        type="submit"
+        form="tema-form"
+        [disabled]="form.invalid || guardando()"
+      >
+        {{ guardando() ? 'Guardando…' : 'Guardar tema' }}
+      </button></mat-dialog-actions
+    >
+  </div></ng-template
+>

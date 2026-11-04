@@ -1,6 +1,8 @@
 :host {
   display: block;
-  font: 400 16px/24px Roboto, sans-serif;
+  font:
+    400 16px/24px Roboto,
+    sans-serif;
   --mat-button-text-label-text-font: Roboto, sans-serif;
   --mat-button-filled-label-text-font: Roboto, sans-serif;
   --mat-button-outlined-label-text-font: Roboto, sans-serif;
@@ -29,8 +31,6 @@
 }
 .login-arrow {
   display: inline-block;
-  width: 20px;
-  height: 20px;
   margin-left: 8px;
   vertical-align: middle;
 }
@@ -72,7 +72,9 @@
   transition: 220ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  .nav-indicator { transition: none; }
+  .nav-indicator {
+    transition: none;
+  }
 }
 .faq-heading > a {
   border-radius: 999px;
@@ -307,9 +309,13 @@ h2,
 .about-intro h2,
 .faq-heading h2,
 .contact-copy h2 {
-  font: 700 28px/36px Roboto, sans-serif;
+  font:
+    700 28px/36px Roboto,
+    sans-serif;
 }
-h3 { font: var(--font-card-title); }
+h3 {
+  font: var(--font-card-title);
+}
 .section p,
 .group-card p,
 .scene-bottom p,
@@ -326,7 +332,9 @@ a[mat-button],
 a[mat-flat-button],
 a[mat-stroked-button],
 button[mat-flat-button] {
-  font: 500 16px/24px Roboto, sans-serif;
+  font:
+    500 16px/24px Roboto,
+    sans-serif;
   letter-spacing: 0;
   height: auto;
   min-height: 48px;
@@ -347,11 +355,15 @@ button[mat-flat-button] {
 .video-controls,
 .chapters strong,
 .footer-bottom p {
-  font: 400 14px/20px Roboto, sans-serif;
+  font:
+    400 14px/20px Roboto,
+    sans-serif;
 }
 .scene-heading,
 .course-tag {
-  font: 700 12px/18px Roboto, sans-serif;
+  font:
+    700 12px/18px Roboto,
+    sans-serif;
 }
 .group-card h2 {
   font: var(--font-card-title);
@@ -366,7 +378,9 @@ button[mat-flat-button] {
 }
 .ai-chip strong,
 .footer h3 {
-  font: 500 16px/24px Roboto, sans-serif;
+  font:
+    500 16px/24px Roboto,
+    sans-serif;
 }
 .hero-grid > *,
 .grid > *,
@@ -377,7 +391,15 @@ button[mat-flat-button] {
 .ai-chip > div {
   min-width: 0;
 }
-p, h1, h2, h3, a, strong, small, dt, dd {
+p,
+h1,
+h2,
+h3,
+a,
+strong,
+small,
+dt,
+dd {
   overflow-wrap: anywhere;
 }
 .hero-actions,
@@ -419,7 +441,9 @@ p, h1, h2, h3, a, strong, small, dt, dd {
   .about-intro h2,
   .faq-heading h2,
   .contact-copy h2 {
-    font: 700 24px/32px Roboto, sans-serif;
+    font:
+      700 24px/32px Roboto,
+      sans-serif;
   }
   .nav-auth a {
     font-size: 14px;
@@ -444,8 +468,6 @@ p, h1, h2, h3, a, strong, small, dt, dd {
     height: auto;
   }
   .navbar .login-arrow {
-    width: 16px;
-    height: 16px;
     margin-left: 4px;
   }
   .mobile-menu > img {
@@ -470,7 +492,6 @@ p, h1, h2, h3, a, strong, small, dt, dd {
 }
 
 .about-intro {
-  display: block;
   text-align: left;
 }
 .about-intro p {

@@ -1057,3 +1057,34 @@ app-home {
     }
   }
 }
+
+/* Patrones de contenido de la landing, dentro del ámbito ya usado por Home. */
+app-home {
+  .hero-action-hint,
+  .contact-hint,
+  .testimonial-note {
+    font:
+      400 12px/18px Roboto,
+      sans-serif;
+    color: var(--landing-subtle);
+  }
+  .hero-action-hint {
+    margin-top: 12px;
+  }
+  .testimonials .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .testimonials .panel > p {
+    flex: 1;
+  }
+  .stars {
+    display: flex;
+    gap: 4px;
+  }
+  .stars img {
+    width: 16px;
+    height: 16px;
+  }
+}

@@ -1,28 +1,53 @@
 <div class="group-card">
   <header class="group-header">
     <div class="group-heading">
-      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+      <img src="/icons/grupo/grupos.svg" alt="" width="24" height="24" />
       <div>
-        <h1>{{ grupo.nombre }}</h1>
-        <p>{{ grupo.detalle }}</p>
+        <h1>{{ contexto.grupo()?.nombre || 'Grupo de estudio' }}</h1>
+        <p>{{ detalle() }}</p>
       </div>
     </div>
     <ng-content select="[grupo-acciones]" />
   </header>
-  <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Secciones del grupo">
-    @for (tab of tabs; track tab.path) {
+  <nav class="desktop-sections" aria-label="Secciones del grupo">
+    @for (tab of tabs(); track tab.path) {
       <a
-        mat-tab-link
+        mat-button
         [routerLink]="tab.path"
-        queryParamsHandling="preserve"
-        routerLinkActive
+        routerLinkActive="selected"
         #active="routerLinkActive"
-        [active]="active.isActive"
         ariaCurrentWhenActive="page"
-        ><mat-icon fontSet="material-symbols-rounded">{{ tab.icon }}</mat-icon
-        >{{ tab.label }}</a
+        ><img
+          [src]="'/icons/grupo/' + tab.path + (active.isActive ? '-active' : '') + '.svg'"
+          alt=""
+          width="24"
+          height="24"
+        />{{ tab.label }}</a
       >
     }
   </nav>
+  <button
+    class="mobile-sections"
+    [matMenuTriggerFor]="secciones"
+    aria-label="Cambiar sección del grupo"
+  >
+    <span>{{ seleccion().label }}</span
+    ><img src="/icons/grupo/chevron.svg" alt="" width="24" height="24" /></button
+  ><mat-menu #secciones="matMenu">
+    @for (tab of tabs(); track tab.path) {
+      <a
+        mat-menu-item
+        [routerLink]="tab.path"
+        routerLinkActive
+        #active="routerLinkActive"
+        ariaCurrentWhenActive="page"
+        >{{ tab.label }}</a
+      >
+    }
+  </mat-menu>
 </div>
-<mat-tab-nav-panel #panel><router-outlet /></mat-tab-nav-panel>
+@if (contexto.error()) {
+  <p role="alert">{{ contexto.error() }}</p>
+  <button mat-button (click)="contexto.recargar()">Reintentar acceso al grupo</button>
+}
+<section class="group-body"><router-outlet /></section>

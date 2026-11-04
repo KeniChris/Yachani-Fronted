@@ -41,7 +41,11 @@ export class GrupoEstudioService {
   }
 
   listarMisGrupos(idUsuario: number) {
-    return todasLasPaginas<GrupoEstudioResponse>(page => this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/mis-grupos`, { params: { page, size: 100 } }));
+    return todasLasPaginas<GrupoEstudioResponse>((page) =>
+      this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/mis-grupos`, {
+        params: { page, size: 100 },
+      }),
+    );
   }
 
   obtenerGrupo(idGrupo: number) {
@@ -49,7 +53,11 @@ export class GrupoEstudioService {
   }
 
   buscarGrupos(query: string) {
-    return todasLasPaginas<GrupoEstudioResponse>(page => this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/buscar`, { params: { query, page, size: 100 } }));
+    return todasLasPaginas<GrupoEstudioResponse>((page) =>
+      this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/buscar`, {
+        params: { query, page, size: 100 },
+      }),
+    );
   }
 
   filtrarGrupos(filtros: FiltrarGruposParams) {
@@ -66,7 +74,11 @@ export class GrupoEstudioService {
       params['tipoGrupo'] = filtros.tipoGrupo;
     }
 
-    return todasLasPaginas<GrupoEstudioResponse>(page => this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/filtrar`, { params: { ...params, page, size: 100 } }));
+    return todasLasPaginas<GrupoEstudioResponse>((page) =>
+      this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/filtrar`, {
+        params: { ...params, page, size: 100 },
+      }),
+    );
   }
 
   actualizarCapacidad(idGrupo: number, nuevaCapacidad: number) {
@@ -96,12 +108,21 @@ export class GrupoEstudioService {
   }
 
   listarSolicitudes(idGrupo: number) {
-    return todasLasPaginas<SolicitudPendienteResponse>(page => this.http.get<PaginaGrupos<SolicitudPendienteResponse>>(`${this.gruposUrl}/${idGrupo}/solicitudes`, { params: { page, size: 100 } }));
+    return todasLasPaginas<SolicitudPendienteResponse>((page) =>
+      this.http.get<PaginaGrupos<SolicitudPendienteResponse>>(
+        `${this.gruposUrl}/${idGrupo}/solicitudes`,
+        { params: { page, size: 100 } },
+      ),
+    );
   }
 
   // Solicitudes que envió el estudiante, para la sección "Mis solicitudes".
   listarMisSolicitudes(idEstudiante: number) {
-    return todasLasPaginas<MiSolicitudResponse>(page => this.http.get<PaginaGrupos<MiSolicitudResponse>>(`${this.gruposUrl}/solicitudes`, { params: { page, size: 100 } }));
+    return todasLasPaginas<MiSolicitudResponse>((page) =>
+      this.http.get<PaginaGrupos<MiSolicitudResponse>>(`${this.gruposUrl}/solicitudes`, {
+        params: { page, size: 100 },
+      }),
+    );
   }
 
   solicitarUnirse(idGrupo: number, idEstudiante: number) {

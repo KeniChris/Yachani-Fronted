@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Pruebas de integración en navegador
+/test-results/
+/playwright-report/
+/test-server.log

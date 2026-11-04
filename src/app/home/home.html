@@ -10,19 +10,33 @@
     >
     <nav #pageNavigation class="desktop-nav" aria-label="Navegación de la página">
       @for (link of navigation; track link.anchor) {
-        <a mat-button [href]="'#' + link.anchor" (click)="irASeccion($event, link.anchor)" [attr.aria-current]="seccionActiva === link.anchor ? 'location' : null"
+        <a
+          mat-button
+          [href]="'#' + link.anchor"
+          (click)="irASeccion($event, link.anchor)"
+          [attr.aria-current]="seccionActiva === link.anchor ? 'location' : null"
           ><span [attr.data-anchor]="link.anchor">{{ link.label }}</span></a
         >
       }
-      <span class="nav-indicator" aria-hidden="true" [style.left.px]="indicador.izquierda" [style.top.px]="indicador.arriba" [style.width.px]="indicador.ancho"></span>
+      <span
+        class="nav-indicator"
+        aria-hidden="true"
+        [style.left.px]="indicador.izquierda"
+        [style.top.px]="indicador.arriba"
+        [style.width.px]="indicador.ancho"
+      ></span>
     </nav>
     <div class="nav-auth">
-    <a
-      mat-stroked-button
-      class="login"
-      routerLink="/auth/iniciar-sesion"
-      [queryParams]="{ rol: audience.controls.rol.value }"
-      ><span>Iniciar sesión</span><svg class="login-arrow" viewBox="0 0 17 17" fill="none" aria-hidden="true" focusable="false"><path d="M2.83333 8.5H13.4583M9.20833 12.75L13.4583 8.5L9.20833 4.25" stroke="currentColor" stroke-width="1.20417" stroke-linecap="round" stroke-linejoin="round" /></svg></a>
+      <a
+        mat-stroked-button
+        class="login"
+        routerLink="/auth/iniciar-sesion"
+        [queryParams]="{ rol: audience.controls.rol.value }"
+        ><span class="desktop-text">Iniciar sesión</span><span class="mobile-text">Entrar</span
+        ><picture class="login-arrow"
+          ><source media="(max-width: 767px)" srcset="/landing/mobile-login.svg" />
+          <img src="/landing/login.svg" alt="" /></picture
+      ></a>
     </div>
     <button
       mat-icon-button
@@ -34,7 +48,13 @@
     </button>
     <mat-menu #mobileMenu="matMenu">
       @for (link of navigation; track link.anchor) {
-        <a mat-menu-item [href]="'#' + link.anchor" (click)="irASeccion($event, link.anchor)" [attr.aria-current]="seccionActiva === link.anchor ? 'location' : null">{{ link.label }}</a>
+        <a
+          mat-menu-item
+          [href]="'#' + link.anchor"
+          (click)="irASeccion($event, link.anchor)"
+          [attr.aria-current]="seccionActiva === link.anchor ? 'location' : null"
+          >{{ link.label }}</a
+        >
       }
     </mat-menu>
   </div>
@@ -85,11 +105,17 @@
             routerLink="/auth/registro"
             [queryParams]="{ rol: audience.controls.rol.value }"
             >{{ tutor ? 'Empezar como tutor' : 'Encontrar mi grupo'
-            }}<img src="/landing/arrow.svg" alt="" /></a
+            }}<picture
+              ><source media="(max-width: 767px)" srcset="/landing/mobile-arrow.svg" />
+              <img src="/landing/arrow.svg" alt="" /></picture></a
           ><a mat-stroked-button class="hero-video-link" href="#tutorial"
-            ><img src="/landing/play-outline.svg" alt="" />Ver cómo funciona</a
+            ><picture
+              ><source media="(max-width: 767px)" srcset="/landing/mobile-play-outline.svg" />
+              <img src="/landing/play-outline.svg" alt="" /></picture
+            >Ver cómo funciona</a
           >
         </div>
+        <p class="hero-action-hint">Tu próximo paso empieza en la app web de Yachani.</p>
         <ul class="hero-values">
           @if (tutor) {
             <li><strong>Guía</strong><span>con tu propio estilo</span></li>
@@ -110,8 +136,15 @@
           <div class="group-card">
             <div class="group-top">
               <span class="course-tag"
-                ><img src="/landing/course.svg" alt="" />INGENIERÍA DE SOFTWARE</span
-              ><span class="group-symbol"><img src="/landing/scene-groups.svg" alt="" /></span>
+                ><picture
+                  ><source media="(max-width: 767px)" srcset="/landing/mobile-course.svg" />
+                  <img src="/landing/course.svg" alt="" /></picture
+                >INGENIERÍA DE SOFTWARE</span
+              ><span class="group-symbol"
+                ><picture
+                  ><source media="(max-width: 767px)" srcset="/landing/mobile-scene-groups.svg" />
+                  <img src="/landing/scene-groups.svg" alt="" /></picture
+              ></span>
             </div>
             <h2>
               {{
@@ -196,9 +229,26 @@
           <h2 id="about-title">Hecho por estudiantes,<br /><span>para estudiantes</span></h2>
           <p>
             Somos un equipo de estudiantes de la UPC. Vivimos lo difícil que es coordinar grupos de
-            estudio por WhatsApp, con horarios que chocan y materiales perdidos. Por eso
-            creamos Yachani.
+            estudio por WhatsApp, con horarios que chocan y materiales perdidos. Por eso creamos
+            Yachani.
           </p>
+        </div>
+        <div class="desktop-text">
+          <dl class="stats" aria-label="Cifras ilustrativas">
+            <div>
+              <dt>+1 200</dt>
+              <dd>estudiantes</dd>
+            </div>
+            <div>
+              <dt>350</dt>
+              <dd>grupos activos</dd>
+            </div>
+            <div>
+              <dt>40</dt>
+              <dd>cursos</dd>
+            </div>
+          </dl>
+          <small>Cifras de muestra del diseño.</small>
         </div>
       </div>
       <div class="grid two">
@@ -305,7 +355,11 @@
             <ul class="check-list">
               @for (item of role.items; track item.text) {
                 <li>
-                  <span><img src="/landing/check.svg" alt="" /></span>
+                  <span
+                    ><picture
+                      ><source media="(max-width: 767px)" srcset="/landing/mobile-check.svg" />
+                      <img src="/landing/check.svg" alt="" /></picture
+                  ></span>
                   <p>
                     <span class="desktop-text">{{ item.text }}</span
                     ><span class="mobile-text">{{ item.mobile }}</span>
@@ -323,13 +377,13 @@
       <header class="section-heading">
         <span class="badge">Video</span>
         <h2 id="video-title">Mira cómo funciona Yachani</h2>
-        <p>En menos de 2 minutos te mostramos cómo encontrar tu grupo y empezar a estudiar.</p>
+        <p>
+          Conoce el recorrido para encontrar tu grupo y empezar a estudiar. El videotutorial estará
+          disponible próximamente.
+        </p>
       </header>
       <!-- Vista previa del frame. Figma no incluye un archivo de video reproducible. -->
-      <figure
-        class="video-preview"
-        aria-label="Vista previa del tutorial, duración 1 minuto y 45 segundos"
-      >
+      <figure class="video-preview" aria-label="Vista previa del videotutorial, próximamente">
         <picture class="video-glow"
           ><source media="(max-width: 767px)" srcset="/landing/mobile-video-glow.svg" />
           <img src="/landing/video-glow.svg" alt=""
@@ -346,12 +400,12 @@
           ><source media="(max-width: 767px)" srcset="/landing/mobile-play-icon.svg" />
           <img src="/landing/play-icon.svg" alt=""
         /></picture>
-        <figcaption>Tutorial · 1:45 min</figcaption>
-        <div class="video-controls">
+        <figcaption>Videotutorial · Próximamente</figcaption>
+        <div class="video-controls" aria-hidden="true">
           <img class="desktop-text" src="/landing/play-small.svg" alt="" /><span
             class="video-progress"
             ><span></span></span
-          ><span class="desktop-text">0:00 / 1:45</span>
+          ><span class="desktop-text">Próximamente</span>
         </div>
       </figure>
       <ol class="chapters">
@@ -379,6 +433,26 @@
             ><span class="icon-box"><img [src]="'/landing/' + item.icon + '.svg'" alt="" /></span>
             <h3>{{ item.title }}</h3>
             <p>{{ item.text }}</p></mat-card
+          >
+        }
+      </div>
+      <h3 class="center">Lo que dicen nuestros estudiantes</h3>
+      <p class="center testimonial-note">Testimonios de muestra del prototipo.</p>
+      <div class="grid three testimonials">
+        @for (item of testimonials; track item.role) {
+          <mat-card class="panel"
+            ><div class="stars" aria-label="5 de 5 estrellas">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+                <img src="/landing/star.svg" alt="" width="16" height="16" />
+              }
+            </div>
+            <p>{{ item.text }}</p>
+            <div class="testimonial-person">
+              <span class="avatar">NA</span>
+              <div>
+                <strong>Nombre Apellido</strong><small>{{ item.role }}</small>
+              </div>
+            </div></mat-card
           >
         }
       </div>
@@ -420,8 +494,12 @@
           @for (item of contact; track item.label) {
             <div>
               <span class="contact-icon"
-                ><img [src]="'/landing/' + item.icon + '.svg'" alt=""
-              /></span>
+                ><picture
+                  ><source
+                    media="(max-width: 767px)"
+                    [srcset]="'/landing/mobile-' + item.icon + '.svg'" />
+                  <img [src]="'/landing/' + item.icon + '.svg'" alt="" /></picture
+              ></span>
               <div>
                 <dt>{{ item.label }}</dt>
                 <dd>
@@ -436,7 +514,12 @@
           }
         </dl>
       </div>
-      <form class="contact-card" [formGroup]="contactForm" aria-label="Formulario de contacto">
+      <form
+        class="contact-card"
+        [formGroup]="contactForm"
+        (ngSubmit)="prepararCorreo()"
+        aria-label="Formulario de contacto"
+      >
         <div class="grid two">
           <mat-form-field appearance="outline" hideRequiredMarker
             ><mat-label>Nombre</mat-label
@@ -466,8 +549,11 @@
             <mat-error>Escribe tu mensaje.</mat-error>
           }
         </mat-form-field>
-        <button mat-flat-button type="button" [disabled]="contactForm.invalid">
-          Enviar mensaje
+        <p class="contact-hint">
+          Se abrirá tu aplicación de correo para que revises y envíes el mensaje.
+        </p>
+        <button mat-flat-button type="submit" [disabled]="contactForm.invalid">
+          Preparar correo
         </button>
       </form>
     </div>
@@ -478,7 +564,11 @@
     <div class="footer-grid">
       <div>
         <a class="footer-brand" href="#inicio"
-          ><span><img src="/landing/footer-brand.svg" alt="" /></span>Yachani</a
+          ><span
+            ><picture
+              ><source media="(max-width: 767px)" srcset="/landing/mobile-footer-brand.svg" />
+              <img src="/landing/footer-brand.svg" alt="" /></picture></span
+          >Yachani</a
         >
         <p>Conectamos estudiantes y tutores<br />para aprender, colaborar y avanzar juntos.</p>
         <div class="social-labels" aria-label="Redes sociales"><span>IG</span><span>FB</span></div>
