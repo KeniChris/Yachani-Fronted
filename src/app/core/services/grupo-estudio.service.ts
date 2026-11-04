@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PaginaGrupos } from '../models/recursos.models';
+import { PaginaGrupos, TAMANO_PAGINA_MAXIMO } from '../models/pagina.models';
 import { todasLasPaginas } from './paginas-api';
 import { environment } from '../../../environments/environment';
 import {
@@ -43,7 +43,7 @@ export class GrupoEstudioService {
   listarMisGrupos(idUsuario: number) {
     return todasLasPaginas<GrupoEstudioResponse>((page) =>
       this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/mis-grupos`, {
-        params: { page, size: 100 },
+        params: { page, size: TAMANO_PAGINA_MAXIMO },
       }),
     );
   }
@@ -55,7 +55,7 @@ export class GrupoEstudioService {
   buscarGrupos(query: string) {
     return todasLasPaginas<GrupoEstudioResponse>((page) =>
       this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/buscar`, {
-        params: { query, page, size: 100 },
+        params: { query, page, size: TAMANO_PAGINA_MAXIMO },
       }),
     );
   }
@@ -76,7 +76,7 @@ export class GrupoEstudioService {
 
     return todasLasPaginas<GrupoEstudioResponse>((page) =>
       this.http.get<PaginaGrupos<GrupoEstudioResponse>>(`${this.gruposUrl}/filtrar`, {
-        params: { ...params, page, size: 100 },
+        params: { ...params, page, size: TAMANO_PAGINA_MAXIMO },
       }),
     );
   }
@@ -111,7 +111,7 @@ export class GrupoEstudioService {
     return todasLasPaginas<SolicitudPendienteResponse>((page) =>
       this.http.get<PaginaGrupos<SolicitudPendienteResponse>>(
         `${this.gruposUrl}/${idGrupo}/solicitudes`,
-        { params: { page, size: 100 } },
+        { params: { page, size: TAMANO_PAGINA_MAXIMO } },
       ),
     );
   }
@@ -120,7 +120,7 @@ export class GrupoEstudioService {
   listarMisSolicitudes(idEstudiante: number) {
     return todasLasPaginas<MiSolicitudResponse>((page) =>
       this.http.get<PaginaGrupos<MiSolicitudResponse>>(`${this.gruposUrl}/solicitudes`, {
-        params: { page, size: 100 },
+        params: { page, size: TAMANO_PAGINA_MAXIMO },
       }),
     );
   }
