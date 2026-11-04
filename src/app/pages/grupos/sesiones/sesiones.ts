@@ -17,6 +17,7 @@ import {
   idGrupoDesdeSlug,
 } from '../../../core/services/grupo-estudio.service';
 import { SesionUsuarioService } from '../../../core/services/sesion-usuario.service';
+import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 @Component({
   selector: 'app-sesiones',
@@ -54,7 +55,8 @@ export class Sesiones implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal(false);
   readonly sesiones = signal<SesionEstudioResponse[]>([]);
-  readonly avisoAccion = signal('');
+  // Confirmación que se desvanece a los 3 s ('programada' | 'actualizada' | 'cancelada').
+  readonly aviso = crearAvisoTemporal();
   readonly errorAccion = signal('');
   // Programar (S04) empieza vacío; editar (S07) muestra los datos actuales de la sesión.
   readonly form = new FormGroup({
@@ -159,7 +161,7 @@ export class Sesiones implements OnInit {
       next: () => {
         this.cargar();
         this.vistaSignal.set('');
-        this.avisoAccion.set('programada');
+        this.aviso.mostrar('programada');
       },
       error: (respuesta) => {
         this.errorAccion.set(respuesta.error?.mensaje || 'No pudimos programar la sesión.');
@@ -173,7 +175,7 @@ export class Sesiones implements OnInit {
       next: () => {
         this.cargar();
         this.vistaSignal.set('');
-        this.avisoAccion.set('actualizada');
+        this.aviso.mostrar('actualizada');
       },
       error: (respuesta) => {
         this.errorAccion.set(respuesta.error?.mensaje || 'No pudimos guardar los cambios.');
@@ -186,7 +188,7 @@ export class Sesiones implements OnInit {
       next: () => {
         this.cargar();
         this.vistaSignal.set('');
-        this.avisoAccion.set('cancelada');
+        this.aviso.mostrar('cancelada');
       },
       error: (respuesta) => {
         this.errorAccion.set(respuesta.error?.mensaje || 'No pudimos cancelar la sesión.');

@@ -132,8 +132,12 @@
   </section>
 </div>
 
-@if (resultadoCapacidad(); as resultado) {
-  <div class="notice success" role="status">
+@if (avisoCapacidad.clave() ? resultadoCapacidad() : null; as resultado) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="avisoCapacidad.desvaneciendo()"
+    role="status"
+  >
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <div>
       <p class="notice-title">Capacidad actualizada</p>
@@ -141,8 +145,12 @@
     </div>
   </div>
 }
-@if (eliminadoReal()) {
-  <div class="notice success" role="status">
+@if (avisoEliminado.clave()) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="avisoEliminado.desvaneciendo()"
+    role="status"
+  >
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <p class="notice-title">Integrante eliminado</p>
   </div>

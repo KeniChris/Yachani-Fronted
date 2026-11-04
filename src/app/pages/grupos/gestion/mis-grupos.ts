@@ -10,6 +10,7 @@ import {
   MiSolicitudResponse,
 } from '../../../core/models/grupo-estudio.models';
 import { SesionUsuarioService } from '../../../core/services/sesion-usuario.service';
+import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 @Component({
   selector: 'app-mis-grupos',
@@ -21,7 +22,19 @@ import { SesionUsuarioService } from '../../../core/services/sesion-usuario.serv
 export class MisGrupos implements OnInit {
   // Variante visual mediante ?rol=tutor y estados de Figma mediante ?grupos=vacio|creado|creado-ia.
   @Input() rol = 'estudiante';
-  @Input() grupos = '';
+  // El ?grupos=creado|creado-ia que deja la pantalla de creación solo sirve para el
+  // aviso de confirmación, que se desvanece a los 3 s aunque el parámetro siga en la URL.
+  readonly avisoCreado = crearAvisoTemporal();
+  private gruposVisible = '';
+  @Input() set grupos(valor: string) {
+    this.gruposVisible = valor || '';
+    if (valor === 'creado' || valor === 'creado-ia') {
+      this.avisoCreado.mostrar(valor);
+    }
+  }
+  get grupos() {
+    return this.gruposVisible;
+  }
   // App zoneless: el estado que cambia tras una respuesta HTTP tiene que ser signal().
   readonly cargando = signal(true);
   readonly error = signal(false);

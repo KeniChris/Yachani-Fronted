@@ -3,8 +3,12 @@
   <p>Administra el nombre y la colaboración de tu grupo.</p>
 </header>
 
-@if (configuracion === 'actualizado') {
-  <div class="notice success" role="status">
+@if (avisoActualizado.clave()) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="avisoActualizado.desvaneciendo()"
+    role="status"
+  >
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
     <div>
       <p class="notice-title">Nombre actualizado</p>

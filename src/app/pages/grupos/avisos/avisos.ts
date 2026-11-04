@@ -12,6 +12,7 @@ import {
   idGrupoDesdeSlug,
 } from '../../../core/services/grupo-estudio.service';
 import { SesionUsuarioService } from '../../../core/services/sesion-usuario.service';
+import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 @Component({
   selector: 'app-avisos',
@@ -39,7 +40,8 @@ export class Avisos implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal(false);
   readonly lista = signal<AvisoResponse[]>([]);
-  readonly avisoAccion = signal('');
+  // Confirmación que se desvanece a los 3 s.
+  readonly aviso = crearAvisoTemporal();
   readonly errorAccion = signal('');
   // Publicar (AV03) empieza vacío; editar (AV04) carga el aviso actual al abrir el diálogo.
   readonly form = new FormGroup({
@@ -85,7 +87,7 @@ export class Avisos implements OnInit {
     llamada.subscribe({
       next: () => {
         this.cargar();
-        this.avisoAccion.set('publicado');
+        this.aviso.mostrar('publicado');
         this.dialog.closeAll();
       },
       error: (respuesta) => {

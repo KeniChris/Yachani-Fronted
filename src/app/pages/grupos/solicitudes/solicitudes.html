@@ -34,11 +34,15 @@
       >
     </section>
   } @else {
-    @if (avisoAccion()) {
-      <div class="notice success" role="status">
+    @if (aviso.clave()) {
+      <div
+        class="notice success temporal"
+        [class.desvaneciendo]="aviso.desvaneciendo()"
+        role="status"
+      >
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
         <div>
-          @if (avisoAccion() === 'aceptada') {
+          @if (aviso.clave() === 'aceptada') {
             <p class="notice-title">Solicitud aceptada</p>
             <p>El estudiante ahora forma parte del grupo.</p>
           } @else {

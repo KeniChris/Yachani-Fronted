@@ -158,11 +158,15 @@
     }
   </header>
 
-  @if (avisoAccion()) {
-    <div class="notice success" role="status">
+  @if (aviso.clave()) {
+    <div
+      class="notice success temporal"
+      [class.desvaneciendo]="aviso.desvaneciendo()"
+      role="status"
+    >
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
       <div>
-        @switch (avisoAccion()) {
+        @switch (aviso.clave()) {
           @case ('programada') {
             <p class="notice-title">Sesión programada</p>
             <p>El encuentro ya aparece en las sesiones del grupo.</p>

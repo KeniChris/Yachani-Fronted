@@ -82,7 +82,12 @@ export class CrearGrupo {
       })
       .subscribe({
         next: () => {
-          this.router.navigate(['/grupos/gestion'], { queryParams: { grupos: 'creado' } });
+          // Con merge se conserva el ?rol= de la vista previa: sin eso "Mis grupos"
+          // volvería al estudiante de ejemplo y el grupo recién creado no aparecería.
+          this.router.navigate(['/grupos/gestion'], {
+            queryParams: { grupos: 'creado', crear: null },
+            queryParamsHandling: 'merge',
+          });
         },
         error: (respuesta) => {
           const mensaje: string = respuesta.error?.mensaje || '';

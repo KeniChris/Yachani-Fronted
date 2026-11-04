@@ -1,15 +1,15 @@
 <h1>Chat del grupo</h1>
 
-@if (avisoEnviado()) {
-  <div class="notice success" role="status">
+@if (aviso.clave()) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="aviso.desvaneciendo()"
+    role="status"
+  >
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
-    <p class="notice-title">Mensaje enviado</p>
-  </div>
-}
-@if (avisoEliminado()) {
-  <div class="notice success" role="status">
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
-    <p class="notice-title">Mensaje eliminado</p>
+    <p class="notice-title">
+      {{ aviso.clave() === 'enviado' ? 'Mensaje enviado' : 'Mensaje eliminado' }}
+    </p>
   </div>
 }
 @if (errorAccion()) {

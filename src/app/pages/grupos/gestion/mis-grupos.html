@@ -50,11 +50,15 @@
     >
   }
 } @else {
-  @if (grupos === 'creado' || grupos === 'creado-ia') {
-    <div class="notice success" role="status">
+  @if (avisoCreado.clave()) {
+    <div
+      class="notice success temporal"
+      [class.desvaneciendo]="avisoCreado.desvaneciendo()"
+      role="status"
+    >
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
       <div>
-        @if (grupos === 'creado-ia') {
+        @if (avisoCreado.clave() === 'creado-ia') {
           <p class="notice-title">Grupo creado con IA</p>
           <p>Se crearon los temas y se compartieron los mazos que revisaste.</p>
         } @else {
@@ -106,6 +110,8 @@
           <a
             mat-button
             [routerLink]="['/grupos/descubrimiento', solicitud.idGrupo]"
+            [queryParams]="{ grupos: null }"
+            queryParamsHandling="merge"
             [attr.aria-label]="'Ver grupo ' + solicitud.nombreGrupo"
             >Ver grupo</a
           >

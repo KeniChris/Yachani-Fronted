@@ -155,3 +155,20 @@ textarea {
     margin: 0;
   }
 }
+
+/* Avisos de confirmación temporales (ver core/services/aviso-temporal.ts):
+   se desvanecen antes de desaparecer a los 3 segundos. */
+.notice.temporal {
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
+}
+.notice.temporal.desvaneciendo {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .notice.temporal {
+    transition: none;
+  }
+}

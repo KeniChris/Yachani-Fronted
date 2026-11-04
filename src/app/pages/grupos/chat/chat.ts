@@ -13,6 +13,7 @@ import {
   idGrupoDesdeSlug,
 } from '../../../core/services/grupo-estudio.service';
 import { SesionUsuarioService } from '../../../core/services/sesion-usuario.service';
+import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 
 @Component({
@@ -43,8 +44,8 @@ export class Chat implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal(false);
   readonly mensajes = signal<MensajeChatResponse[]>([]);
-  readonly avisoEnviado = signal(false);
-  readonly avisoEliminado = signal(false);
+  // Confirmaciones que se desvanecen a los 3 s ('enviado' | 'eliminado').
+  readonly aviso = crearAvisoTemporal();
   readonly errorAccion = signal('');
   // Evita que un segundo clic (o Enter + clic) envíe el mismo mensaje dos veces
   // mientras la primera petición sigue en curso.
@@ -107,8 +108,7 @@ export class Chat implements OnInit {
       .subscribe({
         next: () => {
           this.form.reset();
-          this.avisoEnviado.set(true);
-          this.avisoEliminado.set(false);
+          this.aviso.mostrar('enviado');
           this.enviando.set(false);
           this.cargar();
         },
@@ -122,8 +122,7 @@ export class Chat implements OnInit {
     this.errorAccion.set('');
     this.api.eliminarMensaje(this.idGrupo, idMensaje, this.idUsuario).subscribe({
       next: () => {
-        this.avisoEliminado.set(true);
-        this.avisoEnviado.set(false);
+        this.aviso.mostrar('eliminado');
         this.ahora.set(Date.now());
         this.cargar();
       },

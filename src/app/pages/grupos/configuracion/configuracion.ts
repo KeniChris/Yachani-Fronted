@@ -12,6 +12,7 @@ import {
   idGrupoDesdeSlug,
 } from '../../../core/services/grupo-estudio.service';
 import { GrupoEstudioResponse } from '../../../core/models/grupo-estudio.models';
+import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 @Component({
   selector: 'app-configuracion',
@@ -38,7 +39,19 @@ export class Configuracion implements OnInit {
     this.idGrupo = idGrupoDesdeSlug(valor) ?? ID_GRUPO_DEMO;
   }
   // Estados de Figma mediante ?configuracion=: editar (G22/G23) y actualizado (G24/G25).
-  @Input() configuracion = '';
+  // El aviso de "Nombre actualizado" se desvanece a los 3 s aunque el ?configuracion=
+  // siga en la URL.
+  readonly avisoActualizado = crearAvisoTemporal();
+  private configuracionVisible = '';
+  @Input() set configuracion(valor: string) {
+    this.configuracionVisible = valor || '';
+    if (valor === 'actualizado') {
+      this.avisoActualizado.mostrar();
+    }
+  }
+  get configuracion() {
+    return this.configuracionVisible;
+  }
   // App zoneless: el estado que cambia tras una respuesta HTTP tiene que ser signal().
   readonly cargando = signal(true);
   readonly error = signal(false);

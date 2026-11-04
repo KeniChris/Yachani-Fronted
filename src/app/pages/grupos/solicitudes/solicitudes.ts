@@ -13,6 +13,7 @@ import {
   GrupoEstudioResponse,
   SolicitudPendienteResponse,
 } from '../../../core/models/grupo-estudio.models';
+import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 @Component({
   selector: 'app-solicitudes',
@@ -35,7 +36,8 @@ export class Solicitudes implements OnInit {
   readonly error = signal(false);
   readonly lista = signal<SolicitudPendienteResponse[]>([]);
   readonly grupo = signal<GrupoEstudioResponse | null>(null);
-  readonly avisoAccion = signal('');
+  // Confirmación que se desvanece a los 3 s ('aceptada' | 'rechazada').
+  readonly aviso = crearAvisoTemporal();
   readonly errorAccion = signal('');
   constructor(
     public readonly dialog: MatDialog,
@@ -64,7 +66,7 @@ export class Solicitudes implements OnInit {
     this.api.aceptarSolicitud(idSolicitud).subscribe({
       next: () => {
         this.cargar();
-        this.avisoAccion.set('aceptada');
+        this.aviso.mostrar('aceptada');
         this.dialog.closeAll();
       },
       error: (respuesta) => {
@@ -78,7 +80,7 @@ export class Solicitudes implements OnInit {
     this.api.rechazarSolicitud(idSolicitud).subscribe({
       next: () => {
         this.cargar();
-        this.avisoAccion.set('rechazada');
+        this.aviso.mostrar('rechazada');
         this.dialog.closeAll();
       },
       error: (respuesta) => {

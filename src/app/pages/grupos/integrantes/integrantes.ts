@@ -15,6 +15,7 @@ import {
   GrupoEstudioResponse,
   IntegranteResponse,
 } from '../../../core/models/grupo-estudio.models';
+import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 @Component({
   selector: 'app-integrantes',
@@ -48,7 +49,8 @@ export class Integrantes implements OnInit {
   readonly lista = signal<IntegranteResponse[]>([]);
   readonly grupo = signal<GrupoEstudioResponse | null>(null);
   readonly errorEliminar = signal('');
-  readonly eliminadoReal = signal(false);
+  // Confirmación de integrante eliminado: se desvanece a los 3 s.
+  readonly avisoEliminado = crearAvisoTemporal();
   // La API no marca quién es tutor en /integrantes: se identifica comparando
   // con el idCreador que devuelve el grupo.
   get tutor() {
@@ -74,6 +76,9 @@ export class Integrantes implements OnInit {
     capacidad: new FormControl<number | null>(15, [Validators.required, Validators.min(8)]),
   });
   readonly errorCapacidad = signal('');
+  // Capacidad guardada: el aviso se desvanece a los 3 s, pero la capacidad nueva
+  // se conserva aparte porque el texto del aviso la menciona.
+  readonly avisoCapacidad = crearAvisoTemporal();
   readonly resultadoCapacidad = signal<GrupoEstudioResponse | null>(null);
   constructor(
     public readonly dialog: MatDialog,
@@ -104,6 +109,7 @@ export class Integrantes implements OnInit {
     this.api.actualizarCapacidad(this.idGrupo, this.capacidadForm.getRawValue().capacidad!).subscribe({
       next: (respuesta) => {
         this.resultadoCapacidad.set(respuesta);
+        this.avisoCapacidad.mostrar();
         this.dialogRefCapacidad?.close();
       },
       error: (respuesta) => {
@@ -116,7 +122,7 @@ export class Integrantes implements OnInit {
     this.api.eliminarIntegrante(this.idGrupo, idUsuario).subscribe({
       next: () => {
         this.cargar();
-        this.eliminadoReal.set(true);
+        this.avisoEliminado.mostrar();
         this.dialog.closeAll();
       },
       error: (respuesta) => {
