@@ -3,16 +3,14 @@
   <p>Busca un curso o tema y encuentra tu comunidad.</p>
 </header>
 
-<form [formGroup]="buscarForm" class="search-panel">
+<form [formGroup]="buscarForm" class="search-panel" (ngSubmit)="buscar()">
   <mat-form-field appearance="outline" class="search-field">
     <mat-label>Curso o tema</mat-label>
     <input matInput formControlName="busqueda" placeholder="Ej.: Ingeniería de Software" />
     <mat-hint>Busca por el nombre o la descripción del grupo.</mat-hint>
   </mat-form-field>
   <div class="search-actions">
-    <a mat-flat-button routerLink="/grupos/descubrimiento" [queryParams]="{ estado: 'filtrados' }"
-      >Buscar</a
-    >
+    <button mat-flat-button type="submit">Buscar</button>
     <button
       mat-stroked-button
       type="button"
@@ -26,19 +24,23 @@
 @switch (estado) {
   @case ('filtrados') {
     <div class="chips" aria-label="Filtros aplicados">
-      <span class="chip">Cálculo</span>
-      <span class="chip">Con tutor</span>
-      <a mat-button routerLink="/grupos/descubrimiento">Limpiar</a>
+      @if (filtrosForm.getRawValue().curso) {
+        <span class="chip">{{ filtrosForm.getRawValue().curso }}</span>
+      }
+      @if (filtrosForm.getRawValue().metodo) {
+        <span class="chip">{{ filtrosForm.getRawValue().metodo }}</span>
+      }
+      <a mat-button (click)="limpiar()">Limpiar</a>
     </div>
-    <p class="count">1 grupo encontrado</p>
+    <p class="count">{{ resultados().length }} grupo{{ resultados().length === 1 ? '' : 's' }} encontrado{{ resultados().length === 1 ? '' : 's' }}</p>
     <div class="group-grid single">
-      @for (grupo of filtrados; track grupo.id) {
+      @for (grupo of resultados(); track grupo.idGrupo) {
         <article class="group-card">
           <h2><mat-icon fontSet="material-symbols-rounded">groups</mat-icon>{{ grupo.nombre }}</h2>
           <p>{{ grupo.descripcion }}</p>
-          <small>{{ grupo.tipo }} · {{ grupo.responsable }}</small>
-          <strong>{{ grupo.metodo }} · {{ grupo.integrantes }}</strong>
-          <a mat-stroked-button [routerLink]="['/grupos/descubrimiento', grupo.id]">Ver grupo</a>
+          <small>{{ grupo.tipoGrupo === 'TUTOR' ? 'Con tutor' : 'Entre estudiantes' }}</small>
+          <strong>{{ grupo.metodoEstudio }} · {{ grupo.integrantesActuales }} de {{ grupo.capacidadMaxima }} integrantes</strong>
+          <a mat-stroked-button [routerLink]="['/grupos/descubrimiento', grupo.idGrupo]">Ver grupo</a>
         </article>
       }
     </div>
@@ -48,7 +50,7 @@
       <mat-icon fontSet="material-symbols-rounded">search</mat-icon>
       <h2 id="vacio-title">No encontramos grupos con esa búsqueda</h2>
       <p>Prueba otro nombre o quita alguno de los filtros.</p>
-      <a mat-flat-button routerLink="/grupos/descubrimiento">Limpiar búsqueda</a>
+      <a mat-flat-button (click)="limpiar()">Limpiar búsqueda</a>
     </section>
   }
   @case ('error') {
@@ -59,27 +61,25 @@
         <p>Revisa tu conexión y vuelve a intentarlo.</p>
       </div>
     </section>
-    <a
-      mat-stroked-button
-      class="retry"
-      routerLink="/grupos/descubrimiento"
-      [queryParams]="{ estado: 'error' }"
-      >Reintentar</a
-    >
+    <button mat-stroked-button class="retry" type="button" (click)="listarTodos()">Reintentar</button>
   }
   @default {
-    <p class="count">4 grupos disponibles</p>
-    <div class="group-grid">
-      @for (grupo of grupos; track grupo.id) {
-        <article class="group-card">
-          <h2><mat-icon fontSet="material-symbols-rounded">groups</mat-icon>{{ grupo.nombre }}</h2>
-          <p>{{ grupo.descripcion }}</p>
-          <small>{{ grupo.tipo }} · {{ grupo.responsable }}</small>
-          <strong>{{ grupo.metodo }} · {{ grupo.integrantes }}</strong>
-          <a mat-stroked-button [routerLink]="['/grupos/descubrimiento', grupo.id]">Ver grupo</a>
-        </article>
-      }
-    </div>
+    @if (cargando()) {
+      <p class="count">Cargando grupos…</p>
+    } @else {
+      <p class="count">{{ resultados().length }} grupo{{ resultados().length === 1 ? '' : 's' }} disponible{{ resultados().length === 1 ? '' : 's' }}</p>
+      <div class="group-grid">
+        @for (grupo of resultados(); track grupo.idGrupo) {
+          <article class="group-card">
+            <h2><mat-icon fontSet="material-symbols-rounded">groups</mat-icon>{{ grupo.nombre }}</h2>
+            <p>{{ grupo.descripcion }}</p>
+            <small>{{ grupo.tipoGrupo === 'TUTOR' ? 'Con tutor' : 'Entre estudiantes' }}</small>
+            <strong>{{ grupo.metodoEstudio }} · {{ grupo.integrantesActuales }} de {{ grupo.capacidadMaxima }} integrantes</strong>
+            <a mat-stroked-button [routerLink]="['/grupos/descubrimiento', grupo.idGrupo]">Ver grupo</a>
+          </article>
+        }
+      </div>
+    }
   }
 }
 
@@ -123,15 +123,16 @@
       </form>
     </mat-dialog-content>
     <mat-dialog-actions>
-      <a mat-stroked-button mat-dialog-close routerLink="/grupos/descubrimiento">Cancelar</a>
-      <a
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
         mat-flat-button
+        type="button"
         mat-dialog-close
-        routerLink="/grupos/descubrimiento"
-        [queryParams]="{ estado: 'filtrados' }"
-        [class.disabled]="filtrosForm.invalid"
-        >Aplicar filtros</a
+        [disabled]="filtrosForm.invalid"
+        (click)="filtrar()"
       >
+        Aplicar filtros
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>

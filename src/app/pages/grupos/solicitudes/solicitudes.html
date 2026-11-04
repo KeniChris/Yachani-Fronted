@@ -3,24 +3,28 @@
   <p>Revisa quién desea formar parte de tu grupo.</p>
 </header>
 
-<section class="content-card summary">
-  @if (admin === 'si') {
-    <p>Ingeniería de Software: repasos · {{ solicitudes === 'aceptada' ? 5 : 4 }} de 8 integrantes</p>
-  } @else {
-    <p>
-      Dominando Cálculo ·
-      {{ solicitudes === 'aceptada' ? 9 : solicitudes === 'sin-cupos' ? 12 : 8 }} de 12 integrantes
-    </p>
-  }
-</section>
+@if (grupo(); as g) {
+  <section class="content-card summary">
+    <p>{{ g.nombre }} · {{ g.integrantesActuales }} de {{ g.capacidadMaxima }} integrantes</p>
+  </section>
+}
 
 @if (rol !== 'tutor' && admin !== 'si') {
   <section class="content-card">
     <p class="help">El creador administra los cupos y las solicitudes.</p>
   </section>
+} @else if (cargando()) {
+  <section class="content-card empty-state">
+    <p>Cargando solicitudes…</p>
+  </section>
+} @else if (error()) {
+  <section class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+    <h2>No pudimos cargar las solicitudes</h2>
+    <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+  </section>
 } @else {
-@switch (solicitudes) {
-  @case ('vacio') {
+  @if (lista().length === 0) {
     <section class="content-card empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person_add</mat-icon>
       <h2>No tienes solicitudes pendientes</h2>
@@ -29,59 +33,44 @@
         >Ver integrantes</a
       >
     </section>
-  }
-  @default {
-    @if (solicitudes === 'aceptada' || solicitudes === 'rechazada') {
-      <div class="notice success" role="status">
+  } @else {
+    @if (aviso.clave()) {
+      <div
+        class="notice success temporal"
+        [class.desvaneciendo]="aviso.desvaneciendo()"
+        role="status"
+      >
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
         <div>
-          @if (solicitudes === 'aceptada') {
+          @if (aviso.clave() === 'aceptada') {
             <p class="notice-title">Solicitud aceptada</p>
-            <p>Irene Castro ahora forma parte del grupo.</p>
+            <p>El estudiante ahora forma parte del grupo.</p>
           } @else {
             <p class="notice-title">Solicitud rechazada</p>
-            <p>Se notificó a Irene sobre el resultado de su solicitud.</p>
+            <p>Se notificó al estudiante sobre el resultado de su solicitud.</p>
           }
         </div>
       </div>
     }
-    @if (solicitudes === 'sin-cupos') {
+    @if (errorAccion()) {
       <div class="notice" role="status">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
         <div>
-          <p class="notice-title">No hay cupos para aceptar esta solicitud</p>
-          <a
-            mat-stroked-button
-            routerLink="../integrantes"
-            [queryParams]="{ solicitudes: null }"
-            queryParamsHandling="merge"
+          <p class="notice-title">{{ errorAccion() }}</p>
+          <a mat-stroked-button routerLink="../integrantes" [queryParams]="{ solicitudes: null }" queryParamsHandling="merge"
             >Cambiar capacidad</a
           >
         </div>
       </div>
     }
-    @if (solicitudes === 'procesada') {
-      <div class="notice" role="status">
-        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
-        <div>
-          <p class="notice-title">La solicitud ya fue procesada</p>
-          <a mat-stroked-button routerLink="." [queryParams]="{ solicitudes: null }" queryParamsHandling="merge"
-            >Actualizar solicitudes</a
-          >
-        </div>
-      </div>
-    }
-    <div class="request-grid" [class.single]="solicitudes === 'aceptada' || solicitudes === 'rechazada'">
-      @for (
-        solicitud of solicitudes === 'aceptada' || solicitudes === 'rechazada' ? lista.slice(1) : lista;
-        track solicitud.nombre
-      ) {
+    <div class="request-grid">
+      @for (solicitud of lista(); track solicitud.idSolicitud) {
         <article class="content-card request">
           <div class="request-person">
-            <span class="avatar" aria-hidden="true">{{ solicitud.iniciales }}</span>
+            <span class="avatar" aria-hidden="true">{{ solicitud.nombreEstudiante.split(' ')[0][0] }}{{ solicitud.nombreEstudiante.split(' ')[1]?.[0] }}</span>
             <div>
-              <h2>{{ solicitud.nombre }}</h2>
-              <p class="help">{{ solicitud.fecha }}</p>
+              <h2>{{ solicitud.nombreEstudiante }}</h2>
+              <p class="help">Solicitó unirse el {{ solicitud.fechaSolicitud | date: "d MMM y" }}</p>
             </div>
           </div>
           <p class="pending">Pendiente de revisión</p>
@@ -89,12 +78,12 @@
             <button
               mat-stroked-button
               type="button"
-              [attr.aria-label]="'Rechazar a ' + solicitud.nombre"
+              [attr.aria-label]="'Rechazar a ' + solicitud.nombreEstudiante"
               (click)="
                 dialog.open(rechazarDialog, {
                   width: '600px',
                   maxWidth: 'calc(100vw - 32px)',
-                  data: solicitud.nombre,
+                  data: solicitud,
                 })
               "
             >
@@ -103,12 +92,12 @@
             <button
               mat-flat-button
               type="button"
-              [attr.aria-label]="'Aceptar a ' + solicitud.nombre"
+              [attr.aria-label]="'Aceptar a ' + solicitud.nombreEstudiante"
               (click)="
                 dialog.open(aceptarDialog, {
                   width: '600px',
                   maxWidth: 'calc(100vw - 32px)',
-                  data: solicitud.nombre,
+                  data: solicitud,
                 })
               "
             >
@@ -120,38 +109,30 @@
     </div>
   }
 }
-}
 
-<ng-template #aceptarDialog let-nombre>
+<ng-template #aceptarDialog let-solicitud>
   <div class="dialog-shell">
     <div class="dialog-heading">
-      <h2>¿Aceptar a {{ nombre }}?</h2>
+      <h2>¿Aceptar a {{ solicitud.nombreEstudiante }}?</h2>
       <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
         <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
       </button>
     </div>
     <mat-dialog-content>
       <p>
-        {{ nombre.split(' ')[0] }} podrá participar en el chat, las sesiones y los recursos del grupo.
+        {{ solicitud.nombreEstudiante.split(' ')[0] }} podrá participar en el chat, las sesiones y los recursos del grupo.
       </p>
     </mat-dialog-content>
     <mat-dialog-actions>
       <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
-      <button
-        mat-flat-button
-        type="button"
-        mat-dialog-close
-        routerLink="."
-        [queryParams]="{ solicitudes: 'aceptada' }"
-        queryParamsHandling="merge"
-      >
+      <button mat-flat-button type="button" (click)="aceptar(solicitud.idSolicitud)">
         Aceptar solicitud
       </button>
     </mat-dialog-actions>
   </div>
 </ng-template>
 
-<ng-template #rechazarDialog let-nombre>
+<ng-template #rechazarDialog let-solicitud>
   <div class="dialog-shell">
     <div class="dialog-heading">
       <h2>¿Rechazar esta solicitud?</h2>
@@ -160,19 +141,11 @@
       </button>
     </div>
     <mat-dialog-content>
-      <p>{{ nombre.split(' ')[0] }} recibirá una notificación con el resultado.</p>
+      <p>{{ solicitud.nombreEstudiante.split(' ')[0] }} recibirá una notificación con el resultado.</p>
     </mat-dialog-content>
     <mat-dialog-actions>
       <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
-      <button
-        mat-flat-button
-        type="button"
-        class="danger"
-        mat-dialog-close
-        routerLink="."
-        [queryParams]="{ solicitudes: 'rechazada' }"
-        queryParamsHandling="merge"
-      >
+      <button mat-flat-button type="button" class="danger" (click)="rechazar(solicitud.idSolicitud)">
         Rechazar solicitud
       </button>
     </mat-dialog-actions>

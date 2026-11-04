@@ -13,7 +13,17 @@
       queryParamsHandling="merge">Crear grupo</a>
 </header>
 
-@if (grupos === 'vacio') {
+@if (cargando()) {
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <p>Cargando tus grupos…</p>
+  </mat-card>
+} @else if (error()) {
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+    <h2>No pudimos cargar tus grupos</h2>
+    <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+  </mat-card>
+} @else if (grupos === 'vacio' || lista().length === 0) {
   <mat-card appearance="outlined" class="content-card empty-state">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
     <h2>Todavía no tienes grupos</h2>
@@ -40,44 +50,40 @@
     >
   }
 } @else {
-  @let nuevo = grupoCreado[rol === 'tutor' ? 'tutor' : 'estudiante'];
-  @let recienCreado = grupos === 'creado' || grupos === 'creado-ia';
-  @if (recienCreado) {
-    <div class="notice success" role="status">
+  @if (avisoCreado.clave()) {
+    <div
+      class="notice success temporal"
+      [class.desvaneciendo]="avisoCreado.desvaneciendo()"
+      role="status"
+    >
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
       <div>
-        @if (grupos === 'creado-ia') {
+        @if (avisoCreado.clave() === 'creado-ia') {
           <p class="notice-title">Grupo creado con IA</p>
           <p>Se crearon los temas y se compartieron los mazos que revisaste.</p>
         } @else {
           <p class="notice-title">Grupo creado</p>
-          <p>{{ nuevo.nombre }} ya está listo para recibir solicitudes.</p>
+          <p>Tu grupo ya está listo para recibir solicitudes.</p>
         }
       </div>
     </div>
   }
-  <div class="group-grid" [class.single]="recienCreado">
-    @for (
-      grupo of recienCreado ? [nuevo] : listas[rol === 'tutor' ? 'tutor' : 'estudiante'];
-      track grupo.id
-    ) {
+  <div class="group-grid">
+    @for (grupo of lista(); track grupo.idGrupo) {
       <mat-card appearance="outlined" class="content-card">
         <div class="card-heading">
           <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
           <h2>{{ grupo.nombre }}</h2>
         </div>
         <p class="group-description">{{ grupo.descripcion }}</p>
-        <p class="group-responsible">{{ grupo.responsable }}</p>
-        <p class="group-detail">{{ grupo.detalle }}</p>
+        <p class="group-responsible">{{ responsable(grupo) }}</p>
+        <p class="group-detail">{{ detalle(grupo) }}</p>
         <a
           mat-stroked-button
           class="group-action"
-          [routerLink]="['/grupos', grupo.id]"
-          [queryParams]="{
-            grupos: null,
-            admin: rol !== 'tutor' && grupo.id === 'ingenieria-software' ? 'si' : null,
-          }"
-      queryParamsHandling="merge"
+          [routerLink]="['/grupos', grupo.idGrupo]"
+          [queryParams]="{ grupos: null, admin: esAdministradora(grupo) ? 'si' : null }"
+          queryParamsHandling="merge"
           [attr.aria-label]="'Ver grupo ' + grupo.nombre"
           >Ver grupo</a
         >
@@ -85,30 +91,32 @@
     }
   </div>
 
-  @if (rol !== 'tutor') {
-    <mat-card appearance="outlined" class="content-card requests" aria-labelledby="requests-title">
-      <h2 id="requests-title">Mis solicitudes</h2>
-      <ul>
-        @for (solicitud of solicitudes; track solicitud.grupo) {
-          <li>
-            <div class="request-row">
-              <div class="request-copy">
-                <h3>{{ solicitud.grupo }}</h3>
-                <p>{{ solicitud.fecha }}</p>
-              </div>
-              <span class="status-badge">{{ solicitud.estado }}</span>
+}
+
+<!-- Fuera del if/else: las solicitudes enviadas se ven aunque todavía no tengas grupos. -->
+@if (solicitudes().length > 0) {
+  <mat-card appearance="outlined" class="content-card requests" aria-labelledby="requests-title">
+    <h2 id="requests-title">Mis solicitudes</h2>
+    <ul>
+      @for (solicitud of solicitudes(); track solicitud.idSolicitud) {
+        <li>
+          <div class="request-row">
+            <div class="request-copy">
+              <h3>{{ solicitud.nombreGrupo }}</h3>
+              <p>Solicitud enviada el {{ solicitud.fechaSolicitud | date: "d MMM y" }}</p>
             </div>
-            <a
-              mat-button
-              routerLink="/grupos/descubrimiento"
-              [queryParams]="{ grupos: null }"
-      queryParamsHandling="merge"
-              [attr.aria-label]="'Ver grupo ' + solicitud.grupo"
-              >Ver grupo</a
-            >
-          </li>
-        }
-      </ul>
-    </mat-card>
-  }
+            <span class="status-badge">{{ estadoLegible(solicitud.estado) }}</span>
+          </div>
+          <a
+            mat-button
+            [routerLink]="['/grupos/descubrimiento', solicitud.idGrupo]"
+            [queryParams]="{ grupos: null }"
+            queryParamsHandling="merge"
+            [attr.aria-label]="'Ver grupo ' + solicitud.nombreGrupo"
+            >Ver grupo</a
+          >
+        </li>
+      }
+    </ul>
+  </mat-card>
 }
