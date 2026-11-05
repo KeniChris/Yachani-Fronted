@@ -86,29 +86,42 @@ export class Sesiones implements OnInit {
   @Input() set vista(valor: string) {
     this.vistaSignal.set(valor || '');
     if (valor === 'editar') {
-      const s = this.sesionActual;
-      const inicio = s ? new Date(s.fechaHoraInicio) : null;
-      this.form.reset(
-        s
-          ? {
-              tema: s.tema,
-              descripcion: s.descripcion,
-              fecha: inicio,
-              hora: inicio,
-              duracion: s.duracionMinutos,
-              lugar: s.lugar,
-            }
-          : {},
-      );
-    } else if (valor === 'programar') {
-      this.form.reset();
+      this.llenarFormularioEditar();
+    } else {
+      this.idLlenado = null;
+      if (valor === 'programar') this.form.reset();
     }
   }
   get vista() {
     return this.vistaSignal();
   }
   // Sesión activa para las vistas de detalle/editar, mediante ?idSesion=.
-  @Input() idSesion = '';
+  private _idSesion = '';
+  @Input() set idSesion(valor: string) {
+    this._idSesion = valor ?? '';
+    this.llenarFormularioEditar();
+  }
+  get idSesion() {
+    return this._idSesion;
+  }
+  // Id de la sesión ya volcada al formulario, para no pisar lo que el usuario escribe.
+  private idLlenado: number | null = null;
+  // Rellena el formulario de Modificar en cuanto se conocen vista, idSesion y las sesiones.
+  private llenarFormularioEditar() {
+    if (this.vista !== 'editar') return;
+    const s = this.sesionActual;
+    if (!s || this.idLlenado === s.idSesion) return;
+    this.idLlenado = s.idSesion;
+    const inicio = new Date(s.fechaHoraInicio);
+    this.form.reset({
+      tema: s.tema,
+      descripcion: s.descripcion,
+      fecha: inicio,
+      hora: inicio,
+      duracion: s.duracionMinutos,
+      lugar: s.lugar,
+    });
+  }
   get sesionActual(): SesionEstudioResponse | undefined {
     return this.sesiones().find((s) => String(s.idSesion) === this.idSesion);
   }
@@ -134,6 +147,7 @@ export class Sesiones implements OnInit {
       next: (sesiones) => {
         this.sesiones.set(sesiones);
         this.cargando.set(false);
+        this.llenarFormularioEditar();
       },
       error: () => {
         this.error.set(true);
