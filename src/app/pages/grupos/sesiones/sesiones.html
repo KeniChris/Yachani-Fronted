@@ -18,7 +18,7 @@
       <a mat-stroked-button routerLink="." [queryParams]="{ vista: null, idSesion: null }" queryParamsHandling="merge"
         >Volver a sesiones</a
       >
-      @if (rol === 'tutor' || admin === 'si') {
+      @if (puedeGestionar()) {
         <a
           mat-flat-button
           routerLink="."
@@ -28,7 +28,7 @@
         >
       }
     </div>
-    @if (rol === 'tutor' || admin === 'si') {
+    @if (puedeGestionar()) {
       <button
         mat-button
         type="button"
@@ -151,7 +151,7 @@
       <h1>Sesiones de estudio</h1>
       <p>Consulta los próximos encuentros del grupo.</p>
     </div>
-    @if (rol === 'tutor' || admin === 'si') {
+    @if (puedeGestionar()) {
       <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar' }" queryParamsHandling="merge"
         >Programar sesión</a
       >
@@ -206,7 +206,7 @@
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
       <h2>No hay sesiones programadas</h2>
       <p>Programa el próximo encuentro para tu grupo.</p>
-      @if (rol === 'tutor' || admin === 'si') {
+      @if (puedeGestionar()) {
         <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar' }" queryParamsHandling="merge"
           >Programar sesión</a
         >
@@ -232,7 +232,7 @@
         [attr.aria-label]="'Ver sesión ' + sesionPrincipal.tema"
         >Ver sesión</a
       >
-      @if (rol === 'tutor' || admin === 'si') {
+      @if (puedeGestionar()) {
         <div class="session-actions">
           <a
             mat-stroked-button
