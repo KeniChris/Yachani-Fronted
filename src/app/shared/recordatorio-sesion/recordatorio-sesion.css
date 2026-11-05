@@ -1,0 +1,48 @@
+:host {
+  display: contents;
+}
+.reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--color-active);
+  color: var(--color-primary);
+  font: var(--font-secondary);
+}
+.reminder.en-curso {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+.reminder > mat-icon {
+  flex: none;
+}
+.reminder-copy {
+  flex: 1;
+  min-width: 0;
+}
+.reminder-copy p {
+  overflow-wrap: anywhere;
+}
+.reminder-title {
+  font: var(--font-control);
+}
+.reminder-copy .help {
+  color: inherit;
+  opacity: 0.85;
+}
+.reminder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+@media (max-width: 767px) {
+  .reminder {
+    flex-direction: column;
+  }
+  .reminder-actions,
+  .reminder-actions a {
+    width: 100%;
+  }
+}

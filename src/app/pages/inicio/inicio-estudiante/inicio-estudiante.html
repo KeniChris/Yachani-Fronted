@@ -2,6 +2,9 @@
   <h1>{{ nombre ? 'Hola, ' + nombre : 'Hola' }}</h1>
   <p>Sigue aprendiendo con tu comunidad de estudio.</p>
 </header>
+<!-- Aviso antes de comenzar: el recordatorio de la hora previa, visible al entrar. -->
+<app-recordatorio-sesion [sesiones]="sesiones()" [mostrarGrupo]="true" />
+
 <section class="next-step" aria-labelledby="next-step-title">
   <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">menu_book</mat-icon>
   <div class="next-step-copy">

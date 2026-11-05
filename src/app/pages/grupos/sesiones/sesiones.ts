@@ -17,6 +17,7 @@ import {
   idGrupoDesdeSlug,
 } from '../../../core/services/grupo-estudio.service';
 import { SesionUsuarioService } from '../../../core/services/sesion-usuario.service';
+import { RecordatorioSesion } from '../../../shared/recordatorio-sesion/recordatorio-sesion';
 import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 @Component({
@@ -33,6 +34,7 @@ import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
     MatIconModule,
     MatInputModule,
     MatTimepickerModule,
+    RecordatorioSesion,
   ],
   providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'es-PE' }],
   templateUrl: './sesiones.html',

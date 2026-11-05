@@ -36,8 +36,15 @@
   }
 } @else {
   <header class="page-heading">
-    <h1>Notificaciones</h1>
-    <p>Mantente al tanto de tus grupos y sesiones.</p>
+    <div>
+      <h1>Notificaciones</h1>
+      <p>Mantente al tanto de tus grupos y sesiones.</p>
+    </div>
+    @if (sinLeer() > 0) {
+      <button mat-stroked-button type="button" [disabled]="marcando()" (click)="marcarTodas()">
+        Marcar todas como leídas
+      </button>
+    }
   </header>
 
   @if (cargando()) {
@@ -58,47 +65,69 @@
       <a mat-flat-button routerLink="/inicio">Volver al inicio</a>
     </section>
   } @else {
-    @if (avisoLeida()) {
-      <div class="notice success" role="status">
+    @if (aviso.clave()) {
+      <div
+        class="notice success temporal"
+        [class.desvaneciendo]="aviso.desvaneciendo()"
+        role="status"
+      >
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
-        <div>
-          <p class="notice-title">Notificación marcada como leída</p>
-          <p>Puedes seguir revisando tus novedades.</p>
-        </div>
+        <p class="notice-title">
+          {{
+            aviso.clave() === "todas"
+              ? "Notificaciones marcadas como leídas"
+              : "Notificación marcada como leída"
+          }}
+        </p>
       </div>
     }
-    <span class="badge">{{ sinLeer }} sin leer</span>
-    <p class="help">Revisa las novedades de tus grupos y los recordatorios de sesión.</p>
+    <p class="help resumen">
+      {{ sinLeer() }} sin leer de {{ lista().length }}
+      {{ lista().length === 1 ? "notificación" : "notificaciones" }}
+    </p>
     <ul class="list">
       @for (notificacion of lista(); track notificacion.clave) {
-        <li class="content-card item">
-          <div class="item-body">
-            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
-            <div class="item-copy">
-              <h2>{{ notificacion.titulo }}</h2>
-              <p>{{ notificacion.texto }}</p>
-              <p class="help">{{ notificacion.fecha | date: "d MMM y · HH:mm" }}</p>
+        <li class="content-card item" [class.sin-leer]="!notificacion.leida">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+            {{ notificacion.sesion ? "alarm" : "notifications" }}
+          </mat-icon>
+          <div class="item-copy">
+            <h2>{{ notificacion.titulo }}</h2>
+            <p>{{ notificacion.texto }}</p>
+            <p class="meta">
+              <span class="help">{{ notificacion.fecha | date: "d MMM y · HH:mm" }}</span>
               @if (notificacion.sesion) {
                 <a
-                  mat-button
+                  class="accion"
                   routerLink="/notificaciones"
-                  [queryParams]="{ vista: 'recordatorio', idNotificacion: notificacion.idNotificacion }"
+                  [queryParams]="{
+                    vista: 'recordatorio',
+                    idNotificacion: notificacion.idNotificacion,
+                  }"
                   queryParamsHandling="merge"
                   >{{ notificacion.accion }}</a
                 >
               } @else {
-                <a mat-button [routerLink]="notificacion.enlace">{{ notificacion.accion }}</a>
+                <a class="accion" [routerLink]="notificacion.enlace">{{ notificacion.accion }}</a>
               }
-            </div>
+            </p>
           </div>
-          <span class="badge" [class.read]="notificacion.leida">{{
-            notificacion.leida ? 'Leída' : 'Sin leer'
-          }}</span>
-          @if (!notificacion.leida && notificacion.marcable) {
-            <button mat-button class="mark" type="button" (click)="marcarComoLeida(notificacion)">
-              Marcar como leída
-            </button>
-          }
+          <div class="item-estado">
+            <span class="badge" [class.read]="notificacion.leida">{{
+              notificacion.leida ? "Leída" : "No leída"
+            }}</span>
+            @if (!notificacion.leida && notificacion.marcable) {
+              <button
+                class="mark"
+                type="button"
+                [disabled]="marcando()"
+                [attr.aria-label]="'Marcar como leída: ' + notificacion.titulo"
+                (click)="marcarComoLeida(notificacion)"
+              >
+                Marcar como leída
+              </button>
+            }
+          </div>
         </li>
       }
     </ul>

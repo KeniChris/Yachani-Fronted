@@ -163,6 +163,15 @@ mat-icon img {
 }
 .topbar-profile .identity {
   width: 150px;
+  overflow: hidden;
+}
+/* Un nombre largo se salía de la caja y estiraba la página: de ahí la barra de
+   desplazamiento horizontal. Se recorta con puntos suspensivos. */
+.topbar-profile .user-name,
+.topbar-profile .user-role {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .topbar-profile .user-role {
   color: var(--color-muted);
@@ -260,4 +269,19 @@ main {
     color: var(--color-primary);
     border-radius: 0;
   }
+}
+
+/* Punto de notificaciones sin leer sobre la campanita. */
+.notification-link {
+  position: relative;
+}
+.notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-primary);
 }

@@ -1,7 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
-import {  Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NotificacionService } from '../../core/services/notificacion.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -29,9 +32,39 @@ import { Brand } from '../brand/brand';
   templateUrl: './app-layout.html',
   styleUrl: './app-layout.css',
 })
-export class AppLayout {
+export class AppLayout implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly notificaciones = inject(NotificacionService);
+  // Se guarda el DestroyRef porque ngOnInit ya no es contexto de inyección.
+  private readonly destroyRef = inject(DestroyRef);
+  // Punto de aviso en la campanita cuando hay notificaciones sin leer.
+  // App zoneless: el conteo llega por HTTP, así que tiene que ser signal().
+  readonly sinLeer = signal(0);
+
+  ngOnInit(): void {
+    this.contarSinLeer();
+    // Se vuelve a consultar al cambiar de pantalla, para que el punto desaparezca
+    // en cuanto se marcan como leídas y se sale de notificaciones.
+    this.router.events
+      .pipe(
+        filter((evento) => evento instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.contarSinLeer());
+  }
+
+  private contarSinLeer(): void {
+    if (!this.authService.obtenerToken()) {
+      this.sinLeer.set(0);
+      return;
+    }
+    this.notificaciones.contarNoLeidas().subscribe({
+      next: (cantidad) => this.sinLeer.set(cantidad),
+      // Sin sesión válida o sin conexión, simplemente no se muestra el punto.
+      error: () => this.sinLeer.set(0),
+    });
+  }
 
 cerrarSesion(): void {
   this.authService.cerrarSesion();

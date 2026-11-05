@@ -1,6 +1,3 @@
-.summary p {
-  font: var(--font-control);
-}
 .request-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -55,4 +52,35 @@
   .empty-state a {
     width: 100%;
   }
+}
+
+/* La pantalla ya no vive dentro de un grupo: cada solicitud lleva su grupo de origen. */
+.total {
+  margin-block-end: calc(var(--space-6) * -1 + var(--space-2));
+}
+.request-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: start;
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--color-active);
+  color: var(--color-primary);
+  font: var(--font-secondary);
+  text-decoration: none;
+}
+.request-group:hover,
+.request-group:focus-visible {
+  text-decoration: underline;
+}
+.request-group mat-icon {
+  flex: none;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+.request-group span {
+  overflow-wrap: anywhere;
 }

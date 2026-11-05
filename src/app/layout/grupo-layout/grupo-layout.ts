@@ -31,11 +31,10 @@ export class GrupoLayout {
     { label: 'Avisos', path: 'avisos' },
     { label: 'Flashcards', path: 'flashcards' },
     { label: 'Integrantes', path: 'integrantes' },
-    { label: 'Solicitudes', path: 'solicitudes' },
   ];
-  readonly tabs = computed(() =>
-    this.secciones.filter((t) => t.path !== 'solicitudes' || this.contexto.administrador()),
-  );
+  // Solicitudes ya no es una sección del grupo: tiene su propia pantalla en
+  // /grupos/solicitudes, con las de todos los grupos que administro.
+  readonly tabs = computed(() => this.secciones);
   readonly seleccion = computed(
     () =>
       this.tabs().find((t) => this.url().split('?')[0].split('/')[3] === t.path) ?? {

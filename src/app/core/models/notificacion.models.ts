@@ -1,6 +1,9 @@
-// Coincide con com.yachaniapi.notificacion.dto.NotificacionResponse.
-// tipo: SOLICITUD_RECIBIDA | SOLICITUD_ACEPTADA | SOLICITUD_RECHAZADA.
-export interface NotificacionSolicitudResponse {
+// Bandeja general: coincide con com.yachaniapi.notificacion.dto.NotificacionResponse.
+// tipo: SOLICITUD_RECIBIDA | SOLICITUD_ACEPTADA | SOLICITUD_RECHAZADA y los de sesión.
+// idSolicitud puede ser null cuando la solicitud se aceptó o se reemplazó en un reintento;
+// idSesion es null en las de solicitudes. 'ruta' ya viene lista como ruta de Angular
+// (sin /api): se usa para el enlace, nunca como endpoint HTTP.
+export interface NotificacionResponse {
   idNotificacion: number;
   idSolicitud: number | null;
   idGrupo: number | null;
@@ -9,11 +12,14 @@ export interface NotificacionSolicitudResponse {
   mensaje: string;
   leida: boolean;
   fechaCreacion: string;
+  idSesion: number | null;
+  titulo: string;
+  ruta: string;
 }
 
-// Coincide con com.yachaniapi.sesion.dto.NotificacionResponse: recordatorios y cambios
-// de sesión, que viven en otro endpoint y no se marcan como leídos.
-// tipo: RECORDATORIO | CAMBIO.
+// Coincide con com.yachaniapi.sesion.dto.NotificacionResponse: la ruta antigua de
+// sesiones, que es la única que trae fecha, hora, tema y lugar del encuentro.
+// tipo: RECORDATORIO | CAMBIO. No se marcan como leídas.
 export interface NotificacionSesionResponse {
   idNotificacion: number;
   idSesion: number;
@@ -35,9 +41,10 @@ export interface NotificacionVista {
   texto: string;
   fecha: string;
   accion: string;
-  enlace: unknown[];
+  // Ruta de Angular a la que lleva la acción.
+  enlace: string;
   leida: boolean;
-  // Solo las de solicitudes se pueden marcar como leídas.
+  // Solo las de la bandeja general se pueden marcar como leídas.
   marcable: boolean;
   sesion: NotificacionSesionResponse | null;
 }
