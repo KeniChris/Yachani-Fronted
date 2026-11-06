@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   FormControl,
   FormGroup,
@@ -31,7 +31,6 @@ import { TutorPerfilResponse } from '../../../../core/models/perfil-tutor.models
   selector: 'app-mi-perfil-tutor',
   standalone: true,
   imports: [
-    RouterLink,
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
@@ -54,6 +53,8 @@ export class MiPerfilTutor implements OnInit {
   readonly cargando = signal(true);
   readonly errorCarga = signal('');
   readonly perfil = signal<TutorPerfilResponse | null>(null);
+  readonly guardando = signal(false);
+  readonly errorGuardado = signal('');
 
   readonly metodos = [
     'Visual',
@@ -100,9 +101,9 @@ export class MiPerfilTutor implements OnInit {
 
   cargarPerfil(): void {
     if (!this.authService.estaAutenticado()) {
-  void this.router.navigateByUrl('/auth/iniciar-sesion');
-  return;
-}
+      void this.router.navigateByUrl('/auth/iniciar-sesion');
+      return;
+    }
     const usuario = this.authService.usuario();
 
     if (!usuario) {
@@ -142,9 +143,54 @@ export class MiPerfilTutor implements OnInit {
   prepararEdicion(): void {
     const datos = this.perfil();
 
+    this.errorGuardado.set('');
     this.presentacionForm.reset({
       presentacion: datos?.presentacion ?? '',
       metodo: datos?.metodoEnsenanza ?? '',
     });
+  }
+
+  guardarPresentacion(): void {
+    const usuario = this.authService.usuario();
+
+    if (!usuario || this.guardando()) {
+      return;
+    }
+
+    this.presentacionForm.markAllAsTouched();
+
+    if (this.presentacionForm.invalid) {
+      return;
+    }
+
+    const { presentacion, metodo } = this.presentacionForm.getRawValue();
+
+    this.guardando.set(true);
+    this.errorGuardado.set('');
+
+    this.perfilService
+      .guardarPerfil(usuario.idUsuario, {
+        presentacion: presentacion.trim(),
+        metodoEnsenanza: metodo.trim(),
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.guardando.set(false)),
+      )
+      .subscribe({
+        next: (datos) => {
+          this.perfil.set(datos);
+          this.prepararEdicion();
+          this.dialog.closeAll();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.errorGuardado.set(
+            error.error?.mensaje ??
+              (error.status === 0
+                ? 'No pudimos conectar con el servidor.'
+                : 'No pudimos guardar los cambios. Vuelve a intentarlo.'),
+          );
+        },
+      });
   }
 }
