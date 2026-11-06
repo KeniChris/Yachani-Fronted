@@ -1,0 +1,67 @@
+<div class="container flow">
+  <header class="section-heading">
+    <span class="badge">Videotutoriales</span>
+    <h2 id="video-title">{{ tutorial.titulo }}</h2>
+    <p>{{ tutorial.descripcion }}</p>
+  </header>
+  <mat-button-toggle-group
+    class="tutorial-selector"
+    [value]="rol"
+    (change)="rolChange.emit($event.value)"
+    aria-label="Elige un videotutorial"
+    hideSingleSelectionIndicator
+  >
+    <mat-button-toggle value="estudiante">Estudiante</mat-button-toggle>
+    <mat-button-toggle value="tutor">Tutor</mat-button-toggle>
+  </mat-button-toggle-group>
+  <figure class="video-preview">
+    @if (reproduciendo()) {
+      <iframe
+        [src]="tutorial.reproductor"
+        [title]="tutorial.titulo"
+        allow="
+          accelerometer;
+          autoplay;
+          clipboard-write;
+          encrypted-media;
+          gyroscope;
+          picture-in-picture;
+          web-share;
+        "
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen
+      ></iframe>
+    } @else {
+      <button
+        class="tutorial-play"
+        type="button"
+        (click)="reproduciendo.set(true)"
+        [attr.aria-label]="'Reproducir ' + tutorial.titulo"
+      >
+        <picture class="video-glow">
+          <source media="(max-width: 767px)" srcset="/landing/mobile-video-glow.svg" />
+          <img src="/landing/video-glow.svg" alt="" />
+        </picture>
+        <picture class="play-halo">
+          <source media="(max-width: 767px)" srcset="/landing/mobile-play-halo.svg" />
+          <img src="/landing/play-halo.svg" alt="" />
+        </picture>
+        <picture class="play-button">
+          <source media="(max-width: 767px)" srcset="/landing/mobile-play-button.svg" />
+          <img src="/landing/play-button.svg" alt="" />
+        </picture>
+        <picture class="play-icon">
+          <source media="(max-width: 767px)" srcset="/landing/mobile-play-icon.svg" />
+          <img src="/landing/play-icon.svg" alt="" />
+        </picture>
+        <span>Reproducir tutorial</span>
+      </button>
+      <figcaption>{{ tutorial.titulo }}</figcaption>
+    }
+  </figure>
+  <p class="tutorial-link">
+    <a mat-stroked-button [href]="tutorial.enlace" target="_blank" rel="noopener noreferrer">
+      Ver {{ tutorial.titulo }} en YouTube
+    </a>
+  </p>
+</div>

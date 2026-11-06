@@ -375,7 +375,7 @@ for (const [nombre, viewport] of [
   ['móvil', { width: 390, height: 844 }],
 ]) {
   test(
-    `Home ${nombre}: muestra secciones, video pendiente y contacto válido`,
+    `Home ${nombre}: muestra secciones, tutoriales y contacto válido`,
     { timeout: 60000 },
     async (t) => {
       const { page } = await sesion(t, {}, viewport);
@@ -387,11 +387,11 @@ for (const [nombre, viewport] of [
         path: `test-results/Home-${nombre === 'móvil' ? 'movil' : 'escritorio'}-tutor.png`,
         fullPage: true,
       });
-      await page.locator('mat-button-toggle[value="estudiante"]').click();
+      await page.locator('.hero mat-button-toggle[value="estudiante"]').click();
       await ver(page.getByRole('heading', { name: /Aprende a tu ritmo/ }));
       assert.equal(await page.locator('.testimonials .panel').count(), 3);
-      await ver(page.getByText('Videotutorial · Próximamente', { exact: true }));
-      const correo = page.getByRole('button', { name: 'Preparar correo', exact: true });
+      await ver(page.getByRole('button', { name: 'Reproducir Yachani para estudiantes', exact: true }));
+      const correo = page.getByRole('button', { name: 'Enviar mensaje', exact: true });
       assert.equal(await correo.isDisabled(), true);
       await page.getByLabel('Nombre', { exact: true }).fill('Ana Pérez');
       await page.getByLabel('Correo', { exact: true }).fill('ana@upc.edu.pe');

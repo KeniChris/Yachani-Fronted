@@ -27,6 +27,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/auth/recuperar-contrasena',
     '/auth/verificar-codigo',
     '/auth/restablecer-contrasena',
+    '/contacto',
   ];
 
   if (req.method === 'POST' && rutasPublicas.includes(ruta)) {

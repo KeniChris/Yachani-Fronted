@@ -1,0 +1,57 @@
+<form
+  class="contact-card"
+  [formGroup]="formulario"
+  #contactDirective="ngForm"
+  (ngSubmit)="enviar()"
+  [attr.aria-busy]="enviando()"
+  aria-label="Formulario de contacto"
+>
+  <div class="grid two">
+    <mat-form-field appearance="outline" hideRequiredMarker>
+      <mat-label>Nombre</mat-label>
+      <input
+        matInput
+        formControlName="nombre"
+        autocomplete="name"
+        maxlength="100"
+        [readonly]="enviando()"
+      />
+      <mat-error>Ingresa tu nombre, de hasta 100 caracteres.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" hideRequiredMarker>
+      <mat-label>Correo</mat-label>
+      <input
+        matInput
+        type="email"
+        formControlName="correo"
+        autocomplete="email"
+        maxlength="254"
+        [readonly]="enviando()"
+      />
+      <mat-error>Ingresa un correo electrónico válido.</mat-error>
+    </mat-form-field>
+  </div>
+  <mat-form-field appearance="outline" hideRequiredMarker>
+    <mat-label>Asunto</mat-label>
+    <input matInput formControlName="asunto" maxlength="150" [readonly]="enviando()" />
+    <mat-error>Ingresa el asunto, de hasta 150 caracteres.</mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="outline" hideRequiredMarker>
+    <mat-label>Mensaje</mat-label>
+    <textarea
+      matInput
+      formControlName="mensaje"
+      rows="5"
+      maxlength="5000"
+      [readonly]="enviando()"
+    ></textarea>
+    <mat-hint align="end">{{ formulario.controls.mensaje.value.length }}/5000</mat-hint>
+    <mat-error>Escribe tu mensaje, de hasta 5000 caracteres.</mat-error>
+  </mat-form-field>
+  <p class="contact-hint">Te responderemos al correo que indiques. No necesitas iniciar sesión.</p>
+  <app-aviso-operacion [mensaje]="error()" tipo="error" />
+  <app-aviso-operacion [mensaje]="confirmacion()" tipo="exito" />
+  <button mat-flat-button type="submit" [disabled]="formulario.invalid || enviando()">
+    {{ enviando() ? 'Enviando…' : 'Enviar mensaje' }}
+  </button>
+</form>
