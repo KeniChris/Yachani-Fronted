@@ -16,13 +16,20 @@ after(async () => {
   await browser?.close();
 });
 
-async function esperar(condicion) {
+async function esperar(condicion, mensaje = 'No se alcanzó el estado esperado de la landing') {
   const hasta = Date.now() + 12000;
   while (Date.now() < hasta) {
     if (await condicion()) return;
     await new Promise((resolver) => setTimeout(resolver, 50));
   }
-  assert.fail('No se alcanzó el estado esperado de la landing');
+  assert.fail(mensaje);
+}
+
+async function verificarEnlace(enlace, destino) {
+  await esperar(
+    async () => (await enlace.getAttribute('href')) === destino,
+    `El enlace del tutorial no se actualizó a ${destino}`,
+  );
 }
 
 async function pagina(t, viewport = { width: 1440, height: 1000 }) {
@@ -84,43 +91,34 @@ for (const [nombre, viewport] of [
       await page.goto(base);
       const reproductor = page.locator('app-tutorial-landing iframe');
       const enlace = page.locator('app-tutorial-landing a');
+      await verificarEnlace(enlace, 'https://www.youtube.com/watch?v=BKrl1zL8zDU');
       assert.equal(await reproductor.count(), 0);
       assert.equal(reproducciones.length, 0);
-      assert.equal(
-        await enlace.getAttribute('href'),
-        'https://www.youtube.com/watch?v=BKrl1zL8zDU',
-      );
       await page
         .getByRole('button', { name: 'Reproducir Yachani para estudiantes', exact: true })
         .press('Enter');
       await reproductor.waitFor({ state: 'visible' });
+      await esperar(() => reproducciones.length === 1);
       assert.match(
         await reproductor.getAttribute('src'),
         /youtube-nocookie\.com\/embed\/BKrl1zL8zDU\?/,
       );
-      await esperar(() => reproducciones.length === 1);
       await page.locator('app-tutorial-landing mat-button-toggle[value="tutor"]').click();
       await esperar(async () => (await reproductor.count()) === 0);
       await page.getByRole('heading', { name: /Enseña a tu ritmo/ }).waitFor({ state: 'visible' });
-      assert.equal(
-        await enlace.getAttribute('href'),
-        'https://www.youtube.com/watch?v=kwnOnu7YtMQ',
-      );
+      await verificarEnlace(enlace, 'https://www.youtube.com/watch?v=kwnOnu7YtMQ');
       await page
         .getByRole('button', { name: 'Reproducir Yachani para tutores', exact: true })
         .click();
       await reproductor.waitFor({ state: 'visible' });
+      await esperar(() => reproducciones.length === 2);
       assert.match(
         await reproductor.getAttribute('src'),
         /youtube-nocookie\.com\/embed\/kwnOnu7YtMQ\?/,
       );
-      await esperar(() => reproducciones.length === 2);
       await page.locator('.hero mat-button-toggle[value="estudiante"]').click();
       await esperar(async () => (await reproductor.count()) === 0);
-      assert.equal(
-        await enlace.getAttribute('href'),
-        'https://www.youtube.com/watch?v=BKrl1zL8zDU',
-      );
+      await verificarEnlace(enlace, 'https://www.youtube.com/watch?v=BKrl1zL8zDU');
       assert.equal(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
         true,
