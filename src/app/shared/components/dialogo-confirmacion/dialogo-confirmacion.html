@@ -1,9 +1,0 @@
-<div class="dialog" [class.danger]="datos.tono === 'peligro'">
-  <span class="dialog-icon" aria-hidden="true"><mat-icon fontSet="material-symbols-rounded">{{ datos.icono ?? (datos.tono === 'peligro' ? 'warning' : 'help') }}</mat-icon></span>
-  <h2 mat-dialog-title>{{ datos.titulo }}</h2>
-  <mat-dialog-content><p>{{ datos.mensaje }}</p></mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-stroked-button type="button" [mat-dialog-close]="false">{{ datos.cancelar ?? 'Cancelar' }}</button>
-    <button mat-flat-button type="button" class="confirm-button" [mat-dialog-close]="true">{{ datos.confirmar }}</button>
-  </mat-dialog-actions>
-</div>
