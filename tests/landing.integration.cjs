@@ -163,7 +163,10 @@ test(
     await enviando.waitFor({ state: 'visible' });
     await esperar(() => recibidos.length === 1);
     assert.equal(await enviando.isDisabled(), true);
-    assert.equal(await page.getByLabel('Mensaje', { exact: true }).getAttribute('readonly'), '');
+    assert.equal(
+      await page.getByLabel('Mensaje', { exact: true }).evaluate((campo) => campo.readOnly),
+      true,
+    );
     await page
       .getByRole('form', { name: 'Formulario de contacto' })
       .evaluate((form) =>
