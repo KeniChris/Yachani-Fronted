@@ -33,7 +33,7 @@
         mat-button
         type="button"
         class="text-action"
-        (click)="dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: sesionActual })"
+        (click)="errorAccion.set(''); dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: sesionActual })"
       >
         Cancelar sesión
       </button>
@@ -132,8 +132,8 @@
         <a mat-stroked-button routerLink="." [queryParams]="{ vista: null }" queryParamsHandling="merge"
           >Cancelar</a
         >
-        <button mat-flat-button type="submit" [disabled]="form.invalid">
-          {{ vista === 'editar' ? 'Guardar cambios' : 'Programar sesión' }}
+        <button mat-flat-button type="submit" [disabled]="form.invalid || guardando()">
+          {{ guardando() ? 'Guardando…' : vista === 'editar' ? 'Guardar cambios' : 'Programar sesión' }}
         </button>
       </div>
     </form>
@@ -152,7 +152,7 @@
       <p>Consulta los próximos encuentros del grupo.</p>
     </div>
     @if (puedeGestionar()) {
-      <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar' }" queryParamsHandling="merge"
+      <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar', idSesion: null }" queryParamsHandling="merge"
         >Programar sesión</a
       >
     }
@@ -199,20 +199,22 @@
     <section class="content-card empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
       <h2>No pudimos cargar las sesiones</h2>
+      <app-aviso-operacion tipo="error" [mensaje]="errorCarga()" />
       <button mat-flat-button type="button" (click)="cargar()">Reintentar</button>
     </section>
-  } @else if (!sesionPrincipal) {
+  } @else if (sesionesProgramadas().length === 0) {
     <section class="content-card empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
       <h2>No hay sesiones programadas</h2>
-      <p>Programa el próximo encuentro para tu grupo.</p>
+      <p>{{ puedeGestionar() ? 'Programa el próximo encuentro para tu grupo.' : 'Cuando el administrador programe una sesión, aparecerá aquí.' }}</p>
       @if (puedeGestionar()) {
-        <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar' }" queryParamsHandling="merge"
+        <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar', idSesion: null }" queryParamsHandling="merge"
           >Programar sesión</a
         >
       }
     </section>
   } @else {
+    @for (sesionPrincipal of sesionesProgramadas(); track sesionPrincipal.idSesion) {
     <article class="content-card session">
       <div class="card-heading">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
@@ -244,13 +246,14 @@
           <button
             mat-button
             type="button"
-            (click)="dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: sesionPrincipal })"
+            (click)="errorAccion.set(''); dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: sesionPrincipal })"
           >
             Cancelar
           </button>
         </div>
       }
     </article>
+    }
     <section class="content-card reminder" aria-labelledby="reminder-title">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
       <h2 id="reminder-title">Un aviso antes de comenzar</h2>
@@ -262,11 +265,11 @@
   }
 }
 
-<ng-template #cancelarDialog let-sesion>
+<ng-template #cancelarDialog let-sesion let-ref="dialogRef">
   <div class="dialog-shell">
     <div class="dialog-heading">
       <h2>¿Cancelar esta sesión?</h2>
-      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+      <button mat-icon-button type="button" mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
         <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
       </button>
     </div>
@@ -274,15 +277,18 @@
       <p>"{{ sesion.tema }}" dejará de aparecer en las sesiones programadas del grupo.</p>
       <p class="dialog-label">Fecha de la sesión</p>
       <p class="dialog-value">{{ sesion.fechaHoraInicio | date: "d MMM y · HH:mm" }}</p>
+      @if (errorAccion()) {
+        <app-aviso-operacion tipo="error" [mensaje]="errorAccion()" />
+      }
     </mat-dialog-content>
     <mat-dialog-actions>
-      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button mat-stroked-button type="button" mat-dialog-close [disabled]="guardando()">Cancelar</button>
       <button
         mat-flat-button
         type="button"
         class="danger"
-        mat-dialog-close
-        (click)="cancelar(sesion.idSesion)"
+        [disabled]="guardando()"
+        (click)="cancelar(sesion.idSesion, ref)"
       >
         Cancelar sesión
       </button>

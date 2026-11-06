@@ -14,13 +14,16 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { ContextoGrupoService } from '../../../core/services/contexto-grupo.service';
 import { RecursosApiService } from '../../../core/services/recursos-api.service';
 import { errorApi, textoRequerido } from '../../../core/services/recursos-ui';
 import { TemaResponse } from '../../../core/models/recursos.models';
 import { SeleccionarGrupo } from '../seleccionar-grupo';
+import { AccesoGrupo } from '../../../shared/acceso-grupo/acceso-grupo';
+import { AvisoOperacion } from '../../../shared/aviso-operacion/aviso-operacion';
 @Component({
   selector: 'app-temas',
   standalone: true,
@@ -34,6 +37,9 @@ import { SeleccionarGrupo } from '../seleccionar-grupo';
     MatInputModule,
     MatIconModule,
     SeleccionarGrupo,
+    AccesoGrupo,
+    AvisoOperacion,
+    MatSnackBarModule,
   ],
   templateUrl: './temas.html',
   styleUrl: './temas.css',
@@ -42,6 +48,7 @@ export class Temas {
   readonly contexto = inject(ContextoGrupoService);
   private readonly api = inject(RecursosApiService);
   private readonly dialog = inject(MatDialog);
+  private readonly mensajes = inject(MatSnackBar);
   private readonly destroy = inject(DestroyRef);
   private carga?: Subscription;
   readonly temas = signal<TemaResponse[]>([]);
@@ -61,14 +68,18 @@ export class Temas {
   constructor() {
     effect(() => {
       const id = this.contexto.idGrupo();
-      untracked(() => this.cargar(id));
+      const acceso = this.contexto.miembro() && !this.contexto.cargando();
+      untracked(() => this.cargar(acceso ? id : null));
     });
   }
   cargar(id = this.contexto.idGrupo()): void {
     this.carga?.unsubscribe();
     this.temas.set([]);
     this.error.set('');
-    if (!id) return;
+    if (!id || !this.contexto.miembro() || this.contexto.cargando()) {
+      this.cargando.set(false);
+      return;
+    }
     this.cargando.set(true);
     this.carga = this.api
       .temas(id)
@@ -85,6 +96,9 @@ export class Temas {
       });
   }
   abrir(template: TemplateRef<unknown>, tema?: TemaResponse): void {
+    if (this.guardando() || !this.contexto.puedeGestionarTemas()) return;
+    this.exito.set('');
+    this.mensajes.dismiss();
     this.editando.set(tema?.idTema ?? null);
     this.form.reset({ nombre: tema?.nombre ?? '', descripcion: tema?.descripcion ?? '' });
     this.errorDialogo.set('');
@@ -95,6 +109,7 @@ export class Temas {
     const id = this.contexto.idGrupo();
     if (!id || this.form.invalid || this.guardando() || !this.contexto.puedeGestionarTemas())
       return;
+    const idTema = this.editando();
     const body = {
       nombre: this.form.controls.nombre.value.trim(),
       descripcion: this.form.controls.descripcion.value.trim(),
@@ -102,19 +117,27 @@ export class Temas {
     this.guardando.set(true);
     this.errorDialogo.set('');
     ref.disableClose = true;
-    const operacion = this.editando()
-      ? this.api.editarTema(id, this.editando()!, body)
+    const operacion = idTema !== null
+      ? this.api.editarTema(id, idTema, body)
       : this.api.crearTema(id, body);
-    operacion.pipe(takeUntilDestroyed(this.destroy)).subscribe({
-      next: () => {
-        this.guardando.set(false);
-        ref.close();
-        this.exito.set('Tema guardado.');
-        this.cargar();
-      },
-      error: (e) => {
+    operacion.pipe(
+      takeUntilDestroyed(this.destroy),
+      finalize(() => {
         this.guardando.set(false);
         ref.disableClose = false;
+      }),
+    ).subscribe({
+      next: (guardado) => {
+        // Actualiza la tarjeta sin destruir la lista ni el botón que abrió el diálogo.
+        this.temas.update((temas) => [
+          ...temas.filter((t) => t.idTema !== guardado.idTema), guardado,
+        ].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')));
+        ref.close();
+        const mensaje = idTema !== null ? 'Tema actualizado correctamente.' : 'Tema creado correctamente.';
+        this.exito.set(mensaje);
+        this.mensajes.open(mensaje, 'Cerrar', { duration: 6000, verticalPosition: 'top' });
+      },
+      error: (e) => {
         this.errorDialogo.set(errorApi(e));
       },
     });

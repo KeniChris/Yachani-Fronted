@@ -5,11 +5,12 @@ import { filter, map, startWith } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { ContextoGrupoService } from '../../core/services/contexto-grupo.service';
+import { AccesoGrupo } from '../../shared/acceso-grupo/acceso-grupo';
 @Component({
   selector: 'app-grupo-layout',
   standalone: true,
   providers: [ContextoGrupoService],
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, MatButtonModule, MatMenuModule],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, MatButtonModule, MatMenuModule, AccesoGrupo],
   templateUrl: './grupo-layout.html',
   styleUrl: './grupo-layout.css',
 })
