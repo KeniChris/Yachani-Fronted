@@ -7,15 +7,14 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { textoRequerido } from '../core/services/recursos-ui';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { ContactoLanding } from './contacto-landing/contacto-landing';
+import { TutorialLanding } from './tutorial-landing/tutorial-landing';
 
 @Component({
   selector: 'app-home',
@@ -26,9 +25,9 @@ import { MatMenuModule } from '@angular/material/menu';
     MatButtonModule,
     MatButtonToggleModule,
     MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatMenuModule,
+    ContactoLanding,
+    TutorialLanding,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -110,16 +109,7 @@ export class Home implements OnDestroy {
     this.resizeObserver?.disconnect();
   }
   readonly audience = new FormGroup({
-    rol: new FormControl('estudiante', { nonNullable: true }),
-  });
-  readonly contactForm = new FormGroup({
-    nombre: new FormControl('', { nonNullable: true, validators: textoRequerido }),
-    correo: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email],
-    }),
-    asunto: new FormControl('', { nonNullable: true, validators: textoRequerido }),
-    mensaje: new FormControl('', { nonNullable: true, validators: textoRequerido }),
+    rol: new FormControl<'estudiante' | 'tutor'>('estudiante', { nonNullable: true }),
   });
   readonly navigation = [
     { label: 'Inicio', anchor: 'inicio' },
@@ -212,11 +202,6 @@ export class Home implements OnDestroy {
       ],
     },
   ];
-  readonly chapters = [
-    { time: '1', label: 'Regístrate' },
-    { time: '2', label: 'Busca un grupo' },
-    { time: '3', label: 'Únete y aprende' },
-  ];
   readonly audiences = [
     {
       icon: 'groups',
@@ -261,13 +246,6 @@ export class Home implements OnDestroy {
         'Puedes compartir PDF, DOCX, PPTX, XLSX, PNG, JPG o JPEG. Cada envío permite hasta 5 archivos de 10 MB cada uno.',
     },
   ];
-  prepararCorreo(): void {
-    this.contactForm.markAllAsTouched();
-    if (this.contactForm.invalid) return;
-    const datos = this.contactForm.getRawValue();
-    const cuerpo = `Nombre: ${datos.nombre.trim()}\nCorreo: ${datos.correo.trim()}\n\n${datos.mensaje.trim()}`;
-    window.location.href = `mailto:yachani.soporte@gmail.com?subject=${encodeURIComponent(datos.asunto.trim())}&body=${encodeURIComponent(cuerpo)}`;
-  }
   readonly testimonials = [
     {
       text: 'Antes coordinábamos todo por WhatsApp y se perdían los archivos. Con Yachani encontré un grupo de Cálculo y aprobé con 16.',

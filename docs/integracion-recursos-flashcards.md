@@ -46,7 +46,7 @@ La interfaz ayuda a presentar las acciones disponibles; la autorización definit
 
 ## Home y cabecera
 
-Se completan los bloques de cifras y testimonios del diseño, identificados como contenido de muestra. El videotutorial queda como **Próximamente** hasta disponer de un video real. Contacto prepara un correo en la aplicación del usuario: no afirma que se haya enviado un mensaje.
+Se completan los bloques de cifras y testimonios del diseño, identificados como contenido de muestra. Home incluye los tutoriales reales de estudiante y tutor y un formulario que envía consultas mediante `POST /api/contacto`. La configuración y las comprobaciones se describen en [landing-contacto.md](landing-contacto.md).
 
 La cabecera reutiliza los SVG de Figma, muestra método y creador, usa pestañas con desplazamiento horizontal en escritorio y un selector Material Menu en móvil. Solicitudes solo aparece para el administrador real.
 
