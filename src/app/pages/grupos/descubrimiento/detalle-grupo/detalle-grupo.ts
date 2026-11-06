@@ -116,6 +116,9 @@ export class DetalleGrupo {
         const normalizado = mensaje.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         if (codigo === 'GRUPO_LLENO' || (e.status === 409 && /capacidad|sin cupos|completo|lleno/.test(normalizado))) {
           this.estadoSolicitud.set('sin-cupos');
+          // El cupo pudo agotarse después de abrir la página: vuelve a consultar
+          // también los números, no solo el mensaje de rechazo.
+          this.cargar();
         } else if (codigo === 'SOLICITUD_PENDIENTE' || (e.status === 409 && /solicitud.*(pendiente|registrada)/.test(normalizado))) {
           this.estadoSolicitud.set('pendiente');
         } else if (codigo === 'YA_ES_INTEGRANTE' || (e.status === 409 && /ya perteneces/.test(normalizado))) {

@@ -576,3 +576,37 @@ test('Sesiones: muestra tres sesiones y permite editar repetidamente sin perder 
   await esperar(async () => await page.locator('article.session').count() === 2);
 });
 
+test('Integrantes: tutor y dos estudiantes muestran 2 de 2 cupos y ningún espacio negativo', { timeout: 60000 }, async (t) => {
+  const { s, page } = await sesion(t);
+  s.usuarios[3] = { idUsuario: 3, nombres: 'Valeria', apellidos: 'Torres', correo: 'valeria@upc.edu.pe', tipoUsuario: 'ESTUDIANTE', configuracionCompletada: true };
+  Object.assign(s.grupo, { capacidadMaxima: 2, integrantesActuales: 2, cuposDisponibles: 0 });
+  await login(page, s);
+  await ir(page, '/grupos/7/integrantes');
+  await ver(page.getByRole('heading', { name: 'Estudiantes (2)', exact: true }));
+  const contador = page.locator('app-integrantes .seats-count');
+  await ver(contador);
+  assert.equal((await contador.innerText()).replace(/\s+/g, ' ').trim(), '2 de 2 integrantes');
+  assert.equal(await page.locator('app-integrantes .member').count(), 3);
+  const espacios = page.locator('app-integrantes .seats .help').first();
+  assert.equal((await espacios.innerText()).replace(/\s+/g, ' ').trim(), 'Quedan 0 espacios disponibles.');
+  await ver(page.getByText('El tutor administra el grupo y no ocupa un cupo de estudiante.', { exact: true }));
+});
+
+test('Ingreso: si el grupo se llena durante el envío, actualiza los cupos sin mostrar solicitud duplicada', { timeout: 60000 }, async (t) => {
+  const { s, context, page } = await sesion(t, { estudiante: true });
+  s.grupos = [];
+  Object.assign(s.grupo, { capacidadMaxima: 2, integrantesActuales: 1, cuposDisponibles: 1 });
+  await context.route('**/api/grupos/7/solicitudes', (route) => {
+    Object.assign(s.grupo, { integrantesActuales: 2, cuposDisponibles: 0 });
+    return route.fulfill({ status: 409, json: { codigo: 'GRUPO_LLENO', mensaje: 'El grupo ya alcanzó su capacidad máxima' } });
+  });
+  await login(page, s);
+  await ir(page, '/grupos/descubrimiento/7');
+  await page.getByRole('button', { name: 'Solicitar ingreso', exact: true }).click();
+  await ver(page.getByRole('button', { name: 'Sin cupos', exact: true }));
+  assert.equal((await page.locator('.seats .count').innerText()).replace(/\s+/g, ' ').trim(), '2 de 2 integrantes');
+  assert.equal(await page.getByText('Ya tienes una solicitud registrada', { exact: true }).count(), 0);
+  assert.equal(await page.locator('.notice.warning').count(), 0);
+});
+
+
