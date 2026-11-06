@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -12,7 +12,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { SesionEstudioService } from '../../../core/services/sesion-estudio.service';
 import { SesionEstudioResponse } from '../../../core/models/sesion-estudio.models';
+import { AuthService } from '../../../core/services/auth.service';
 import {
+  GrupoEstudioService,
   ID_GRUPO_DEMO,
   idGrupoDesdeSlug,
 } from '../../../core/services/grupo-estudio.service';
@@ -82,33 +84,57 @@ export class Sesiones implements OnInit {
       validators: [Validators.required, Validators.maxLength(200)],
     }),
   });
+  private readonly auth = inject(AuthService);
+  private readonly grupos = inject(GrupoEstudioService);
+  private readonly idCreador = signal<number | null>(null);
+  // Solo el creador del grupo (usuario con sesión == idCreador) gestiona las sesiones.
+  readonly puedeGestionar = computed(() => {
+    const usuario = this.auth.usuario();
+    const creador = this.idCreador();
+    return usuario != null && creador != null && usuario.idUsuario === creador;
+  });
   private readonly vistaSignal = signal('');
   @Input() set vista(valor: string) {
     this.vistaSignal.set(valor || '');
     if (valor === 'editar') {
-      const s = this.sesionActual;
-      const inicio = s ? new Date(s.fechaHoraInicio) : null;
-      this.form.reset(
-        s
-          ? {
-              tema: s.tema,
-              descripcion: s.descripcion,
-              fecha: inicio,
-              hora: inicio,
-              duracion: s.duracionMinutos,
-              lugar: s.lugar,
-            }
-          : {},
-      );
-    } else if (valor === 'programar') {
-      this.form.reset();
+      this.llenarFormularioEditar();
+    } else {
+      this.idLlenado = null;
+      if (valor === 'programar') this.form.reset();
     }
   }
+  // Programar y editar solo existen para el creador del grupo; mientras no se sepa, no se muestran.
   get vista() {
-    return this.vistaSignal();
+    const v = this.vistaSignal();
+    return (v === 'programar' || v === 'editar') && !this.puedeGestionar() ? '' : v;
   }
   // Sesión activa para las vistas de detalle/editar, mediante ?idSesion=.
-  @Input() idSesion = '';
+  private _idSesion = '';
+  @Input() set idSesion(valor: string) {
+    this._idSesion = valor ?? '';
+    this.llenarFormularioEditar();
+  }
+  get idSesion() {
+    return this._idSesion;
+  }
+  // Id de la sesión ya volcada al formulario, para no pisar lo que el usuario escribe.
+  private idLlenado: number | null = null;
+  // Rellena el formulario de Modificar en cuanto se conocen vista, idSesion y las sesiones.
+  private llenarFormularioEditar() {
+    if (this.vista !== 'editar') return;
+    const s = this.sesionActual;
+    if (!s || this.idLlenado === s.idSesion) return;
+    this.idLlenado = s.idSesion;
+    const inicio = new Date(s.fechaHoraInicio);
+    this.form.reset({
+      tema: s.tema,
+      descripcion: s.descripcion,
+      fecha: inicio,
+      hora: inicio,
+      duracion: s.duracionMinutos,
+      lugar: s.lugar,
+    });
+  }
   get sesionActual(): SesionEstudioResponse | undefined {
     return this.sesiones().find((s) => String(s.idSesion) === this.idSesion);
   }
@@ -125,6 +151,13 @@ export class Sesiones implements OnInit {
     private readonly sesion: SesionUsuarioService,
   ) {}
   ngOnInit() {
+    this.grupos.obtenerGrupo(this.idGrupo).subscribe({
+      next: (grupo) => {
+        this.idCreador.set(grupo.idCreador);
+        this.llenarFormularioEditar();
+      },
+      error: () => this.idCreador.set(null),
+    });
     this.cargar();
   }
   cargar() {
@@ -134,6 +167,7 @@ export class Sesiones implements OnInit {
       next: (sesiones) => {
         this.sesiones.set(sesiones);
         this.cargando.set(false);
+        this.llenarFormularioEditar();
       },
       error: () => {
         this.error.set(true);
@@ -161,7 +195,7 @@ export class Sesiones implements OnInit {
     };
   }
   programar() {
-    if (this.form.invalid) return;
+    if (this.form.invalid || !this.puedeGestionar()) return;
     this.errorAccion.set('');
     this.api.crearSesion(this.idGrupo, this.solicitud).subscribe({
       next: () => {
@@ -175,7 +209,7 @@ export class Sesiones implements OnInit {
     });
   }
   guardarCambios() {
-    if (this.form.invalid || !this.sesionActual) return;
+    if (this.form.invalid || !this.sesionActual || !this.puedeGestionar()) return;
     this.errorAccion.set('');
     this.api.modificarSesion(this.idGrupo, this.sesionActual.idSesion, this.solicitud).subscribe({
       next: () => {
