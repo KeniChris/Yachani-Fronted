@@ -1,0 +1,129 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  min-width: 0;
+  color: var(--color-text);
+  --mat-button-outlined-outline-color: var(--color-primary);
+}
+:host > * {
+  align-self: stretch;
+}
+ul,
+dl,
+dd {
+  margin: 0;
+}
+mat-icon {
+  flex: none;
+  color: var(--color-primary);
+}
+/* El botón de "Marcar todas" no debe ocupar todo el ancho de la cabecera. */
+.page-heading button {
+  align-self: flex-start;
+}
+.badge {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-small);
+  background: var(--color-active);
+  color: var(--color-link);
+  font: var(--font-help);
+  white-space: nowrap;
+}
+.badge.read {
+  background: var(--color-background);
+  color: var(--color-muted);
+}
+.resumen {
+  margin-block-end: calc(var(--space-6) * -1 + var(--space-2));
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+/* Card baja: una sola fila de icono, texto y estado, con menos relleno que una
+   content-card normal y sin separaciones verticales de más. */
+.item {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+}
+.item.sin-leer {
+  border-color: var(--color-primary);
+}
+.item-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+.item-copy h2 {
+  font: var(--font-card-title);
+}
+.item-copy p:not(.help) {
+  font: var(--font-body);
+  overflow-wrap: anywhere;
+}
+/* La fecha y la acción comparten línea para no estirar la tarjeta. */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+}
+.accion {
+  font: var(--font-secondary);
+  color: var(--color-link);
+}
+/* El estado va arriba a la derecha, y debajo el enlace para marcar como leída. */
+.item-estado {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  text-align: right;
+}
+.mark {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-link);
+  font: var(--font-secondary);
+  text-align: right;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.mark:disabled {
+  color: var(--color-muted);
+  cursor: default;
+  text-decoration: none;
+}
+.reminder {
+  max-width: 45rem;
+}
+.reminder h2 {
+  font: var(--font-card-title);
+}
+.reminder dt {
+  margin-top: var(--space-3);
+  font: var(--font-help);
+  color: var(--color-muted);
+}
+.reminder dd {
+  font: var(--font-body);
+}
+@media (max-width: 767px) {
+  .empty-state h2 {
+    font: var(--font-card-title);
+  }
+  .empty-state a {
+    align-self: stretch;
+  }
+}

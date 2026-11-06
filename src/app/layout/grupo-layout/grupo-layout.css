@@ -1,0 +1,115 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.group-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+}
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.group-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.group-heading > div {
+  min-width: 0;
+}
+.group-heading img {
+  flex: none;
+}
+.group-heading h1 {
+  margin: 0;
+  font:
+    500 20px/28px Roboto,
+    sans-serif;
+  color: var(--color-brand);
+  overflow-wrap: anywhere;
+}
+.group-heading p {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font:
+    400 14px/20px Roboto,
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+.desktop-sections {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  overflow-x: auto;
+}
+.desktop-sections a {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  height: 48px;
+  padding: 12px;
+  border-radius: var(--radius-control);
+  font:
+    500 14px/20px Roboto,
+    sans-serif;
+  white-space: nowrap;
+  --mat-button-text-label-text-color: var(--color-muted);
+}
+.desktop-sections a.selected {
+  background: var(--color-active);
+  --mat-button-text-label-text-color: var(--color-primary);
+}
+.desktop-sections img {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.mobile-sections {
+  display: none;
+}
+.group-body {
+  padding-top: var(--space-6);
+}
+@media (max-width: 767px) {
+  .group-card {
+    padding: var(--space-4);
+  }
+  .desktop-sections {
+    display: none;
+  }
+  .mobile-sections {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 0;
+    cursor: pointer;
+    color: var(--color-primary);
+    width: 100%;
+    height: 48px;
+    padding: 12px;
+    border-radius: var(--radius-control);
+    background: var(--color-active);
+    text-align: left;
+    --mat-button-text-label-text-color: var(--color-primary);
+  }
+  .mobile-sections span {
+    font:
+      500 14px/20px Roboto,
+      sans-serif;
+  }
+  .group-header {
+    align-items: flex-start;
+  }
+}

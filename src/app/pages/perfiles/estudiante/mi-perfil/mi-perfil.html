@@ -1,0 +1,602 @@
+<header class="page-heading">
+  <h1>Mi perfil</h1>
+  <p>Mantén tu información clara y actualizada.</p>
+</header>
+
+@if (avisoGuardado.clave()) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="avisoGuardado.desvaneciendo()"
+    role="status"
+  >
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+    <p>Cambios guardados.</p>
+  </div>
+}
+
+@if (cargando()) {
+  <p role="status">Cargando tu perfil…</p>
+} @else if (errorCarga()) {
+  <div role="alert">
+    <p>{{ errorCarga() }}</p>
+    <button mat-stroked-button type="button" (click)="cargarPerfil()">
+      Reintentar
+    </button>
+  </div>
+}
+
+@if (perfil(); as datos) {
+  <mat-card appearance="outlined" class="content-card profile-card">
+    <div class="identity">
+      <span class="avatar" aria-hidden="true">{{ iniciales }}</span>
+
+      <div class="identity-copy">
+        <h2>{{ datos.nombres }} {{ datos.apellidos }}</h2>
+        <span class="role">Estudiante</span>
+      </div>
+    </div>
+
+    <p class="email">{{ datos.correo }}</p>
+
+    <p>
+      {{ datos.universidad || 'Universidad pendiente' }}
+      ·
+      {{ datos.carrera || 'Carrera pendiente' }}
+    </p>
+  </mat-card>
+}
+
+<mat-tab-group
+  class="profile-tabs"
+  animationDuration="0ms"
+  mat-stretch-tabs="false"
+>
+  <mat-tab label="Académico">
+    @if (perfil(); as datos) {
+      <div class="columns">
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Datos académicos</h2>
+
+          <dl>
+            <div>
+              <dt>Universidad</dt>
+              <dd>{{ datos.universidad || 'Sin registrar' }}</dd>
+            </div>
+
+            <div>
+              <dt>Carrera</dt>
+              <dd>{{ datos.carrera || 'Sin registrar' }}</dd>
+            </div>
+          </dl>
+
+          <button
+            mat-stroked-button
+            class="card-action"
+            type="button"
+            (click)="
+              prepararAcademico();
+              dialog.open(academicoDialog, {
+                width: '600px',
+                maxWidth: 'calc(100vw - 32px)'
+              })
+            "
+          >
+            Editar información
+          </button>
+        </mat-card>
+
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Cursos y conocimientos</h2>
+
+          @for (curso of datos.conocimientos; track curso.idConocimiento) {
+            <div class="course">
+              <div class="course-copy">
+                <strong>{{ curso.curso }}</strong>
+                <span>Nivel {{ curso.nivel }}</span>
+              </div>
+
+              <button
+                mat-icon-button
+                type="button"
+                [attr.aria-label]="'Editar ' + curso.curso"
+                (click)="
+                  prepararEditarCurso(curso);
+                  dialog.open(editarCursoDialog, {
+                    width: '600px',
+                    maxWidth: 'calc(100vw - 32px)'
+                  })
+                "
+              >
+                <mat-icon
+                  fontSet="material-symbols-rounded"
+                  aria-hidden="true"
+                >
+                  edit
+                </mat-icon>
+              </button>
+            </div>
+          } @empty {
+            <p>Aún no tienes cursos registrados.</p>
+          }
+
+          <button
+            mat-stroked-button
+            class="card-action"
+            type="button"
+            (click)="
+              prepararAgregarCurso();
+              dialog.open(agregarCursoDialog, {
+                width: '600px',
+                maxWidth: 'calc(100vw - 32px)'
+              })
+            "
+          >
+            Agregar curso
+          </button>
+        </mat-card>
+      </div>
+    }
+  </mat-tab>
+
+  <mat-tab label="Preferencias">
+    @if (perfil(); as datos) {
+      <div class="columns">
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Así prefiero aprender</h2>
+
+          <dl>
+            <div>
+              <dt>Método preferido</dt>
+              <dd>{{ datos.metodoPreferido || 'Sin registrar' }}</dd>
+            </div>
+
+            <div>
+              <dt>Modalidad preferida</dt>
+              <dd>{{ datos.modalidadPreferida || 'Sin registrar' }}</dd>
+            </div>
+          </dl>
+
+          <button
+            mat-stroked-button
+            class="card-action"
+            type="button"
+            (click)="
+              prepararPreferencias();
+              dialog.open(preferenciasDialog, {
+                width: '600px',
+                maxWidth: 'calc(100vw - 32px)'
+              })
+            "
+          >
+            Editar preferencias
+          </button>
+        </mat-card>
+
+        <mat-card appearance="outlined" class="content-card">
+          <h2>Temas de interés</h2>
+
+          <ul class="topics" aria-label="Temas de interés">
+            @for (tema of datos.temasInteres; track tema) {
+              <li>{{ tema }}</li>
+            }
+          </ul>
+
+          @if (!datos.temasInteres.length) {
+            <p>Aún no tienes temas de interés registrados.</p>
+          }
+
+          <p class="help">
+            Estas preferencias ayudan a orientar la búsqueda de grupos.
+          </p>
+        </mat-card>
+      </div>
+    }
+  </mat-tab>
+
+  <mat-tab label="Resúmenes">
+    <header class="summaries-heading">
+      <div>
+        <h2>Mis resúmenes</h2>
+        <p>Publica archivos breves para complementar tu perfil.</p>
+      </div>
+
+      <button
+        mat-flat-button
+        type="button"
+        (click)="
+          prepararResumen();
+          dialog.open(resumenDialog, {
+            width: '600px',
+            maxWidth: 'calc(100vw - 32px)',
+            data: 'publicar'
+          })
+        "
+      >
+        Publicar resumen
+      </button>
+    </header>
+
+    @if (misResumenes.length === 0) {
+      <mat-card appearance="outlined" class="content-card empty-state">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          description
+        </mat-icon>
+        <h2>Aún no tienes resúmenes</h2>
+        <p>Agrega tu primer resumen en PDF o imagen.</p>
+
+        <button
+          mat-flat-button
+          type="button"
+          (click)="
+            prepararResumen();
+            dialog.open(resumenDialog, {
+              width: '600px',
+              maxWidth: 'calc(100vw - 32px)',
+              data: 'publicar'
+            })
+          "
+        >
+          Publicar resumen
+        </button>
+      </mat-card>
+    } @else {
+      <mat-card appearance="outlined" class="content-card">
+        @for (resumen of misResumenes; track resumen.archivo) {
+          <article class="file-item summary-item">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+              picture_as_pdf
+            </mat-icon>
+
+            <div class="file-copy">
+              <strong>{{ resumen.archivo }}</strong>
+              <span>{{ resumen.detalle }}</span>
+            </div>
+
+            <div class="summary-actions">
+              <a mat-stroked-button routerLink="/perfiles">Descargar</a>
+
+              <button
+                mat-button
+                type="button"
+                (click)="
+                  prepararResumen();
+                  resumenForm.controls.titulo.setValue(resumen.titulo);
+                  dialog.open(resumenDialog, {
+                    width: '600px',
+                    maxWidth: 'calc(100vw - 32px)',
+                    data: 'reemplazar'
+                  })
+                "
+              >
+                Reemplazar
+              </button>
+            </div>
+          </article>
+        }
+      </mat-card>
+
+      <p class="help">PDF, PNG o JPG/JPEG · Hasta 1 MB por archivo.</p>
+    }
+  </mat-tab>
+</mat-tab-group>
+
+<ng-template #academicoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar información académica</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          close
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-dialog-content>
+      <p>
+        Los nombres y el correo pertenecen a tu cuenta. Aquí actualizas universidad y carrera.
+      </p>
+
+      <form [formGroup]="academicoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Universidad</mat-label>
+          <input
+            matInput
+            formControlName="universidad"
+            placeholder="Nombre de tu universidad"
+            required
+          />
+          <mat-error>Ingresa tu universidad.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Carrera</mat-label>
+          <input
+            matInput
+            formControlName="carrera"
+            placeholder="Nombre de tu carrera"
+            required
+          />
+          <mat-error>Ingresa tu carrera.</mat-error>
+        </mat-form-field>
+      </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="academicoForm.invalid || guardando()"
+        (click)="guardarAcademico()"
+      >
+        Guardar cambios
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<ng-template #preferenciasDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar preferencias</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          close
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-dialog-content>
+      <p>Elige un método y una modalidad para estudiar.</p>
+
+      <form [formGroup]="preferenciasForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Método preferido</mat-label>
+          <mat-select formControlName="metodo" required>
+            @for (metodo of metodos; track metodo) {
+              <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Selecciona una opción.</mat-hint>
+          <mat-error>Selecciona un método.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Modalidad preferida</mat-label>
+          <mat-select formControlName="modalidad" required>
+            @for (modalidad of modalidades; track modalidad) {
+              <mat-option [value]="modalidad">{{ modalidad }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Virtual, presencial o híbrida.</mat-hint>
+          <mat-error>Selecciona una modalidad.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Temas de interés</mat-label>
+          <input matInput formControlName="temas" />
+          <mat-hint>Separa tus temas con comas.</mat-hint>
+        </mat-form-field>
+      </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="preferenciasForm.invalid || guardando()"
+        (click)="guardarPreferencias()"
+      >
+        Guardar cambios
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<ng-template #agregarCursoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Agregar curso</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          close
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-dialog-content>
+      <p>Indica el curso y selecciona tu nivel de conocimiento.</p>
+
+      <form [formGroup]="agregarCursoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso</mat-label>
+          <input matInput formControlName="curso" required />
+          <mat-error>Ingresa el curso.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nivel de conocimiento</mat-label>
+          <mat-select formControlName="nivel" required>
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel">{{ nivel }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Básico, intermedio o avanzado.</mat-hint>
+          <mat-error>Selecciona un nivel.</mat-error>
+        </mat-form-field>
+      </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="agregarCursoForm.invalid || guardando()"
+        (click)="agregarCurso()"
+      >
+        Agregar curso
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<ng-template #editarCursoDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar curso</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          close
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-dialog-content>
+      <p>Indica el curso y selecciona tu nivel de conocimiento.</p>
+
+      <form [formGroup]="editarCursoForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Curso</mat-label>
+          <input matInput formControlName="curso" required />
+          <mat-error>Ingresa el curso.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nivel de conocimiento</mat-label>
+          <mat-select formControlName="nivel" required>
+            @for (nivel of niveles; track nivel) {
+              <mat-option [value]="nivel">{{ nivel }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Básico, intermedio o avanzado.</mat-hint>
+          <mat-error>Selecciona un nivel.</mat-error>
+        </mat-form-field>
+      </form>
+
+      @if (errorGuardado()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <span>{{ errorGuardado() }}</span>
+          </div>
+        </div>
+      }
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="editarCursoForm.invalid || guardando()"
+        (click)="guardarCurso()"
+      >
+        Guardar cambios
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<ng-template #resumenDialog let-modo>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>
+        {{ modo === 'reemplazar' ? 'Reemplazar resumen' : 'Publicar resumen' }}
+      </h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          close
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-dialog-content>
+      <p>
+        {{
+          modo === 'reemplazar'
+            ? 'El nuevo archivo reemplazará al anterior.'
+            : 'Elige un título y un archivo breve.'
+        }}
+      </p>
+
+      <form [formGroup]="resumenForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="titulo" required />
+          <mat-error>Ingresa un título.</mat-error>
+        </mat-form-field>
+
+        <div class="upload-zone">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+            upload
+          </mat-icon>
+
+          @if (archivoSeleccionado(); as archivo) {
+            <strong>{{ archivo.name }}</strong>
+          } @else {
+            <strong>Selecciona un archivo</strong>
+          }
+
+          <small>PDF, PNG o JPG/JPEG · Máximo 1 MB.</small>
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="selector.click()"
+          >
+            {{ archivoSeleccionado() ? 'Cambiar archivo' : 'Elegir archivo' }}
+          </button>
+
+          <input
+            #selector
+            type="file"
+            hidden
+            accept=".pdf,.png,.jpg,.jpeg"
+            (change)="seleccionarArchivo($event)"
+          />
+        </div>
+      </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close>Cancelar</button>
+      <a
+        mat-flat-button
+        mat-dialog-close
+        routerLink="/perfiles"
+        [disabled]="resumenForm.invalid"
+      >
+        {{ modo === 'reemplazar' ? 'Reemplazar archivo' : 'Publicar resumen' }}
+      </a>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

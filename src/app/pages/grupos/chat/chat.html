@@ -1,0 +1,114 @@
+<h1>Chat del grupo</h1>
+
+@if (aviso.clave()) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="aviso.desvaneciendo()"
+    role="status"
+  >
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+    <p class="notice-title">
+      {{ aviso.clave() === 'enviado' ? 'Mensaje enviado' : 'Mensaje eliminado' }}
+    </p>
+  </div>
+}
+@if (errorAccion()) {
+  <div class="notice" role="status">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+    <p class="notice-title">{{ errorAccion() }}</p>
+  </div>
+}
+
+@if (error()) {
+  <section class="chat-card empty-state" aria-label="Conversación del grupo">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+    <h2>No pudimos cargar la conversación</h2>
+    <button mat-flat-button type="button" (click)="cargar()">Reintentar</button>
+  </section>
+} @else {
+  <section class="chat-card" aria-label="Conversación del grupo">
+    @if (cargando()) {
+      <p class="help">Cargando conversación…</p>
+    } @else if (mensajes().length === 0) {
+      <div class="empty-state">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">chat</mat-icon>
+        <h2>Comienza la conversación</h2>
+        <p>Envía el primer mensaje del grupo.</p>
+      </div>
+    } @else {
+      <ol class="messages">
+        @for (mensaje of mensajes(); track mensaje.idMensaje) {
+          <li class="message" [class.own]="mensaje.idAutor === idUsuario">
+            <p class="author">{{ mensaje.idAutor === idUsuario ? 'Tú' : mensaje.nombreAutor }}</p>
+            <p>{{ mensaje.contenido }}</p>
+            <p class="time">{{ mensaje.fechaEnvio | date: 'HH:mm' }}</p>
+            @if (puedeEliminar(mensaje)) {
+              <button
+                mat-button
+                type="button"
+                class="delete"
+                (click)="
+                  dialog.open(eliminarDialog, {
+                    width: '600px',
+                    maxWidth: 'calc(100vw - 32px)',
+                    data: mensaje,
+                  })
+                "
+              >
+                Eliminar
+              </button>
+            }
+          </li>
+        }
+      </ol>
+    }
+
+    <form class="composer" [formGroup]="form" (ngSubmit)="enviar()" aria-label="Enviar mensaje">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+        <mat-label>Mensaje</mat-label>
+        <input matInput formControlName="mensaje" placeholder="Escribe para tu grupo…" maxlength="1000" />
+        @if (form.controls.mensaje.touched && form.controls.mensaje.invalid) {
+          <mat-error>El mensaje está vacío.</mat-error>
+        } @else {
+          <mat-hint>Hasta 1000 caracteres.</mat-hint>
+        }
+      </mat-form-field>
+      <button
+        mat-flat-button
+        type="submit"
+        class="send"
+        [disabled]="form.invalid || enviando()"
+        aria-label="Enviar mensaje"
+      >
+        <mat-icon fontSet="material-symbols-rounded">send</mat-icon>
+      </button>
+    </form>
+  </section>
+}
+
+<ng-template #eliminarDialog let-mensaje>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Eliminar tu mensaje?</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>El mensaje se retirará de la conversación del grupo.</p>
+      <p class="quote">"{{ mensaje.contenido }}"</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        class="danger"
+        mat-dialog-close
+        (click)="eliminar(mensaje.idMensaje)"
+      >
+        Eliminar mensaje
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

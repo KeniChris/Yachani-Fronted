@@ -1,0 +1,110 @@
+<header class="page-heading">
+  <h1>Configuración del grupo</h1>
+  <p>Administra el nombre y la colaboración de tu grupo.</p>
+</header>
+
+@if (avisoActualizado.clave()) {
+  <div
+    class="notice success temporal"
+    [class.desvaneciendo]="avisoActualizado.desvaneciendo()"
+    role="status"
+  >
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+    <div>
+      <p class="notice-title">Nombre actualizado</p>
+      <p>El nuevo nombre ya está disponible para el grupo.</p>
+    </div>
+  </div>
+}
+
+@if (cargando()) {
+  <section class="content-card empty-state">
+    <p>Cargando configuración…</p>
+  </section>
+} @else if (error()) {
+  <section class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+    <h2>No pudimos cargar la configuración</h2>
+    <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+  </section>
+} @else if (grupo(); as g) {
+  @if (configuracion === 'editar') {
+    <form class="content-card" [formGroup]="nombreForm" aria-label="Editar nombre del grupo">
+      <h2>Nombre del grupo</h2>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" maxlength="100" required />
+        @if (nombreForm.controls.nombre.touched && nombreForm.controls.nombre.invalid) {
+          <mat-error>Escribe el nombre del grupo.</mat-error>
+        }
+      </mat-form-field>
+      @if (errorNombre()) {
+        <div class="notice" role="status">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <p class="notice-title">{{ errorNombre() }}</p>
+        </div>
+      }
+      <div class="actions">
+        <a mat-stroked-button routerLink="." [queryParams]="{ configuracion: null }" queryParamsHandling="merge"
+          >Cancelar</a
+        >
+        <button mat-flat-button type="button" [disabled]="nombreForm.invalid" (click)="editarNombre()">
+          Guardar cambios
+        </button>
+      </div>
+    </form>
+  } @else {
+    <section class="content-card" aria-label="Nombre del grupo">
+      <h2>Nombre del grupo</h2>
+      <p class="help">{{ g.nombre }}</p>
+      @if (rol === 'tutor' || admin === 'si') {
+        <a
+          mat-stroked-button
+          class="secondary-action"
+          (click)="nombreForm.reset({ nombre: g.nombre })"
+          routerLink="."
+          [queryParams]="{ configuracion: 'editar' }"
+          queryParamsHandling="merge"
+          >Editar nombre</a
+        >
+      }
+    </section>
+
+    <section class="content-card" aria-label="Materiales y mazos">
+      <h2>Materiales y mazos</h2>
+      @if (errorPublicaciones()) {
+        <div class="notice" role="status">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <p class="notice-title">{{ errorPublicaciones() }}</p>
+        </div>
+      }
+      <form [formGroup]="publicacionesForm">
+        <div class="setting-row">
+          <label for="publicaciones-toggle">Permitir publicaciones de integrantes</label>
+          <mat-slide-toggle
+            id="publicaciones-toggle"
+            formControlName="publicaciones"
+            aria-label="Permitir publicaciones de integrantes"
+            (change)="cambiarPublicaciones($event.checked)"
+          />
+        </div>
+      </form>
+    </section>
+
+    <div class="actions">
+      <a mat-stroked-button routerLink="../integrantes" [queryParams]="{ configuracion: null }" queryParamsHandling="merge"
+        >Ver integrantes</a
+      >
+      <a
+        mat-stroked-button
+        routerLink="../recursos/materiales"
+        [queryParams]="{ configuracion: null }"
+        queryParamsHandling="merge"
+        >Ver materiales</a
+      >
+      <a mat-stroked-button routerLink="../flashcards" [queryParams]="{ configuracion: null }" queryParamsHandling="merge"
+        >Ver flashcards</a
+      >
+    </div>
+  }
+}

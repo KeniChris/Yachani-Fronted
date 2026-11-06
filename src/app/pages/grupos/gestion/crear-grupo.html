@@ -1,0 +1,131 @@
+<header class="page-heading">
+  <h1>Crear grupo</h1>
+  <p>
+    {{
+      esTutor
+        ? 'Crea un espacio para acompañar el estudio de tus estudiantes.'
+        : 'Organiza un grupo para aprender con otros estudiantes.'
+    }}
+  </p>
+</header>
+
+@if (crear === 'limite' || limiteAlcanzado()) {
+  <section class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">block</mat-icon>
+    <h2>Alcanzaste el máximo de grupos</h2>
+    <p>
+      {{
+        mensajeLimite() ||
+          (esTutor
+            ? 'Como tutor puedes crear hasta 10 grupos.'
+            : 'Como estudiante puedes crear hasta 5 grupos.')
+      }}
+    </p>
+    <a
+      mat-flat-button
+      routerLink="/grupos/gestion"
+      [queryParams]="{ crear: null }"
+      queryParamsHandling="merge"
+      >Ver mis grupos</a
+    >
+  </section>
+} @else {
+<div class="layout">
+  <form class="content-card form-card" [formGroup]="form" aria-label="Datos del grupo">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+      <mat-label>Nombre del grupo</mat-label>
+      <input
+        matInput
+        formControlName="nombre"
+        [placeholder]="esTutor ? 'Ej.: Dominando Cálculo' : 'Ej.: Ingeniería de Software: repasos'"
+        required
+      />
+      @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+        <mat-error>Escribe el nombre del grupo.</mat-error>
+      } @else {
+        <mat-hint>Incluye el curso o tema para facilitar su búsqueda.</mat-hint>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+      <mat-label>Descripción</mat-label>
+      <textarea
+        matInput
+        formControlName="descripcion"
+        rows="4"
+        maxlength="500"
+        placeholder="Ej.: Un espacio para repasar conceptos, compartir recursos y resolver ejercicios."
+        required
+      ></textarea>
+      @if (form.controls.descripcion.touched && form.controls.descripcion.invalid) {
+        <mat-error>Escribe una descripción de hasta 500 caracteres.</mat-error>
+      } @else {
+        <mat-hint>Hasta 500 caracteres.</mat-hint>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+      <mat-label>Método de estudio</mat-label>
+      <mat-select formControlName="metodo" placeholder="Selecciona un método de estudio…" required>
+        @for (metodo of metodos; track metodo) {
+          <mat-option [value]="metodo">{{ metodo }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.metodo.touched && form.controls.metodo.invalid) {
+        <mat-error>Selecciona un método de estudio.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+      <mat-label>Capacidad máxima</mat-label>
+      <input matInput type="number" formControlName="capacidad" min="2" placeholder="Ej.: 12" required />
+      @if (form.controls.capacidad.touched && form.controls.capacidad.invalid) {
+        <mat-error>La capacidad mínima es de 2 integrantes.</mat-error>
+      } @else {
+        <mat-hint>Elige un número a partir de 2.</mat-hint>
+      }
+    </mat-form-field>
+
+    @if (errorCrear()) {
+      <div class="notice" role="status">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+        <p class="notice-title">{{ errorCrear() }}</p>
+      </div>
+    }
+    <div class="actions">
+      <a
+        mat-stroked-button
+        routerLink="/grupos/gestion"
+        [queryParams]="{ grupos: null, crear: null }"
+        queryParamsHandling="merge"
+        >Cancelar</a
+      >
+      <button mat-flat-button type="button" [disabled]="form.invalid" (click)="crearGrupo()">
+        Crear grupo
+      </button>
+    </div>
+  </form>
+
+  <aside class="content-card type-card" aria-labelledby="type-title">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+    <h2 id="type-title">{{ esTutor ? 'Grupo con tutor' : 'Grupo entre estudiantes' }}</h2>
+    <p class="type-description">
+      {{
+        esTutor
+          ? 'Como creador, administrarás las solicitudes, la capacidad y las sesiones.'
+          : 'Administras el nombre del grupo, las solicitudes y los integrantes. Todos pueden editar temas y compartir recursos.'
+      }}
+    </p>
+    <p class="type-help">El tipo se determina con el rol de tu cuenta. No necesitas elegirlo.</p>
+    @if (esTutor) {
+      <a
+        mat-stroked-button
+        routerLink="/grupos/crear-con-ia"
+        [queryParams]="{ crear: null }"
+        queryParamsHandling="merge"
+        >Crear con apoyo de IA</a
+      >
+    }
+  </aside>
+</div>
+}

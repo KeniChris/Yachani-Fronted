@@ -1,0 +1,6 @@
+:host {
+  display: block;
+}
+.topic-filter {
+  margin-bottom: var(--space-6);
+}

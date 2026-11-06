@@ -1,0 +1,68 @@
+@if (estado === 'no-disponible') {
+  <h1>Perfil no disponible</h1>
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
+    <h2>No encontramos este perfil</h2>
+    <p>Puede que el usuario ya no esté disponible.</p>
+    <a mat-flat-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
+  </mat-card>
+} @else {
+  <header class="page-heading">
+    <h1>Perfil de Lucía</h1>
+    <p>Conoce cómo estudia y participa en Yachani.</p>
+  </header>
+  <mat-card appearance="outlined" class="content-card profile-card">
+    <div class="identity">
+      <span class="avatar" aria-hidden="true">LP</span>
+      <div class="identity-copy">
+        <h2>Lucía Paredes</h2>
+        <span class="role">Estudiante</span>
+      </div>
+    </div>
+    <p class="email">u20231f123&#64;upc.edu.pe</p>
+    <p>Universidad Peruana de Ciencias Aplicadas · Ingeniería de Sistemas</p>
+  </mat-card>
+  <div class="columns">
+    <mat-card appearance="outlined" class="content-card">
+      <h2>Datos académicos</h2>
+      <dl>
+        <div>
+          <dt>Universidad</dt>
+          <dd>Universidad Peruana de Ciencias Aplicadas</dd>
+        </div>
+        <div>
+          <dt>Carrera</dt>
+          <dd>Ingeniería de Sistemas</dd>
+        </div>
+      </dl>
+    </mat-card>
+    <mat-card appearance="outlined" class="content-card">
+      <h2>Cursos y conocimientos</h2>
+      @for (curso of ['Cálculo I', 'Ingeniería de Software']; track curso) {
+        <div class="course">
+          <div class="course-copy">
+            <strong>{{ curso }}</strong>
+            <span>Nivel Intermedio</span>
+          </div>
+        </div>
+      }
+    </mat-card>
+  </div>
+  <mat-card appearance="outlined" class="content-card">
+    <h2>Resúmenes</h2>
+    <div class="file-item">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">picture_as_pdf</mat-icon>
+      <div class="file-copy">
+        <strong>Guía de límites.pdf</strong>
+        <span>Lucía Paredes · PDF · 680 KB</span>
+      </div>
+      <a
+        mat-icon-button
+        routerLink="/perfiles/otro-estudiante"
+        aria-label="Descargar Guía de límites.pdf"
+      >
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">download</mat-icon>
+      </a>
+    </div>
+  </mat-card>
+}

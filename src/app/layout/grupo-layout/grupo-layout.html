@@ -1,0 +1,53 @@
+<div class="group-card">
+  <header class="group-header">
+    <div class="group-heading">
+      <img src="/icons/grupo/grupos.svg" alt="" width="24" height="24" />
+      <div>
+        <h1>{{ contexto.grupo()?.nombre || 'Grupo de estudio' }}</h1>
+        <p>{{ detalle() }}</p>
+      </div>
+    </div>
+    <ng-content select="[grupo-acciones]" />
+  </header>
+  <nav class="desktop-sections" aria-label="Secciones del grupo">
+    @for (tab of tabs(); track tab.path) {
+      <a
+        mat-button
+        [routerLink]="tab.path"
+        routerLinkActive="selected"
+        #active="routerLinkActive"
+        ariaCurrentWhenActive="page"
+        ><img
+          [src]="'/icons/grupo/' + tab.path + (active.isActive ? '-active' : '') + '.svg'"
+          alt=""
+          width="24"
+          height="24"
+        />{{ tab.label }}</a
+      >
+    }
+  </nav>
+  <button
+    class="mobile-sections"
+    [matMenuTriggerFor]="secciones"
+    aria-label="Cambiar sección del grupo"
+  >
+    <span>{{ seleccion().label }}</span
+    ><img src="/icons/grupo/chevron.svg" alt="" width="24" height="24" /></button
+  ><mat-menu #secciones="matMenu">
+    @for (tab of tabs(); track tab.path) {
+      <a
+        mat-menu-item
+        [routerLink]="tab.path"
+        routerLinkActive
+        #active="routerLinkActive"
+        ariaCurrentWhenActive="page"
+        >{{ tab.label }}</a
+      >
+    }
+  </mat-menu>
+</div>
+@if (contexto.error()) {
+  <p role="alert">{{ contexto.error() }}</p>
+  <button mat-button (click)="contexto.recargar()">Reintentar acceso al grupo</button>
+}
+<section class="group-body"><router-outlet /></section>

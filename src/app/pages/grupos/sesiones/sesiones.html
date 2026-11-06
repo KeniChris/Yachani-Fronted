@@ -1,0 +1,291 @@
+@if (vista === 'detalle' && sesionActual) {
+  <h1>Detalle de la sesión</h1>
+  <section class="content-card detail" aria-labelledby="detail-title">
+    <h2 id="detail-title">{{ sesionActual.tema }}</h2>
+    <p class="help">{{ sesionActual.estado === 'PROGRAMADA' ? 'Programada' : 'Cancelada' }}</p>
+    <dl>
+      <dt>Fecha y hora</dt>
+      <dd>{{ sesionActual.fechaHoraInicio | date: "d MMM y · HH:mm" }}</dd>
+      <dt>Duración</dt>
+      <dd>{{ sesionActual.duracionMinutos }} minutos</dd>
+      <dt>Descripción</dt>
+      <dd>{{ sesionActual.descripcion }}</dd>
+      <dt>Lugar o enlace</dt>
+      <dd>{{ sesionActual.lugar }}</dd>
+    </dl>
+    <p class="help">El enlace se abre fuera de Yachani.</p>
+    <div class="actions">
+      <a mat-stroked-button routerLink="." [queryParams]="{ vista: null, idSesion: null }" queryParamsHandling="merge"
+        >Volver a sesiones</a
+      >
+      @if (puedeGestionar()) {
+        <a
+          mat-flat-button
+          routerLink="."
+          [queryParams]="{ vista: 'editar' }"
+          queryParamsHandling="merge"
+          >Editar sesión</a
+        >
+      }
+    </div>
+    @if (puedeGestionar()) {
+      <button
+        mat-button
+        type="button"
+        class="text-action"
+        (click)="dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: sesionActual })"
+      >
+        Cancelar sesión
+      </button>
+    }
+  </section>
+} @else if (vista === 'programar' || vista === 'editar') {
+  <header class="page-heading">
+    <h1>{{ vista === 'editar' ? 'Editar sesión' : 'Programar sesión' }}</h1>
+    <p>Define el tema, la fecha y dónde se realizará el encuentro.</p>
+  </header>
+  @if (errorAccion()) {
+    <div class="notice" role="status">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+      <p class="notice-title">{{ errorAccion() }}</p>
+    </div>
+  }
+  <div class="form-layout">
+    <form
+      class="content-card"
+      [formGroup]="form"
+      (ngSubmit)="vista === 'editar' ? guardarCambios() : programar()"
+      aria-label="Datos de la sesión"
+    >
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+        <mat-label>Tema</mat-label>
+        <input matInput formControlName="tema" maxlength="150" placeholder="Ej.: Repaso de derivadas" required />
+        @if (form.controls.tema.touched && form.controls.tema.invalid) {
+          <mat-error>Escribe el tema de la sesión.</mat-error>
+        } @else {
+          <mat-hint>Hasta 150 caracteres.</mat-hint>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+        <mat-label>Descripción</mat-label>
+        <textarea
+          matInput
+          formControlName="descripcion"
+          rows="4"
+          maxlength="500"
+          placeholder="Ej.: Repasaremos conceptos y resolveremos ejercicios paso a paso."
+          required
+        ></textarea>
+        @if (form.controls.descripcion.touched && form.controls.descripcion.invalid) {
+          <mat-error>Escribe una descripción de hasta 500 caracteres.</mat-error>
+        } @else {
+          <mat-hint>Hasta 500 caracteres.</mat-hint>
+        }
+      </mat-form-field>
+
+      <fieldset class="date-time">
+        <legend>Fecha y hora de inicio *</legend>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+          <mat-label>Fecha</mat-label>
+          <input matInput formControlName="fecha" [matDatepicker]="fechaPicker" [min]="hoy" placeholder="dd/mm/aaaa" required />
+          <mat-datepicker-toggle matIconSuffix [for]="fechaPicker" />
+          <mat-datepicker #fechaPicker />
+          @if (form.controls.fecha.touched && form.controls.fecha.invalid) {
+            <mat-error>La fecha y hora deben ser posteriores al momento actual.</mat-error>
+          } @else {
+            <mat-hint>Hora local de Lima.</mat-hint>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+          <mat-label>Hora</mat-label>
+          <input matInput formControlName="hora" [matTimepicker]="horaPicker" placeholder="hh:mm" required />
+          <mat-timepicker-toggle matIconSuffix [for]="horaPicker" />
+          <mat-timepicker #horaPicker />
+          @if (form.controls.hora.touched && form.controls.hora.invalid) {
+            <mat-error>Indica la hora de inicio.</mat-error>
+          }
+        </mat-form-field>
+      </fieldset>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+        <mat-label>Duración en minutos</mat-label>
+        <input matInput type="number" formControlName="duracion" min="15" max="480" placeholder="Ej.: 60" required />
+        @if (form.controls.duracion.touched && form.controls.duracion.invalid) {
+          <mat-error>La duración debe estar entre 15 y 480 minutos.</mat-error>
+        } @else {
+          <mat-hint>Entre 15 y 480 minutos.</mat-hint>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+        <mat-label>Lugar o enlace</mat-label>
+        <input matInput formControlName="lugar" maxlength="200" placeholder="Ej.: meet.google.com/abc-defg-hij" required />
+        @if (form.controls.lugar.touched && form.controls.lugar.invalid) {
+          <mat-error>El lugar o enlace es obligatorio y admite hasta 200 caracteres.</mat-error>
+        } @else {
+          <mat-hint>Hasta 200 caracteres.</mat-hint>
+        }
+      </mat-form-field>
+
+      <div class="actions">
+        <a mat-stroked-button routerLink="." [queryParams]="{ vista: null }" queryParamsHandling="merge"
+          >Cancelar</a
+        >
+        <button mat-flat-button type="submit" [disabled]="form.invalid">
+          {{ vista === 'editar' ? 'Guardar cambios' : 'Programar sesión' }}
+        </button>
+      </div>
+    </form>
+
+    <aside class="content-card tip" aria-labelledby="tip-title">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
+      <h2 id="tip-title">Un encuentro bien organizado</h2>
+      <p>Usa un tema concreto y revisa que el lugar o enlace sea correcto antes de guardar.</p>
+      <p class="help">Los estudiantes consultarán estos datos en la sesión y en sus recordatorios.</p>
+    </aside>
+  </div>
+} @else {
+  <header class="page-heading row">
+    <div>
+      <h1>Sesiones de estudio</h1>
+      <p>Consulta los próximos encuentros del grupo.</p>
+    </div>
+    @if (puedeGestionar()) {
+      <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar' }" queryParamsHandling="merge"
+        >Programar sesión</a
+      >
+    }
+  </header>
+
+  <!-- Aviso antes de comenzar: aparece en los 60 min previos, como el recordatorio. -->
+  <app-recordatorio-sesion [sesiones]="sesiones()" />
+
+  @if (aviso.clave()) {
+    <div
+      class="notice success temporal"
+      [class.desvaneciendo]="aviso.desvaneciendo()"
+      role="status"
+    >
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+      <div>
+        @switch (aviso.clave()) {
+          @case ('programada') {
+            <p class="notice-title">Sesión programada</p>
+            <p>El encuentro ya aparece en las sesiones del grupo.</p>
+          }
+          @case ('actualizada') {
+            <p class="notice-title">Sesión actualizada</p>
+            <p>Se guardaron los cambios y se notificó a los estudiantes.</p>
+          }
+          @default {
+            <p class="notice-title">Sesión cancelada</p>
+            <p>El encuentro ya no aparece entre las sesiones programadas.</p>
+          }
+        }
+      </div>
+    </div>
+  }
+  @if (errorAccion()) {
+    <div class="notice" role="status">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+      <p class="notice-title">{{ errorAccion() }}</p>
+    </div>
+  }
+
+  @if (cargando()) {
+    <p class="help">Cargando sesiones…</p>
+  } @else if (error()) {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+      <h2>No pudimos cargar las sesiones</h2>
+      <button mat-flat-button type="button" (click)="cargar()">Reintentar</button>
+    </section>
+  } @else if (!sesionPrincipal) {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
+      <h2>No hay sesiones programadas</h2>
+      <p>Programa el próximo encuentro para tu grupo.</p>
+      @if (puedeGestionar()) {
+        <a mat-flat-button routerLink="." [queryParams]="{ vista: 'programar' }" queryParamsHandling="merge"
+          >Programar sesión</a
+        >
+      }
+    </section>
+  } @else {
+    <article class="content-card session">
+      <div class="card-heading">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">calendar_month</mat-icon>
+        <h2>{{ sesionPrincipal.tema }}</h2>
+      </div>
+      <p class="when">
+        {{ sesionPrincipal.fechaHoraInicio | date: "d MMM y · HH:mm" }} ·
+        {{ sesionPrincipal.duracionMinutos }} minutos
+      </p>
+      <p class="muted">{{ sesionPrincipal.descripcion }}</p>
+      <p class="link">Enlace: {{ sesionPrincipal.lugar }}</p>
+      <a
+        mat-stroked-button
+        routerLink="."
+        [queryParams]="{ vista: 'detalle', idSesion: sesionPrincipal.idSesion }"
+        queryParamsHandling="merge"
+        [attr.aria-label]="'Ver sesión ' + sesionPrincipal.tema"
+        >Ver sesión</a
+      >
+      @if (puedeGestionar()) {
+        <div class="session-actions">
+          <a
+            mat-stroked-button
+            routerLink="."
+            [queryParams]="{ vista: 'editar', idSesion: sesionPrincipal.idSesion }"
+            queryParamsHandling="merge"
+            >Editar</a
+          >
+          <button
+            mat-button
+            type="button"
+            (click)="dialog.open(cancelarDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: sesionPrincipal })"
+          >
+            Cancelar
+          </button>
+        </div>
+      }
+    </article>
+    <section class="content-card reminder" aria-labelledby="reminder-title">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+      <h2 id="reminder-title">Un aviso antes de comenzar</h2>
+      <p class="muted">
+        Los estudiantes reciben un recordatorio dentro de la plataforma aproximadamente 60 minutos
+        antes de la sesión.
+      </p>
+    </section>
+  }
+}
+
+<ng-template #cancelarDialog let-sesion>
+  <div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Cancelar esta sesión?</h2>
+      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
+      </button>
+    </div>
+    <mat-dialog-content>
+      <p>"{{ sesion.tema }}" dejará de aparecer en las sesiones programadas del grupo.</p>
+      <p class="dialog-label">Fecha de la sesión</p>
+      <p class="dialog-value">{{ sesion.fechaHoraInicio | date: "d MMM y · HH:mm" }}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
+      <button
+        mat-flat-button
+        type="button"
+        class="danger"
+        mat-dialog-close
+        (click)="cancelar(sesion.idSesion)"
+      >
+        Cancelar sesión
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

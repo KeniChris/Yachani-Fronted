@@ -1,0 +1,61 @@
+<header class="page-heading">
+  <div>
+    <h1>Mazos del grupo</h1>
+    <p>Practica con los mazos compartidos en este grupo.</p>
+  </div>
+  @if (contexto.puedePublicar()) {
+    <button mat-flat-button (click)="compartir()">Compartir un mazo</button>
+  }
+</header>
+@if (contexto.error()) {
+  <p role="alert">{{ contexto.error() }}</p>
+  <button mat-button (click)="contexto.recargar()">Reintentar acceso</button>
+}
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+  <button mat-button (click)="cargar()">Reintentar</button>
+}
+<mat-form-field class="topic-filter" appearance="outline"
+  ><mat-label>Tema</mat-label
+  ><mat-select [canSelectNullableOptions]="true" [formControl]="filtro"
+    ><mat-option [value]="null">Todos los temas</mat-option>
+    @for (t of temas(); track t.idTema) {
+      <mat-option [value]="t.idTema">{{ t.nombre }}</mat-option>
+    }</mat-select
+  ><mat-hint>Elige un tema para ver sus mazos.</mat-hint></mat-form-field
+>
+@if (cargando()) {
+  <p role="status">Cargando mazos y progreso…</p>
+}
+<div class="deck-grid">
+  @for (p of mazos(); track p.idCompartido) {
+    @let m = p.mazo;
+    <article class="deck-card">
+      <div class="deck-banner">
+        <img src="/icons/flashcards/style.svg" width="24" height="24" alt="" /><span
+          >{{ m.cantidadTarjetas }} tarjetas</span
+        >
+      </div>
+      <h2>{{ m.titulo }}</h2>
+      <p>{{ m.descripcion }}</p>
+      <small>{{ m.autor }} · {{ p.nombreTema }}</small>
+      @if (progresos()[m.idMazo]; as avance) {
+        <small
+          >{{ avance.tarjetasVistas }} de {{ avance.totalTarjetas }} revisadas ·
+          {{ avance.porcentajeRevisado }} %</small
+        ><mat-progress-bar
+          mode="determinate"
+          [value]="avance.porcentajeRevisado"
+          [attr.aria-label]="'Progreso de ' + m.titulo"
+        />
+      } @else {
+        <small>{{ cargando() ? 'Consultando avance…' : 'Avance no disponible' }}</small>
+      }
+      <a mat-stroked-button [routerLink]="[m.idMazo]">Ver mazo</a>
+    </article>
+  } @empty {
+    @if (!cargando() && !error()) {
+      <p>Todavía no hay mazos compartidos{{ filtro.value ? ' en este tema' : '' }}.</p>
+    }
+  }
+</div>

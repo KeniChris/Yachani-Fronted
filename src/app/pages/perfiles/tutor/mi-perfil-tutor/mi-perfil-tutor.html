@@ -1,0 +1,163 @@
+<header class="page-heading">
+  <h1>Mi perfil</h1>
+  <p>Mantén tu información clara y actualizada.</p>
+</header>
+
+@if (cargando()) {
+<p role="status">Cargando tu perfil…</p>
+} @else if (errorCarga()) {
+<div role="alert">
+  <p>{{ errorCarga() }}</p>
+
+  <button mat-stroked-button type="button" (click)="cargarPerfil()">
+    Reintentar
+  </button>
+</div>
+}
+
+@if (perfil(); as datos) {
+<mat-card appearance="outlined" class="content-card profile-card">
+  <div class="identity">
+    <span class="avatar" aria-hidden="true">{{ iniciales }}</span>
+
+    <div class="identity-copy">
+      <h2>{{ datos.nombres }} {{ datos.apellidos }}</h2>
+      <span class="role">Tutor</span>
+    </div>
+  </div>
+
+  <p class="email">{{ datos.correo }}</p>
+
+  <p>
+    {{ datos.universidad || 'Universidad sin registrar' }}
+    ·
+    {{ datos.carrera || 'Carrera sin registrar' }}
+  </p>
+</mat-card>
+
+<mat-tab-group #perfilTabs class="profile-tabs" animationDuration="0ms" mat-stretch-tabs="false">
+  <mat-tab label="Mi presentación">
+    <div class="columns">
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Sobre mí</h2>
+
+        <p class="about-text">
+          {{ datos.presentacion || 'Aún no has registrado tu presentación.' }}
+        </p>
+
+        <dl>
+          <div>
+            <dt>Método de enseñanza</dt>
+            <dd>{{ datos.metodoEnsenanza || 'Sin registrar' }}</dd>
+          </div>
+        </dl>
+
+        <button mat-stroked-button class="card-action" type="button" (click)="
+              prepararEdicion();
+              dialog.open(presentacionDialog, {
+                width: '600px',
+                maxWidth: 'calc(100vw - 32px)'
+              })
+            ">
+          Editar presentación
+        </button>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="content-card">
+        <h2>Lo que dicen tus estudiantes</h2>
+        <p>Las reseñas todavía no están disponibles.</p>
+
+        <button mat-stroked-button class="card-action" type="button" (click)="perfilTabs.selectedIndex = 1">
+          Ver reseñas
+        </button>
+      </mat-card>
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Mis reseñas">
+    <header class="reviews-heading">
+      <div>
+        <h2>Mis reseñas</h2>
+        <p>
+          Comentarios de estudiantes que han participado en tus grupos.
+        </p>
+      </div>
+    </header>
+
+    <mat-card appearance="outlined" class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+        star_outline
+      </mat-icon>
+
+      <h2>Tus reseñas aparecerán aquí</h2>
+      <p>Opiniones de estudiantes que han participado en tus grupos.</p>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>
+}
+
+<ng-template #presentacionDialog>
+  <div class="profile-dialog">
+    <div class="dialog-heading">
+      <h2>Editar presentación</h2>
+
+      <button mat-icon-button mat-dialog-close type="button" aria-label="Cerrar diálogo">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          close
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-dialog-content>
+      <p>Cuenta qué puedes aportar a tus grupos.</p>
+
+      <form [formGroup]="presentacionForm">
+        <mat-form-field appearance="outline">
+          <mat-label>Presentación</mat-label>
+
+          <textarea matInput formControlName="presentacion" rows="4" maxlength="500" required></textarea>
+
+          <mat-hint align="end">
+            {{ presentacionForm.controls.presentacion.value.length }}/500
+            caracteres
+          </mat-hint>
+
+          <mat-error>
+            {{
+            presentacionForm.controls.presentacion.hasError('maxlength')
+            ? 'Máximo permitido: 500 caracteres.'
+            : 'Escribe tu presentación.'
+            }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Método de enseñanza</mat-label>
+
+          <mat-select formControlName="metodo" required>
+            @for (metodo of metodos; track metodo) {
+            <mat-option [value]="metodo">{{ metodo }}</mat-option>
+            }
+          </mat-select>
+
+          <mat-error>Selecciona un método.</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+
+    @if (errorGuardado()) {
+    <p role="alert">{{ errorGuardado() }}</p>
+    }
+
+    <mat-dialog-actions>
+      <button mat-stroked-button mat-dialog-close type="button" [disabled]="guardando()">
+        Cancelar
+      </button>
+
+      <button mat-flat-button type="button" [disabled]="presentacionForm.invalid || guardando()"
+        (click)="guardarPresentacion()">
+        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

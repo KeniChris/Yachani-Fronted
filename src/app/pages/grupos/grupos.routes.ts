@@ -1,0 +1,72 @@
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'gestion' },
+  // Reservas de navegación de la guía; las pantallas se incorporarán en sus áreas.
+  {
+    path: 'descubrimiento',
+    loadComponent: () => import('./descubrimiento/descubrimiento').then((m) => m.Descubrimiento),
+  },
+  {
+    path: 'descubrimiento/:grupoId',
+    loadComponent: () =>
+      import('./descubrimiento/detalle-grupo/detalle-grupo').then((m) => m.DetalleGrupo),
+  },
+  {
+    path: 'gestion',
+    loadComponent: () => import('./gestion/mis-grupos').then((m) => m.MisGrupos),
+  },
+  {
+    path: 'crear',
+    loadComponent: () => import('./gestion/crear-grupo').then((m) => m.CrearGrupo),
+  },
+  {
+    path: 'recomendaciones',
+    loadComponent: () =>
+      import('./descubrimiento/recomendaciones-ia/recomendaciones-ia').then(
+        (m) => m.RecomendacionesIa,
+      ),
+  },
+  {
+    path: 'crear-con-ia',
+    loadComponent: () => import('./gestion/crear-con-ia').then((m) => m.CrearConIa),
+  },
+  // Las solicitudes de ingreso de TODOS mis grupos, fuera del layout de un grupo:
+  // cada tarjeta dice a qué grupo pertenece.
+  {
+    path: 'solicitudes',
+    loadComponent: () => import('./solicitudes/solicitudes').then((m) => m.Solicitudes),
+  },
+  {
+    path: ':grupoId',
+    loadComponent: () =>
+      import('../../layout/grupo-layout/grupo-layout').then((m) => m.GrupoLayout),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'chat' },
+      { path: 'chat', loadComponent: () => import('./chat/chat').then((m) => m.Chat) },
+      {
+        path: 'recursos',
+        loadChildren: () => import('../recursos/recursos.routes').then((m) => m.routes),
+      },
+      {
+        path: 'flashcards',
+        loadChildren: () => import('../flashcards/flashcards-grupo.routes').then((m) => m.routes),
+      },
+      {
+        path: 'sesiones',
+        loadComponent: () => import('./sesiones/sesiones').then((m) => m.Sesiones),
+      },
+      {
+        path: 'integrantes',
+        loadComponent: () => import('./integrantes/integrantes').then((m) => m.Integrantes),
+      },
+      // Los enlaces antiguos a las solicitudes de un grupo llevan a la lista general.
+      { path: 'solicitudes', pathMatch: 'full', redirectTo: '/grupos/solicitudes' },
+      { path: 'avisos', loadComponent: () => import('./avisos/avisos').then((m) => m.Avisos) },
+      {
+        path: 'configuracion',
+        loadComponent: () => import('./configuracion/configuracion').then((m) => m.Configuracion),
+      },
+    ],
+  },
+];

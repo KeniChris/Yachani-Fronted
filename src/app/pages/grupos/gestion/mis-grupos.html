@@ -1,0 +1,122 @@
+<header class="page-heading">
+  <div>
+    <h1>Mis grupos</h1>
+    <p>
+      {{
+        rol === 'tutor'
+          ? 'Administra los espacios que creaste para estudiar en comunidad.'
+          : 'Accede a tus grupos y continúa tu aprendizaje.'
+      }}
+    </p>
+  </div>
+  <a mat-flat-button routerLink="/grupos/crear" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge">Crear grupo</a>
+</header>
+
+@if (cargando()) {
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <p>Cargando tus grupos…</p>
+  </mat-card>
+} @else if (error()) {
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+    <h2>No pudimos cargar tus grupos</h2>
+    <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+  </mat-card>
+} @else if (grupos === 'vacio' || lista().length === 0) {
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+    <h2>Todavía no tienes grupos</h2>
+    @if (rol === 'tutor') {
+      <a mat-flat-button routerLink="/grupos/crear" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge">Crear grupo</a>
+    } @else {
+      <p>Explora una comunidad o crea tu propio espacio de estudio.</p>
+      <a mat-flat-button routerLink="/grupos/descubrimiento" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
+        >Explorar grupos</a
+      >
+    }
+  </mat-card>
+  @if (rol === 'tutor') {
+    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear-con-ia" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
+      >Crear con apoyo de IA</a
+    >
+  } @else {
+    <a mat-stroked-button class="secondary-action" routerLink="/grupos/crear" [queryParams]="{ grupos: null }"
+      queryParamsHandling="merge"
+      >Crear mi primer grupo</a
+    >
+  }
+} @else {
+  @if (avisoCreado.clave()) {
+    <div
+      class="notice success temporal"
+      [class.desvaneciendo]="avisoCreado.desvaneciendo()"
+      role="status"
+    >
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+      <div>
+        @if (avisoCreado.clave() === 'creado-ia') {
+          <p class="notice-title">Grupo creado con IA</p>
+          <p>Se crearon los temas y se compartieron los mazos que revisaste.</p>
+        } @else {
+          <p class="notice-title">Grupo creado</p>
+          <p>Tu grupo ya está listo para recibir solicitudes.</p>
+        }
+      </div>
+    </div>
+  }
+  <div class="group-grid">
+    @for (grupo of lista(); track grupo.idGrupo) {
+      <mat-card appearance="outlined" class="content-card">
+        <div class="card-heading">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">groups</mat-icon>
+          <h2>{{ grupo.nombre }}</h2>
+        </div>
+        <p class="group-description">{{ grupo.descripcion }}</p>
+        <p class="group-responsible">{{ responsable(grupo) }}</p>
+        <p class="group-detail">{{ detalle(grupo) }}</p>
+        <a
+          mat-stroked-button
+          class="group-action"
+          [routerLink]="['/grupos', grupo.idGrupo]"
+          [queryParams]="{ grupos: null, admin: esAdministradora(grupo) ? 'si' : null }"
+          queryParamsHandling="merge"
+          [attr.aria-label]="'Ver grupo ' + grupo.nombre"
+          >Ver grupo</a
+        >
+      </mat-card>
+    }
+  </div>
+
+}
+
+<!-- Fuera del if/else: las solicitudes enviadas se ven aunque todavía no tengas grupos. -->
+@if (solicitudes().length > 0) {
+  <mat-card appearance="outlined" class="content-card requests" aria-labelledby="requests-title">
+    <h2 id="requests-title">Mis solicitudes</h2>
+    <ul>
+      @for (solicitud of solicitudes(); track solicitud.idSolicitud) {
+        <li>
+          <div class="request-row">
+            <div class="request-copy">
+              <h3>{{ solicitud.nombreGrupo }}</h3>
+              <p>Solicitud enviada el {{ solicitud.fechaSolicitud | date: "d MMM y" }}</p>
+            </div>
+            <span class="status-badge">{{ estadoLegible(solicitud.estado) }}</span>
+          </div>
+          <a
+            mat-button
+            [routerLink]="['/grupos/descubrimiento', solicitud.idGrupo]"
+            [queryParams]="{ grupos: null }"
+            queryParamsHandling="merge"
+            [attr.aria-label]="'Ver grupo ' + solicitud.nombreGrupo"
+            >Ver grupo</a
+          >
+        </li>
+      }
+    </ul>
+  </mat-card>
+}

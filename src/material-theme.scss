@@ -1,0 +1,136 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        theme-type: light,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+  @include mat.theme-overrides(
+    (
+      primary: var(--color-primary),
+      on-primary: var(--color-on-primary),
+      primary-container: var(--color-active),
+      on-primary-container: var(--color-link),
+      secondary: var(--color-link),
+      on-secondary: var(--color-on-primary),
+      secondary-container: var(--color-active),
+      on-secondary-container: var(--color-link),
+      tertiary: var(--color-accent),
+      tertiary-container: var(--color-category),
+      on-tertiary-container: var(--color-brand),
+      background: var(--color-background),
+      on-background: var(--color-text),
+      surface: var(--color-surface),
+      on-surface: var(--color-text),
+      surface-container-lowest: var(--color-surface),
+      surface-container-low: var(--color-background),
+      surface-container: var(--color-background),
+      surface-container-high: var(--color-active),
+      surface-container-highest: var(--color-active),
+      on-surface-variant: var(--color-muted),
+      outline: var(--color-control-outline),
+      outline-variant: var(--color-outline),
+      error: var(--color-error),
+      error-container: var(--color-error-surface),
+      on-error-container: var(--color-error),
+      body-large: var(--font-body),
+      body-medium: var(--font-secondary),
+      title-large: var(--font-card-title),
+      label-large: var(--font-control),
+      label-small: var(--font-label),
+    )
+  );
+  @include mat.button-overrides(
+    (
+      filled-container-height: var(--control-height),
+      filled-container-shape: var(--radius-control),
+      outlined-container-height: var(--control-height),
+      outlined-container-shape: var(--radius-control),
+      text-container-height: var(--control-height),
+      text-container-shape: var(--radius-control),
+      protected-container-height: var(--control-height),
+      protected-container-shape: var(--radius-control),
+      tonal-container-height: var(--control-height),
+      tonal-container-shape: var(--radius-control),
+    )
+  );
+  @include mat.form-field-overrides(
+    (
+      outlined-container-shape: var(--radius-control),
+      filled-container-shape: var(--radius-control),
+      container-height: var(--control-height),
+      container-vertical-padding: 12px,
+    )
+  );
+  @include mat.card-overrides(
+    (
+      outlined-container-shape: var(--radius-card),
+      elevated-container-shape: var(--radius-card),
+      filled-container-shape: var(--radius-card),
+    )
+  );
+  @include mat.dialog-overrides(
+    (
+      container-shape: var(--radius-dialog),
+    )
+  );
+  @include mat.list-overrides(
+    (
+      list-item-container-shape: var(--radius-control),
+      active-indicator-shape: var(--radius-control),
+      list-item-one-line-container-height: var(--control-height),
+    )
+  );
+  @include mat.tabs-overrides(
+    (
+      active-label-text-color: var(--color-link),
+      active-indicator-color: var(--color-primary),
+      inactive-label-text-color: var(--color-muted),
+      divider-color: var(--color-outline),
+    )
+  );
+}
+
+/* Contexto de acceso y navegación; los controles heredan los mismos tokens Material. */
+app-app-layout .main-navigation {
+  @include mat.list-overrides(
+    (
+      list-item-label-text-size: 14px,
+      list-item-label-text-line-height: 20px,
+      list-item-label-text-weight: 500,
+      list-item-label-text-tracking: 0,
+    )
+  );
+}
+
+.yachani-dark {
+  color-scheme: dark;
+  @include mat.theme-overrides(
+    (
+      primary: var(--color-dark-link),
+      on-primary: var(--color-brand),
+      surface: var(--color-dark-surface),
+      on-surface: var(--color-on-primary),
+      surface-container: var(--color-dark-surface),
+      surface-container-high: var(--color-dark-elevated),
+      on-surface-variant: var(--color-dark-muted),
+      outline: var(--color-dark-control-outline),
+      outline-variant: var(--color-dark-outline),
+      secondary-container: var(--color-dark-elevated),
+      on-secondary-container: var(--color-on-primary),
+    )
+  );
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--color-primary),
+      filled-label-text-color: var(--color-on-primary),
+    )
+  );
+}

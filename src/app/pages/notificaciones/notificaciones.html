@@ -1,0 +1,135 @@
+@if (vista === 'recordatorio') {
+  <h1>Recordatorio de sesión</h1>
+  @if (recordatorio; as r) {
+    <section class="content-card reminder" aria-labelledby="reminder-title">
+      <h2 id="reminder-title">{{ r.titulo }}</h2>
+      <p class="help">{{ r.tema }}</p>
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+      <dl>
+        <dt>Fecha y hora</dt>
+        <dd>{{ r.fecha }} · {{ r.hora }}</dd>
+        <dt>Grupo</dt>
+        <dd>{{ r.grupo }}</dd>
+        <dt>Lugar o enlace</dt>
+        <dd>{{ r.lugar }}</dd>
+      </dl>
+      <p class="help">Recibiste este recordatorio antes del encuentro.</p>
+      <a
+        mat-flat-button
+        routerLink="/notificaciones"
+        [queryParams]="{ vista: null, idNotificacion: null }"
+        queryParamsHandling="merge"
+        >Volver a notificaciones</a
+      >
+    </section>
+  } @else {
+    <section class="content-card empty-state">
+      <p>No encontramos este recordatorio.</p>
+      <a
+        mat-flat-button
+        routerLink="/notificaciones"
+        [queryParams]="{ vista: null, idNotificacion: null }"
+        queryParamsHandling="merge"
+        >Volver a notificaciones</a
+      >
+    </section>
+  }
+} @else {
+  <header class="page-heading">
+    <div>
+      <h1>Notificaciones</h1>
+      <p>Mantente al tanto de tus grupos y sesiones.</p>
+    </div>
+    @if (sinLeer() > 0) {
+      <button mat-stroked-button type="button" [disabled]="marcando()" (click)="marcarTodas()">
+        Marcar todas como leídas
+      </button>
+    }
+  </header>
+
+  @if (cargando()) {
+    <section class="content-card empty-state">
+      <p>Cargando notificaciones…</p>
+    </section>
+  } @else if (error()) {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+      <h2>No pudimos cargar tus notificaciones</h2>
+      <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
+    </section>
+  } @else if (lista().length === 0) {
+    <section class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">notifications</mat-icon>
+      <h2>Estás al día</h2>
+      <p>Las novedades de tus grupos y los recordatorios aparecerán aquí.</p>
+      <a mat-flat-button routerLink="/inicio">Volver al inicio</a>
+    </section>
+  } @else {
+    @if (aviso.clave()) {
+      <div
+        class="notice success temporal"
+        [class.desvaneciendo]="aviso.desvaneciendo()"
+        role="status"
+      >
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+        <p class="notice-title">
+          {{
+            aviso.clave() === "todas"
+              ? "Notificaciones marcadas como leídas"
+              : "Notificación marcada como leída"
+          }}
+        </p>
+      </div>
+    }
+    <p class="help resumen">
+      {{ sinLeer() }} sin leer de {{ lista().length }}
+      {{ lista().length === 1 ? "notificación" : "notificaciones" }}
+    </p>
+    <ul class="list">
+      @for (notificacion of lista(); track notificacion.clave) {
+        <li class="content-card item" [class.sin-leer]="!notificacion.leida">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+            {{ notificacion.sesion ? "alarm" : "notifications" }}
+          </mat-icon>
+          <div class="item-copy">
+            <h2>{{ notificacion.titulo }}</h2>
+            <p>{{ notificacion.texto }}</p>
+            <p class="meta">
+              <span class="help">{{ notificacion.fecha | date: "d MMM y · HH:mm" }}</span>
+              @if (notificacion.sesion) {
+                <a
+                  class="accion"
+                  routerLink="/notificaciones"
+                  [queryParams]="{
+                    vista: 'recordatorio',
+                    idNotificacion: notificacion.idNotificacion,
+                  }"
+                  queryParamsHandling="merge"
+                  >{{ notificacion.accion }}</a
+                >
+              } @else {
+                <a class="accion" [routerLink]="notificacion.enlace">{{ notificacion.accion }}</a>
+              }
+            </p>
+          </div>
+          <div class="item-estado">
+            <span class="badge" [class.read]="notificacion.leida">{{
+              notificacion.leida ? "Leída" : "No leída"
+            }}</span>
+            @if (!notificacion.leida && notificacion.marcable) {
+              <button
+                class="mark"
+                type="button"
+                [disabled]="marcando()"
+                [attr.aria-label]="'Marcar como leída: ' + notificacion.titulo"
+                (click)="marcarComoLeida(notificacion)"
+              >
+                Marcar como leída
+              </button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+}

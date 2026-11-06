@@ -1,0 +1,186 @@
+@if (cargando()) {
+  <p role="status">Cargando mazo y progreso…</p>
+}
+@if (error()) {
+  <p role="alert">{{ error() }}</p>
+  @if (!detalle()) {
+    <button mat-button (click)="cargar()">Reintentar</button>
+  }
+}
+@if (mazo(); as m) {
+  @if (progreso(); as p) {
+    @if (estado() === 'resumen') {
+      <header class="page-heading">
+        <div>
+          <h1>{{ m.titulo }}</h1>
+          <p>{{ tema() }}{{ esGrupo() ? ' · ' + (contexto.grupo()?.nombre ?? '') : '' }}</p>
+        </div>
+      </header>
+      <section class="panel overview">
+        <p class="author">
+          <img src="/icons/flashcards/person.svg" alt="" width="24" height="24" />Creado por
+          {{ m.autor }}
+        </p>
+        <p>{{ m.descripcion }}</p>
+        <div class="badges">
+          <span class="badge">{{ tarjetas().length }} tarjetas</span
+          ><span class="badge">{{ p.completado ? 'Revisado' : 'En progreso' }}</span>
+        </div>
+        <h2>
+          {{ p.tarjetasVistas }} de {{ p.totalTarjetas }} revisadas ·
+          {{ p.tarjetasAprendidas }} aprendidas
+        </h2>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="p.porcentajeRevisado"
+          aria-label="Progreso personal"
+        /><small>El progreso es personal. Puedes salir y continuar después.</small>
+        @if (tarjetas().length) {
+          <div class="actions">
+            @if (!p.completado) {
+              <button mat-flat-button (click)="iniciar('continuar')">Continuar repaso</button>
+            }
+            <button mat-stroked-button (click)="iniciar('todas')">Repasar de nuevo</button>
+          </div>
+        } @else {
+          <p>Este mazo todavía no tiene tarjetas.</p>
+        }
+        @if (propio()) {
+          <a mat-stroked-button [routerLink]="['/flashcards', id()]">Editar mi mazo</a>
+        }
+        @if (puedeRetirar()) {
+          <button mat-button class="withdraw" (click)="abrir(retirarDialog)">
+            Retirar de este grupo
+          </button>
+        }
+      </section>
+    }
+    @if (estado() === 'pregunta' || estado() === 'respuesta') {
+      @if (actual(); as t) {
+        <header class="review-heading">
+          <button
+            mat-icon-button
+            aria-label="Salir del repaso"
+            [disabled]="guardando()"
+            (click)="abrir(salirDialog)"
+          >
+            <img src="/icons/flashcards/arrow_back.svg" alt="" width="24" height="24" />
+          </button>
+          <h2>{{ m.titulo }}</h2>
+          <span class="badge">{{ indice() + 1 }} de {{ cola().length }}</span>
+        </header>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="p.porcentajeRevisado"
+          aria-label="Progreso personal"
+        /><small class="review-count"
+          >{{ p.tarjetasVistas }} de {{ p.totalTarjetas }} tarjetas revisadas.</small
+        >
+        @if (estado() === 'pregunta') {
+          <section class="question-face">
+            <small>PREGUNTA</small>
+            <h1>{{ t.pregunta }}</h1>
+            <button mat-flat-button (click)="estado.set('respuesta')">Mostrar respuesta</button>
+          </section>
+        } @else {
+          <section class="panel answer-face">
+            <small>RESPUESTA</small>
+            <h1>{{ t.respuesta }}</h1>
+            <p>{{ t.pregunta }}</p>
+          </section>
+          <h2 class="self-assessment">¿Te la aprendiste?</h2>
+          <div class="actions answer-actions">
+            <button mat-stroked-button [disabled]="guardando()" (click)="responder(false)">
+              Aún no</button
+            ><button mat-flat-button [disabled]="guardando()" (click)="responder(true)">
+              La aprendí
+            </button>
+          </div>
+          @if (guardando()) {
+            <p role="status">Guardando avance…</p>
+          }
+        }
+        <small class="footnote">Tu avance se confirma después de guardar cada respuesta.</small>
+      }
+    }
+    @if (estado() === 'resultado') {
+      <section class="panel completed">
+        <img src="/icons/flashcards/check_circle.svg" alt="" width="24" height="24" />
+        <h1>¡Repaso completado!</h1>
+        <p>{{ m.titulo }}{{ esGrupo() ? ' · ' + (contexto.grupo()?.nombre ?? '') : '' }}</p>
+        <span class="badge success"
+          >{{ p.tarjetasVistas }} de {{ p.totalTarjetas }} revisadas ·
+          {{ p.porcentajeRevisado }} %</span
+        ><strong class="learned">{{ porcentajeAprendido() }} %</strong>
+        <p>de tarjetas aprendidas</p>
+        <div class="summary-grid">
+          <article>
+            <strong>{{ p.tarjetasVistas }}</strong
+            ><span>Revisadas</span>
+          </article>
+          <article>
+            <strong>{{ p.tarjetasAprendidas }}</strong
+            ><span>Aprendidas</span>
+          </article>
+          <article>
+            <strong>{{ p.totalTarjetas - p.tarjetasAprendidas }}</strong
+            ><span>Por repasar</span>
+          </article>
+        </div>
+        <div class="actions">
+          @if (pendientes().length) {
+            <button mat-flat-button (click)="iniciar('pendientes')">Repasar pendientes</button>
+          }
+          <button mat-stroked-button (click)="iniciar('todas')">Repasar de nuevo</button
+          ><a mat-stroked-button [routerLink]="destino()">{{
+            esGrupo() ? 'Volver al grupo' : 'Volver a mis mazos'
+          }}</a>
+        </div>
+        <small>Tu progreso se conserva al volver.</small>
+      </section>
+    }
+  }
+}
+<ng-template #salirDialog
+  ><div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Salir del repaso?</h2>
+      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+        <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>Puedes volver después y continuar desde la primera tarjeta pendiente.</p>
+      <p>
+        Tu avance confirmado: {{ progreso()?.tarjetasVistas }} de
+        {{ progreso()?.totalTarjetas }} tarjetas revisadas.
+      </p></mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close>Seguir repasando</button
+      ><a mat-flat-button mat-dialog-close [routerLink]="destino()">{{
+        esGrupo() ? 'Salir al grupo' : 'Volver a mis mazos'
+      }}</a></mat-dialog-actions
+    >
+  </div></ng-template
+>
+<ng-template #retirarDialog let-ref="dialogRef"
+  ><div class="dialog-shell">
+    <div class="dialog-heading">
+      <h2>¿Retirar el mazo de este grupo?</h2>
+      <button mat-icon-button mat-dialog-close [disabled]="guardando()" aria-label="Cerrar diálogo">
+        <img src="/icons/flashcards/close.svg" alt="" width="24" height="24" />
+      </button>
+    </div>
+    <mat-dialog-content
+      ><p>{{ mazo()?.titulo }} dejará de estar disponible en {{ contexto.grupo()?.nombre }}.</p>
+      @if (errorDialogo()) {
+        <p role="alert">{{ errorDialogo() }}</p>
+      }</mat-dialog-content
+    ><mat-dialog-actions
+      ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
+      ><button mat-flat-button [disabled]="guardando()" (click)="retirar(ref)">
+        Retirar de este grupo
+      </button></mat-dialog-actions
+    >
+  </div></ng-template
+>
