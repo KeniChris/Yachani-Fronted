@@ -608,5 +608,3 @@ test('Ingreso: si el grupo se llena durante el envío, actualiza los cupos sin m
   assert.equal(await page.getByText('Ya tienes una solicitud registrada', { exact: true }).count(), 0);
   assert.equal(await page.locator('.notice.warning').count(), 0);
 });
-
-
