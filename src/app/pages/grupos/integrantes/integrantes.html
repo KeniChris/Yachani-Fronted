@@ -80,19 +80,15 @@
       }
     </ul>
   </section>
-  }
 
   <section class="content-card seats" aria-labelledby="seats-title">
-    @let resultado = resultadoCapacidad();
-    @let actuales = lista().length;
     <h2 id="seats-title">Cupos</h2>
     <p class="seats-count">
-      {{ resultado ? resultado.integrantesActuales : actuales }} de
-      {{ resultado ? resultado.capacidadMaxima : capacidadBase }} integrantes
+      {{ integrantesActuales }} de {{ capacidadBase }} integrantes
     </p>
     <p class="help">
       Quedan
-      {{ resultado ? resultado.capacidadMaxima - resultado.integrantesActuales : capacidadBase - actuales }}
+      {{ cuposDisponibles }}
       espacios disponibles.
     </p>
     @if (errorCapacidad()) {
@@ -106,7 +102,7 @@
         mat-stroked-button
         type="button"
         (click)="
-          capacidadForm.reset({ capacidad: 15 });
+          prepararCapacidad();
           dialogRefCapacidad = dialog.open(capacidadDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })
         "
       >
@@ -130,6 +126,7 @@
       <p class="help">El creador administra los cupos y las solicitudes.</p>
     }
   </section>
+  }
 </div>
 
 @if (avisoCapacidad.clave() ? resultadoCapacidad() : null; as resultado) {
@@ -165,15 +162,15 @@
       </button>
     </div>
     <mat-dialog-content>
-      <p>El grupo tiene 8 integrantes. La capacidad debe ser igual o mayor.</p>
+      <p>El grupo tiene {{ integrantesActuales }} estudiantes inscritos. La capacidad mínima es {{ capacidadMinima }}.</p>
       <form [formGroup]="capacidadForm">
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nueva capacidad</mat-label>
-          <input matInput type="number" formControlName="capacidad" min="8" required />
+          <input matInput type="number" formControlName="capacidad" [min]="capacidadMinima" required />
           @if (capacidadForm.controls.capacidad.touched && capacidadForm.controls.capacidad.invalid) {
-            <mat-error>La capacidad no puede ser menor a 8 integrantes.</mat-error>
+            <mat-error>La capacidad no puede ser menor a {{ capacidadMinima }} estudiantes.</mat-error>
           } @else {
-            <mat-hint>Mínimo 2, sin bajar de los integrantes actuales.</mat-hint>
+            <mat-hint>Mínimo {{ capacidadMinima }}, sin bajar de los estudiantes inscritos.</mat-hint>
           }
         </mat-form-field>
       </form>

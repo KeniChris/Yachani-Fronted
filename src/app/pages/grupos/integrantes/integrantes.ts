@@ -6,6 +6,7 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { finalize, forkJoin } from 'rxjs';
 import {
   GrupoEstudioService,
   ID_GRUPO_DEMO,
@@ -72,8 +73,19 @@ export class Integrantes implements OnInit {
   get capacidadBase() {
     return this.grupo()?.capacidadMaxima ?? 0;
   }
+  // La lista incluye al administrador. Los cupos usan el total del backend,
+  // igual que Mis grupos, que excluye al tutor de las plazas de estudiantes.
+  get integrantesActuales() {
+    return this.grupo()?.integrantesActuales ?? 0;
+  }
+  get cuposDisponibles() {
+    return Math.max(0, this.capacidadBase - this.integrantesActuales);
+  }
+  get capacidadMinima() {
+    return Math.max(2, this.integrantesActuales);
+  }
   readonly capacidadForm = new FormGroup({
-    capacidad: new FormControl<number | null>(15, [Validators.required, Validators.min(8)]),
+    capacidad: new FormControl<number | null>(null, [Validators.required, Validators.min(2)]),
   });
   readonly errorCapacidad = signal('');
   // Capacidad guardada: el aviso se desvanece a los 3 s, pero la capacidad nueva
@@ -90,24 +102,36 @@ export class Integrantes implements OnInit {
   cargar() {
     this.cargando.set(true);
     this.error.set(false);
-    this.api.obtenerGrupo(this.idGrupo).subscribe({ next: (grupo) => this.grupo.set(grupo) });
-    this.api.listarIntegrantes(this.idGrupo).subscribe({
-      next: (integrantes) => {
+    forkJoin({
+      grupo: this.api.obtenerGrupo(this.idGrupo),
+      integrantes: this.api.listarIntegrantes(this.idGrupo),
+    }).pipe(
+      finalize(() => this.cargando.set(false)),
+    ).subscribe({
+      next: ({ grupo, integrantes }) => {
+        this.grupo.set(grupo);
         this.lista.set(integrantes);
-        this.cargando.set(false);
       },
       error: () => {
         this.error.set(true);
-        this.cargando.set(false);
       },
     });
   }
   dialogRefCapacidad: MatDialogRef<unknown> | null = null;
+  prepararCapacidad() {
+    this.errorCapacidad.set('');
+    this.capacidadForm.controls.capacidad.setValidators([
+      Validators.required,
+      Validators.min(this.capacidadMinima),
+    ]);
+    this.capacidadForm.reset({ capacidad: this.capacidadBase });
+  }
   cambiarCapacidad() {
     if (this.capacidadForm.invalid) return;
     this.errorCapacidad.set('');
     this.api.actualizarCapacidad(this.idGrupo, this.capacidadForm.getRawValue().capacidad!).subscribe({
       next: (respuesta) => {
+        this.grupo.set(respuesta);
         this.resultadoCapacidad.set(respuesta);
         this.avisoCapacidad.mostrar();
         this.dialogRefCapacidad?.close();
