@@ -42,14 +42,14 @@ function crearEstado({
     descripcion: 'Grupo de estudio',
     metodoEstudio: 'Resolución de ejercicios',
     capacidadMaxima: 20,
-    integrantesActuales: 2,
+    integrantesActuales: 1,
     estado: 'ACTIVO',
     tipoGrupo: 'TUTOR',
     idCreador: 1,
     nombreCreador: 'Carlos Ríos',
     tipoCreador: 'TUTOR',
     permitirPublicaciones: !cerrado,
-    cuposDisponibles: 18,
+    cuposDisponibles: 19,
     mensaje: null,
   };
   const tema = {
@@ -83,6 +83,9 @@ function crearEstado({
       })),
     ],
     temas: [tema],
+    solicitudes: [],
+    sesiones: [],
+    fallarCancelarSesion: 0,
     mazos: mazo ? [deck] : [],
     tarjetas: mazo
       ? {
@@ -211,6 +214,28 @@ async function instalarApi(context, s) {
         ),
       );
     if (path === '/grupos/7') return responder(s.grupo);
+    if (path === '/grupos/solicitudes' && method === 'GET')
+      return responder(pagina(s.solicitudes, Number(url.searchParams.get('page') ?? 0), 100));
+    if (path === '/grupos/7/solicitudes' && method === 'POST') {
+      const solicitud = { idSolicitud: 90, idGrupo: 7, estado: 'PENDIENTE', mensaje: 'Solicitud enviada' };
+      s.solicitudes.push(solicitud);
+      return responder(solicitud, 201);
+    }
+    if (path === '/grupos/7/sesiones') {
+      if (method === 'GET') return responder(s.sesiones.filter((item) => item.estado === 'PROGRAMADA'));
+      const nueva = { ...json, idSesion: 100 + s.sesiones.length, idGrupo: 7, estado: 'PROGRAMADA' };
+      s.sesiones.push(nueva);
+      return responder(nueva, 201);
+    }
+    const sesionMatch = path.match(/^\/grupos\/7\/sesiones\/(\d+)(\/cancelar)?$/);
+    if (sesionMatch) {
+      const actual = s.sesiones.find((item) => item.idSesion === Number(sesionMatch[1]));
+      if (sesionMatch[2]) {
+        if (s.fallarCancelarSesion > 0) { s.fallarCancelarSesion--; return error(); }
+        actual.estado = 'CANCELADA';
+      } else Object.assign(actual, json);
+      return responder(actual);
+    }
     if (path === '/grupos/7/integrantes')
       return responder(
         Object.values(s.usuarios).map((u) => ({

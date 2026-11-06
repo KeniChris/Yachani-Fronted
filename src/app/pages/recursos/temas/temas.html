@@ -14,16 +14,14 @@
       <button mat-flat-button (click)="abrir(temaDialog)">Crear tema</button>
     }
   </div>
-  @if (contexto.error()) {
-    <p role="alert">{{ contexto.error() }}</p>
-    <button mat-button (click)="contexto.recargar()">Reintentar acceso</button>
+  <app-acceso-grupo [contexto]="contexto" />
+  @if (contexto.miembro() && !contexto.cargando()) {
+  @if (!contexto.puedeGestionarTemas()) {
+    <app-aviso-operacion [mensaje]="contexto.grupo()?.estado === 'ACTIVO' ? 'Puedes consultar los temas. Solo el administrador puede crearlos o editarlos en este grupo.' : 'El grupo está inactivo. Puedes consultar los temas existentes.'" />
   }
   @if (error()) {
-    <p role="alert">{{ error() }}</p>
+    <app-aviso-operacion tipo="error" [mensaje]="error()" />
     <button mat-button (click)="cargar()">Reintentar</button>
-  }
-  @if (exito()) {
-    <p role="status">{{ exito() }}</p>
   }
   @if (cargando()) {
     <p role="status">Cargando temas…</p>
@@ -52,6 +50,7 @@
         </article>
       } @empty {
         <p>Todavía no hay temas en este grupo.</p>
+        <p>{{ contexto.puedeGestionarTemas() ? 'Crea el primer tema para organizar los materiales y las flashcards.' : 'Cuando el administrador cree los temas, aparecerán aquí.' }}</p>
       }
     </div>
   }
@@ -62,6 +61,7 @@
       [routerLink]="['/grupos', contexto.idGrupo(), 'configuracion']"
       >Configuración del grupo</a
     >
+  }
   }
 }
 <ng-template #temaDialog let-ref="dialogRef"
@@ -74,7 +74,7 @@
     </div>
     <mat-dialog-content
       ><p>Dale un nombre claro para que el grupo encuentre sus recursos.</p>
-      <form [formGroup]="form" (ngSubmit)="guardar(ref)" id="tema-form">
+      <form [formGroup]="form" (ngSubmit)="guardar(ref)">
         <mat-form-field appearance="outline"
           ><mat-label>Nombre del tema</mat-label
           ><input matInput formControlName="nombre" required maxlength="100" /><mat-hint
@@ -87,14 +87,14 @@
         >
       </form>
       @if (errorDialogo()) {
-        <p role="alert">{{ errorDialogo() }}</p>
+        <app-aviso-operacion tipo="error" [mensaje]="errorDialogo()" />
       }</mat-dialog-content
     ><mat-dialog-actions
       ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
       ><button
         mat-flat-button
-        type="submit"
-        form="tema-form"
+        type="button"
+        (click)="guardar(ref)"
         [disabled]="form.invalid || guardando()"
       >
         {{ guardando() ? 'Guardando…' : 'Guardar tema' }}

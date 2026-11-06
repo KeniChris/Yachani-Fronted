@@ -3,7 +3,7 @@
     <h1>Integrantes del grupo</h1>
     <p>Conoce a las personas con las que estás estudiando.</p>
   </div>
-  @if (rol === 'tutor' || admin === 'si') {
+  @if (puedeGestionar()) {
     <a
       mat-stroked-button
       routerLink="../configuracion"
@@ -27,13 +27,13 @@
     </section>
   } @else {
   <section class="content-card" aria-label="Lista de integrantes">
-    @if (admin !== 'si' && tutor) {
+    @if (tutor) {
       <h2>Administración</h2>
       <ul class="member-list">
         <li class="member">
           <span class="avatar" aria-hidden="true">{{ iniciales(tutor.nombreCompleto) }}</span>
           <span class="member-copy"
-            ><strong>{{ tutor.nombreCompleto }}</strong><small>Tutor · Creador del grupo</small></span
+            ><strong>{{ tutor.nombreCompleto }}</strong><small>{{ grupo()?.tipoCreador === 'TUTOR' || grupo()?.tipoGrupo === 'TUTOR' ? 'Tutor' : 'Estudiante' }} · Creador del grupo</small></span
           >
           <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
             >chevron_right</mat-icon
@@ -59,7 +59,7 @@
           <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
             >chevron_right</mat-icon
           >
-          @if (rol === 'tutor' || admin === 'si') {
+          @if (puedeGestionar()) {
             <button
               mat-icon-button
               type="button"
@@ -91,13 +91,16 @@
       {{ cuposDisponibles }}
       espacios disponibles.
     </p>
+    @if (grupo()?.tipoGrupo === 'TUTOR') {
+      <p class="help">El tutor administra el grupo y no ocupa un cupo de estudiante.</p>
+    }
     @if (errorCapacidad()) {
       <div class="notice" role="status">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
         <p class="notice-title">{{ errorCapacidad() }}</p>
       </div>
     }
-    @if (rol === 'tutor' || admin === 'si') {
+    @if (puedeGestionar()) {
       <button
         mat-stroked-button
         type="button"

@@ -22,16 +22,17 @@
       </button>
     }
   </div>
-  @if (contexto.error()) {
-    <p role="alert">{{ contexto.error() }}</p>
-    <button mat-button (click)="contexto.recargar()">Reintentar acceso</button>
+  <app-acceso-grupo [contexto]="contexto" />
+  @if (contexto.miembro() && !contexto.cargando()) {
+  @if (!contexto.puedePublicar()) {
+    <app-aviso-operacion mensaje="Las publicaciones están desactivadas para tu cuenta en este grupo. Puedes consultar y descargar los materiales existentes." />
   }
   @if (error()) {
-    <p role="alert">{{ error() }}</p>
+    <app-aviso-operacion tipo="error" [mensaje]="error()" />
     <button mat-button (click)="cargar()">Reintentar</button>
   }
   @if (exito()) {
-    <p role="status">{{ exito() }}</p>
+    <app-aviso-operacion tipo="exito" [mensaje]="exito()" />
   }
   <mat-form-field class="filter" appearance="outline"
     ><mat-label>Tema</mat-label
@@ -85,6 +86,7 @@
         </article>
       } @empty {
         <p>Todavía no hay materiales{{ idTema() ? ' en este tema' : ' en el grupo' }}.</p>
+        <p>{{ contexto.puedePublicar() ? 'Comparte el primer archivo con tu grupo.' : 'Los archivos aparecerán aquí cuando se compartan.' }}</p>
       }
     }
     <mat-paginator
@@ -100,7 +102,7 @@
     <section class="deck-panel">
       <h2>Flashcards de este tema</h2>
       @if (errorMazos()) {
-        <p role="alert">{{ errorMazos() }}</p>
+        <app-aviso-operacion tipo="error" [mensaje]="errorMazos()" />
         <button mat-button (click)="cargar()">Reintentar flashcards</button>
       }
       @for (p of mazos(); track p.idCompartido) {
@@ -121,6 +123,7 @@
         }
       }
     </section>
+  }
   }
 }
 <ng-template #subirDialog let-ref="dialogRef"
@@ -176,7 +179,7 @@
         <p role="alert">{{ errorArchivos() }}</p>
       }
       @if (errorDialogo()) {
-        <p role="alert">{{ errorDialogo() }}</p>
+        <app-aviso-operacion tipo="error" [mensaje]="errorDialogo()" />
       }</mat-dialog-content
     ><mat-dialog-actions
       ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
@@ -248,7 +251,7 @@
         </mat-select></mat-form-field
       >
       @if (errorDialogo()) {
-        <p role="alert">{{ errorDialogo() }}</p>
+        <app-aviso-operacion tipo="error" [mensaje]="errorDialogo()" />
       }</mat-dialog-content
     ><mat-dialog-actions
       ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">Cancelar</button
@@ -269,7 +272,7 @@
     <mat-dialog-content
       ><p>{{ m.nombreArchivo }} dejará de estar disponible en este grupo.</p>
       @if (errorDialogo()) {
-        <p role="alert">{{ errorDialogo() }}</p>
+        <app-aviso-operacion tipo="error" [mensaje]="errorDialogo()" />
       }</mat-dialog-content
     ><mat-dialog-actions
       ><button mat-stroked-button mat-dialog-close [disabled]="guardando()">

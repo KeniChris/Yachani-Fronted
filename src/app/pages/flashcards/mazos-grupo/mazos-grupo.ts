@@ -16,6 +16,8 @@ import { ContextoGrupoService } from '../../../core/services/contexto-grupo.serv
 import { errorApi } from '../../../core/services/recursos-ui';
 import { progresosDe } from '../../../core/services/progreso-mazos';
 import { CompartirMazo } from '../compartir-mazo/compartir-mazo';
+import { AccesoGrupo } from '../../../shared/acceso-grupo/acceso-grupo';
+import { AvisoOperacion } from '../../../shared/aviso-operacion/aviso-operacion';
 @Component({
   selector: 'app-mazos-grupo',
   standalone: true,
@@ -27,6 +29,8 @@ import { CompartirMazo } from '../compartir-mazo/compartir-mazo';
     MatFormFieldModule,
     MatSelectModule,
     MatProgressBarModule,
+    AccesoGrupo,
+    AvisoOperacion,
   ],
   templateUrl: './mazos-grupo.html',
   styleUrls: ['../flashcards.css', './mazos-grupo.css'],
@@ -49,7 +53,8 @@ export class MazosGrupo {
     effect(() => {
       const id = this.contexto.idGrupo(),
         tema = this.tema();
-      untracked(() => this.cargar(id, tema));
+      const acceso = this.contexto.miembro() && !this.contexto.cargando();
+      untracked(() => this.cargar(acceso ? id : null, tema));
     });
   }
   cargar(id = this.contexto.idGrupo(), tema = this.tema()): void {
@@ -57,8 +62,9 @@ export class MazosGrupo {
     this.mazos.set([]);
     this.progresos.set({});
     this.error.set('');
-    if (!id) {
-      this.error.set('El identificador del grupo no es válido.');
+    if (!id || !this.contexto.miembro() || this.contexto.cargando()) {
+      this.temas.set([]);
+      this.cargando.set(false);
       return;
     }
     this.cargando.set(true);

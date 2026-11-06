@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +17,7 @@ import {
   IntegranteResponse,
 } from '../../../core/models/grupo-estudio.models';
 import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-integrantes',
@@ -34,6 +35,11 @@ import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
   styleUrls: ['../grupos.css', './integrantes.css'],
 })
 export class Integrantes implements OnInit {
+  private readonly auth = inject(AuthService);
+  readonly puedeGestionar = computed(() => {
+    const usuario = this.auth.usuario();
+    return usuario != null && this.grupo()?.idCreador === usuario.idUsuario;
+  });
   // Variante visual mediante ?rol=tutor y capacidad guardada (G11) mediante ?integrantes=capacidad.
   @Input() rol = 'estudiante';
   // Grupo activo según el :grupoId de la ruta padre.
@@ -127,7 +133,7 @@ export class Integrantes implements OnInit {
     this.capacidadForm.reset({ capacidad: this.capacidadBase });
   }
   cambiarCapacidad() {
-    if (this.capacidadForm.invalid) return;
+    if (this.capacidadForm.invalid || !this.puedeGestionar()) return;
     this.errorCapacidad.set('');
     this.api.actualizarCapacidad(this.idGrupo, this.capacidadForm.getRawValue().capacidad!).subscribe({
       next: (respuesta) => {
@@ -142,6 +148,7 @@ export class Integrantes implements OnInit {
     });
   }
   eliminarIntegrante(idUsuario: number) {
+    if (!this.puedeGestionar()) return;
     this.errorEliminar.set('');
     this.api.eliminarIntegrante(this.idGrupo, idUsuario).subscribe({
       next: () => {

@@ -32,6 +32,8 @@ import {
 import { MaterialResponse, TemaResponse } from '../../../core/models/recursos.models';
 import { MazoCompartidoResponse } from '../../../core/models/flashcards.models';
 import { SeleccionarGrupo } from '../seleccionar-grupo';
+import { AccesoGrupo } from '../../../shared/acceso-grupo/acceso-grupo';
+import { AvisoOperacion } from '../../../shared/aviso-operacion/aviso-operacion';
 function paginador(): MatPaginatorIntl {
   const p = new MatPaginatorIntl();
   p.itemsPerPageLabel = 'Archivos por página';
@@ -56,6 +58,8 @@ function paginador(): MatPaginatorIntl {
     MatMenuModule,
     MatPaginatorModule,
     SeleccionarGrupo,
+    AccesoGrupo,
+    AvisoOperacion,
   ],
   templateUrl: './materiales.html',
   styleUrl: './materiales.css',
@@ -98,15 +102,25 @@ export class Materiales {
     effect(() => {
       const id = this.contexto.idGrupo();
       const tema = this.idTema();
+      const acceso = this.contexto.miembro() && !this.contexto.cargando();
       untracked(() => {
         this.pagina.set(0);
-        this.cargar(id, tema);
+        this.cargar(acceso ? id : null, tema);
       });
     });
   }
   cargar(id = this.contexto.idGrupo(), tema = this.idTema()): void {
     this.carga?.unsubscribe();
-    if (!id) return;
+    if (!id || !this.contexto.miembro() || this.contexto.cargando()) {
+      this.materiales.set([]);
+      this.temas.set([]);
+      this.mazos.set([]);
+      this.total.set(0);
+      this.error.set('');
+      this.errorMazos.set('');
+      this.cargando.set(false);
+      return;
+    }
     this.cargando.set(true);
     this.error.set('');
     this.errorMazos.set('');

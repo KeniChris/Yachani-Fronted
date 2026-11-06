@@ -1,11 +1,13 @@
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { finalize } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -21,6 +23,8 @@ import {
 import { SesionUsuarioService } from '../../../core/services/sesion-usuario.service';
 import { RecordatorioSesion } from '../../../shared/recordatorio-sesion/recordatorio-sesion';
 import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
+import { errorApi } from '../../../core/services/recursos-ui';
+import { AvisoOperacion } from '../../../shared/aviso-operacion/aviso-operacion';
 
 @Component({
   selector: 'app-sesiones',
@@ -37,6 +41,7 @@ import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
     MatInputModule,
     MatTimepickerModule,
     RecordatorioSesion,
+    AvisoOperacion,
   ],
   providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'es-PE' }],
   templateUrl: './sesiones.html',
@@ -58,6 +63,8 @@ export class Sesiones implements OnInit {
   readonly hoy = new Date();
   readonly cargando = signal(true);
   readonly error = signal(false);
+  readonly errorCarga = signal('');
+  readonly guardando = signal(false);
   readonly sesiones = signal<SesionEstudioResponse[]>([]);
   // Confirmación que se desvanece a los 3 s ('programada' | 'actualizada' | 'cancelada').
   readonly aviso = crearAvisoTemporal();
@@ -85,6 +92,9 @@ export class Sesiones implements OnInit {
     }),
   });
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroy = inject(DestroyRef);
   private readonly grupos = inject(GrupoEstudioService);
   private readonly idCreador = signal<number | null>(null);
   // Solo el creador del grupo (usuario con sesión == idCreador) gestiona las sesiones.
@@ -102,6 +112,7 @@ export class Sesiones implements OnInit {
       this.idLlenado = null;
       if (valor === 'programar') this.form.reset();
     }
+    this.errorAccion.set('');
   }
   // Programar y editar solo existen para el creador del grupo; mientras no se sepa, no se muestran.
   get vista() {
@@ -138,10 +149,12 @@ export class Sesiones implements OnInit {
   get sesionActual(): SesionEstudioResponse | undefined {
     return this.sesiones().find((s) => String(s.idSesion) === this.idSesion);
   }
-  // La sesión principal que se muestra en la lista (la primera programada).
-  get sesionPrincipal(): SesionEstudioResponse | undefined {
-    return this.sesiones().find((s) => s.estado === 'PROGRAMADA');
-  }
+  readonly sesionesProgramadas = computed(() =>
+    this.sesiones()
+      .filter((s) => s.estado === 'PROGRAMADA')
+      .slice()
+      .sort((a, b) => a.fechaHoraInicio.localeCompare(b.fechaHoraInicio)),
+  );
   get idUsuario() {
     return this.sesion.idUsuario(this.rol);
   }
@@ -163,16 +176,27 @@ export class Sesiones implements OnInit {
   cargar() {
     this.cargando.set(true);
     this.error.set(false);
-    this.api.listarSesiones(this.idGrupo).subscribe({
+    this.errorCarga.set('');
+    this.api.listarSesiones(this.idGrupo).pipe(takeUntilDestroyed(this.destroy)).subscribe({
       next: (sesiones) => {
         this.sesiones.set(sesiones);
         this.cargando.set(false);
         this.llenarFormularioEditar();
       },
-      error: () => {
+      error: (e) => {
         this.error.set(true);
+        this.errorCarga.set(errorApi(e));
         this.cargando.set(false);
       },
+    });
+  }
+  private volverAlListado() {
+    this.idLlenado = null;
+    this.vistaSignal.set('');
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { vista: null, idSesion: null },
+      queryParamsHandling: 'merge',
     });
   }
   private get solicitud() {
@@ -195,43 +219,63 @@ export class Sesiones implements OnInit {
     };
   }
   programar() {
-    if (this.form.invalid || !this.puedeGestionar()) return;
+    this.form.markAllAsTouched();
+    if (this.form.invalid || !this.puedeGestionar() || this.guardando()) return;
     this.errorAccion.set('');
-    this.api.crearSesion(this.idGrupo, this.solicitud).subscribe({
+    this.guardando.set(true);
+    this.api.crearSesion(this.idGrupo, this.solicitud).pipe(
+      takeUntilDestroyed(this.destroy),
+      finalize(() => this.guardando.set(false)),
+    ).subscribe({
       next: () => {
         this.cargar();
-        this.vistaSignal.set('');
+        this.volverAlListado();
         this.aviso.mostrar('programada');
       },
       error: (respuesta) => {
-        this.errorAccion.set(respuesta.error?.mensaje || 'No pudimos programar la sesión.');
+        this.errorAccion.set(errorApi(respuesta));
       },
     });
   }
   guardarCambios() {
-    if (this.form.invalid || !this.sesionActual || !this.puedeGestionar()) return;
+    this.form.markAllAsTouched();
+    if (this.form.invalid || !this.sesionActual || !this.puedeGestionar() || this.guardando()) return;
     this.errorAccion.set('');
-    this.api.modificarSesion(this.idGrupo, this.sesionActual.idSesion, this.solicitud).subscribe({
+    this.guardando.set(true);
+    this.api.modificarSesion(this.idGrupo, this.sesionActual.idSesion, this.solicitud).pipe(
+      takeUntilDestroyed(this.destroy),
+      finalize(() => this.guardando.set(false)),
+    ).subscribe({
       next: () => {
         this.cargar();
-        this.vistaSignal.set('');
+        this.volverAlListado();
         this.aviso.mostrar('actualizada');
       },
       error: (respuesta) => {
-        this.errorAccion.set(respuesta.error?.mensaje || 'No pudimos guardar los cambios.');
+        this.errorAccion.set(errorApi(respuesta));
       },
     });
   }
-  cancelar(idSesion: number) {
+  cancelar(idSesion: number, ref?: MatDialogRef<unknown>) {
+    if (!this.puedeGestionar() || this.guardando()) return;
     this.errorAccion.set('');
-    this.api.cancelarSesion(this.idGrupo, idSesion).subscribe({
+    this.guardando.set(true);
+    if (ref) ref.disableClose = true;
+    this.api.cancelarSesion(this.idGrupo, idSesion).pipe(
+      takeUntilDestroyed(this.destroy),
+      finalize(() => {
+        this.guardando.set(false);
+        if (ref) ref.disableClose = false;
+      }),
+    ).subscribe({
       next: () => {
         this.cargar();
-        this.vistaSignal.set('');
+        this.volverAlListado();
+        ref?.close();
         this.aviso.mostrar('cancelada');
       },
       error: (respuesta) => {
-        this.errorAccion.set(respuesta.error?.mensaje || 'No pudimos cancelar la sesión.');
+        this.errorAccion.set(errorApi(respuesta));
       },
     });
   }
