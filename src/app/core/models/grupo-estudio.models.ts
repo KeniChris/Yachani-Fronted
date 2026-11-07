@@ -1,6 +1,6 @@
 export type TipoGrupo = 'TUTOR' | 'ESTUDIANTES';
 
-// Coincide con com.yachaniapi.grupoestudio.dto.GrupoEstudioDTO.Response.
+// Coincide con com.yachaniapi.grupoestudio.dto.response.GrupoResponse.
 export interface GrupoEstudioResponse {
   idGrupo: number;
   nombre: string;
@@ -11,6 +11,9 @@ export interface GrupoEstudioResponse {
   estado: string;
   tipoGrupo: TipoGrupo;
   idCreador: number;
+  nombreCreador?: string;
+  tipoCreador?: 'TUTOR' | 'ESTUDIANTE';
+  cuposDisponibles?: number;
   mensaje: string | null;
   permitirPublicaciones?: boolean;
 }
@@ -32,11 +35,13 @@ export interface FiltrarGruposParams {
   tipoGrupo?: TipoGrupo;
 }
 
-// La API no marca quién es el tutor: hay que comparar con el idCreador del grupo.
+// El creador sigue visible en Administración, aunque sea tutor y no ocupe cupo.
 export interface IntegranteResponse {
   idUsuario: number;
   nombreCompleto: string;
   correo: string;
+  tipoUsuario?: 'TUTOR' | 'ESTUDIANTE';
+  administrador?: boolean;
 }
 
 export interface SolicitudResponse {

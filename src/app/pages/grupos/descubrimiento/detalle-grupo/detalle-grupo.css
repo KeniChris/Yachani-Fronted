@@ -107,6 +107,10 @@ small {
   background: var(--color-warning-surface);
   color: var(--color-warning);
 }
+.notice.info {
+  background: var(--color-active);
+  color: var(--color-primary);
+}
 .back {
   margin-top: var(--space-6);
 }

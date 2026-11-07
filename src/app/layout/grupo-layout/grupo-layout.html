@@ -1,3 +1,4 @@
+@if (contexto.miembro() && !contexto.cargando() && !contexto.error()) {
 <div class="group-card">
   <header class="group-header">
     <div class="group-heading">
@@ -46,8 +47,7 @@
     }
   </mat-menu>
 </div>
-@if (contexto.error()) {
-  <p role="alert">{{ contexto.error() }}</p>
-  <button mat-button (click)="contexto.recargar()">Reintentar acceso al grupo</button>
-}
 <section class="group-body"><router-outlet /></section>
+} @else {
+  <app-acceso-grupo [contexto]="contexto" />
+}

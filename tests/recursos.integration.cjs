@@ -375,7 +375,7 @@ for (const [nombre, viewport] of [
   ['móvil', { width: 390, height: 844 }],
 ]) {
   test(
-    `Home ${nombre}: muestra secciones, video pendiente y contacto válido`,
+    `Home ${nombre}: muestra secciones, tutoriales y contacto válido`,
     { timeout: 60000 },
     async (t) => {
       const { page } = await sesion(t, {}, viewport);
@@ -387,11 +387,11 @@ for (const [nombre, viewport] of [
         path: `test-results/Home-${nombre === 'móvil' ? 'movil' : 'escritorio'}-tutor.png`,
         fullPage: true,
       });
-      await page.locator('mat-button-toggle[value="estudiante"]').click();
+      await page.locator('.hero mat-button-toggle[value="estudiante"]').click();
       await ver(page.getByRole('heading', { name: /Aprende a tu ritmo/ }));
       assert.equal(await page.locator('.testimonials .panel').count(), 3);
-      await ver(page.getByText('Videotutorial · Próximamente', { exact: true }));
-      const correo = page.getByRole('button', { name: 'Preparar correo', exact: true });
+      await ver(page.getByRole('button', { name: 'Reproducir Yachani para estudiantes', exact: true }));
+      const correo = page.getByRole('button', { name: 'Enviar mensaje', exact: true });
       assert.equal(await correo.isDisabled(), true);
       await page.getByLabel('Nombre', { exact: true }).fill('Ana Pérez');
       await page.getByLabel('Correo', { exact: true }).fill('ana@upc.edu.pe');
@@ -439,3 +439,172 @@ test(
     await ver(page.getByRole('button', { name: 'Reintentar flashcards', exact: true }));
   },
 );
+
+test('Temas: permite editar el mismo tema tres veces y confirma cada guardado', { timeout: 60000 }, async (t) => {
+  const { s, page } = await sesion(t);
+  await login(page, s);
+  await ir(page, '/grupos/7/recursos/temas');
+  let nombre = 'Derivadas';
+  for (const nuevo of ['Derivadas básicas', 'Derivadas avanzadas', 'Derivadas finales']) {
+    await page.getByRole('button', { name: 'Editar ' + nombre, exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    await ver(dialog);
+    await dialog.getByLabel('Nombre del tema').fill(nuevo);
+    await dialog.getByRole('button', { name: 'Guardar tema', exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+    await ver(page.getByRole('heading', { name: nuevo, exact: true }));
+    await ver(page.getByText('Tema actualizado correctamente.', { exact: true }));
+    nombre = nuevo;
+  }
+  assert.equal(s.temas.length, 1);
+  assert.equal(s.llamadas.filter((r) => r.method === 'PATCH' && r.path === '/grupos/7/temas/21').length, 3);
+});
+
+test('Temas: muestra el límite del backend y conserva el formulario al rechazar el tema 31', { timeout: 60000 }, async (t) => {
+  const { s, context, page } = await sesion(t);
+  s.temas = Array.from({ length: 30 }, (_, i) => ({ ...s.temas[0], idTema: 21 + i, nombre: 'Tema ' + (i + 1) }));
+  await context.route('**/api/grupos/7/temas', (route) =>
+    route.request().method() === 'POST'
+      ? route.fulfill({ status: 409, json: { mensaje: 'Este grupo alcanzó el límite de 30 temas' } })
+      : route.fallback(),
+  );
+  await login(page, s);
+  await ir(page, '/grupos/7/recursos/temas');
+  await page.getByRole('button', { name: 'Crear tema', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Nombre del tema').fill('Tema adicional');
+  await dialog.getByRole('button', { name: 'Guardar tema', exact: true }).click();
+  await ver(dialog.getByRole('alert'));
+  assert.match(await dialog.getByRole('alert').innerText(), /30 temas/);
+  assert.equal(await dialog.getByLabel('Nombre del tema').inputValue(), 'Tema adicional');
+  assert.equal(s.temas.length, 30);
+});
+
+test('Acceso: un usuario ajeno ve cómo solicitar ingreso en Temas, Materiales y Flashcards', { timeout: 60000 }, async (t) => {
+  const { s, context, page } = await sesion(t, { estudiante: true });
+  await context.route('**/api/grupos/7/integrantes', (route) =>
+    route.fulfill({ status: 403, json: { mensaje: 'No perteneces a este grupo' } }),
+  );
+  await login(page, s);
+  for (const ruta of ['/grupos/7/recursos/temas', '/grupos/7/recursos/materiales', '/grupos/7/flashcards']) {
+    await ir(page, ruta);
+    await ver(page.getByRole('heading', { name: 'Aún no perteneces a este grupo', exact: true }));
+    await ver(page.getByRole('link', { name: 'Ver grupo y solicitar ingreso', exact: true }));
+    assert.equal(await page.getByText(/Todavía no hay (temas|materiales|mazos)/).count(), 0);
+  }
+  assert.equal(s.llamadas.filter((r) => /^\/grupos\/7\/(temas|materiales|mazos)$/.test(r.path)).length, 0);
+});
+
+test('Ingreso: un grupo completo informa Sin cupos y no envía una solicitud', { timeout: 60000 }, async (t) => {
+  const { s, page } = await sesion(t, { estudiante: true });
+  s.grupos = [];
+  Object.assign(s.grupo, { capacidadMaxima: 2, integrantesActuales: 2, cuposDisponibles: 0 });
+  await login(page, s);
+  await ir(page, '/grupos/descubrimiento/7');
+  await ver(page.getByRole('button', { name: 'Sin cupos', exact: true }));
+  await ver(page.getByText('Este grupo no tiene cupos', { exact: true }));
+  assert.equal(await page.locator('.notice.warning').count(), 0);
+  assert.equal(await page.getByText('Ya tienes una solicitud registrada', { exact: true }).count(), 0);
+  assert.equal(s.llamadas.filter((r) => r.method === 'POST' && r.path === '/grupos/7/solicitudes').length, 0);
+});
+
+test('Ingreso: un fallo de red permite reintentar y no inventa una solicitud pendiente', { timeout: 60000 }, async (t) => {
+  const { s, context, page } = await sesion(t, { estudiante: true });
+  s.grupos = [];
+  await context.route('**/api/grupos/7/solicitudes', (route) => route.abort('failed'));
+  await login(page, s);
+  await ir(page, '/grupos/descubrimiento/7');
+  const boton = page.getByRole('button', { name: 'Solicitar ingreso', exact: true });
+  await ver(boton);
+  await boton.click();
+  await ver(page.getByRole('alert'));
+  assert.match(await page.getByRole('alert').innerText(), /conectar con el servidor/);
+  assert.equal(await boton.isEnabled(), true);
+  assert.equal(await page.getByText('Tu solicitud está pendiente', { exact: true }).count(), 0);
+});
+
+test('Ingreso: una solicitud pendiente real y una membresía muestran estados distintos', { timeout: 60000 }, async (t) => {
+  const { s, page } = await sesion(t, { estudiante: true });
+  s.grupos = [];
+  s.solicitudes = [{ idSolicitud: 90, idGrupo: 7, estado: 'PENDIENTE', fechaSolicitud: '2026-11-06T12:00:00' }];
+  await login(page, s);
+  await ir(page, '/grupos/descubrimiento/7');
+  await ver(page.getByText('Tu solicitud está pendiente', { exact: true }));
+  s.grupos = [s.grupo];
+  s.solicitudes = [];
+  await page.reload();
+  await ver(page.getByText('Ya formas parte de este grupo.', { exact: true }));
+  await ver(page.getByRole('link', { name: 'Entrar al grupo', exact: true }));
+});
+
+test('Sesiones: muestra tres sesiones y permite editar repetidamente sin perder las demás', { timeout: 90000 }, async (t) => {
+  const { s, page } = await sesion(t);
+  const fecha = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  s.sesiones = [3, 1, 2].map((id) => ({
+    idSesion: id, idGrupo: 7, tema: 'Sesión ' + id, descripcion: 'Repaso',
+    fechaHoraInicio: fecha + 'T' + String(14 + id).padStart(2, '0') + ':00:00',
+    duracionMinutos: 60, lugar: 'Aula virtual', estado: 'PROGRAMADA',
+  }));
+  await login(page, s);
+  await ir(page, '/grupos/7/sesiones');
+  await ver(page.getByRole('heading', { name: 'Sesión 1', exact: true }));
+  assert.deepEqual(await page.locator('article.session h2').allTextContents(), ['Sesión 1', 'Sesión 2', 'Sesión 3']);
+  let nombre = 'Sesión 1';
+  for (const nuevo of ['Sesión actualizada', 'Sesión editada de nuevo']) {
+    const tarjeta = page.locator('article.session').filter({ has: page.getByRole('heading', { name: nombre, exact: true }) });
+    await tarjeta.getByRole('link', { name: 'Editar', exact: true }).click();
+    const tema = page.getByLabel('Tema', { exact: true });
+    await ver(tema);
+    await esperar(async () => await tema.inputValue() === nombre);
+    await tema.fill(nuevo);
+    await page.getByRole('button', { name: 'Guardar cambios', exact: true }).click();
+    await ver(page.getByRole('heading', { name: nuevo, exact: true }));
+    assert.equal(new URL(page.url()).searchParams.has('vista'), false);
+    assert.equal(await page.locator('article.session').count(), 3);
+    nombre = nuevo;
+  }
+  s.fallarCancelarSesion = 1;
+  const segunda = page.locator('article.session').filter({ has: page.getByRole('heading', { name: 'Sesión 2', exact: true }) });
+  await segunda.getByRole('button', { name: 'Cancelar', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await ver(dialog);
+  await dialog.getByRole('button', { name: 'Cancelar sesión', exact: true }).click();
+  await ver(dialog.getByRole('alert'));
+  assert.equal(s.sesiones.filter((item) => item.estado === 'PROGRAMADA').length, 3);
+  await dialog.getByRole('button', { name: 'Cancelar sesión', exact: true }).click();
+  await dialog.waitFor({ state: 'hidden' });
+  await esperar(async () => await page.locator('article.session').count() === 2);
+});
+
+test('Integrantes: tutor y dos estudiantes muestran 2 de 2 cupos y ningún espacio negativo', { timeout: 60000 }, async (t) => {
+  const { s, page } = await sesion(t);
+  s.usuarios[3] = { idUsuario: 3, nombres: 'Valeria', apellidos: 'Torres', correo: 'valeria@upc.edu.pe', tipoUsuario: 'ESTUDIANTE', configuracionCompletada: true };
+  Object.assign(s.grupo, { capacidadMaxima: 2, integrantesActuales: 2, cuposDisponibles: 0 });
+  await login(page, s);
+  await ir(page, '/grupos/7/integrantes');
+  await ver(page.getByRole('heading', { name: 'Estudiantes (2)', exact: true }));
+  const contador = page.locator('app-integrantes .seats-count');
+  await ver(contador);
+  assert.equal((await contador.innerText()).replace(/\s+/g, ' ').trim(), '2 de 2 integrantes');
+  assert.equal(await page.locator('app-integrantes .member').count(), 3);
+  const espacios = page.locator('app-integrantes .seats .help').first();
+  assert.equal((await espacios.innerText()).replace(/\s+/g, ' ').trim(), 'Quedan 0 espacios disponibles.');
+  await ver(page.getByText('El tutor administra el grupo y no ocupa un cupo de estudiante.', { exact: true }));
+});
+
+test('Ingreso: si el grupo se llena durante el envío, actualiza los cupos sin mostrar solicitud duplicada', { timeout: 60000 }, async (t) => {
+  const { s, context, page } = await sesion(t, { estudiante: true });
+  s.grupos = [];
+  Object.assign(s.grupo, { capacidadMaxima: 2, integrantesActuales: 1, cuposDisponibles: 1 });
+  await context.route('**/api/grupos/7/solicitudes', (route) => {
+    Object.assign(s.grupo, { integrantesActuales: 2, cuposDisponibles: 0 });
+    return route.fulfill({ status: 409, json: { codigo: 'GRUPO_LLENO', mensaje: 'El grupo ya alcanzó su capacidad máxima' } });
+  });
+  await login(page, s);
+  await ir(page, '/grupos/descubrimiento/7');
+  await page.getByRole('button', { name: 'Solicitar ingreso', exact: true }).click();
+  await ver(page.getByRole('button', { name: 'Sin cupos', exact: true }));
+  assert.equal((await page.locator('.seats .count').innerText()).replace(/\s+/g, ' ').trim(), '2 de 2 integrantes');
+  assert.equal(await page.getByText('Ya tienes una solicitud registrada', { exact: true }).count(), 0);
+  assert.equal(await page.locator('.notice.warning').count(), 0);
+});

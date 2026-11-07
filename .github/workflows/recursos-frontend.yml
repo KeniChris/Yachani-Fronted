@@ -1,4 +1,4 @@
-name: Recursos y Flashcards
+name: Frontend
 on:
   pull_request:
     branches: [develop]
@@ -29,6 +29,7 @@ jobs:
             sleep 1
           done
           npm run test:integracion
+          npm run test:landing
       - uses: actions/upload-artifact@v4
         if: always()
         with:

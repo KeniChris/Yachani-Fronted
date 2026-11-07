@@ -375,50 +375,10 @@
     </div>
   </section>
   <section class="section alternate" id="tutorial" aria-labelledby="video-title">
-    <div class="container flow">
-      <header class="section-heading">
-        <span class="badge">Video</span>
-        <h2 id="video-title">Mira cómo funciona Yachani</h2>
-        <p>
-          Conoce el recorrido para encontrar tu grupo y empezar a estudiar. El videotutorial estará
-          disponible próximamente.
-        </p>
-      </header>
-      <!-- Vista previa del frame. Figma no incluye un archivo de video reproducible. -->
-      <figure class="video-preview" aria-label="Vista previa del videotutorial, próximamente">
-        <picture class="video-glow"
-          ><source media="(max-width: 767px)" srcset="/landing/mobile-video-glow.svg" />
-          <img src="/landing/video-glow.svg" alt=""
-        /></picture>
-        <picture class="play-halo"
-          ><source media="(max-width: 767px)" srcset="/landing/mobile-play-halo.svg" />
-          <img src="/landing/play-halo.svg" alt=""
-        /></picture>
-        <picture class="play-button"
-          ><source media="(max-width: 767px)" srcset="/landing/mobile-play-button.svg" />
-          <img src="/landing/play-button.svg" alt=""
-        /></picture>
-        <picture class="play-icon"
-          ><source media="(max-width: 767px)" srcset="/landing/mobile-play-icon.svg" />
-          <img src="/landing/play-icon.svg" alt=""
-        /></picture>
-        <figcaption>Videotutorial · Próximamente</figcaption>
-        <div class="video-controls" aria-hidden="true">
-          <img class="desktop-text" src="/landing/play-small.svg" alt="" /><span
-            class="video-progress"
-            ><span></span></span
-          ><span class="desktop-text">Próximamente</span>
-        </div>
-      </figure>
-      <ol class="chapters">
-        @for (chapter of chapters; track chapter.time) {
-          <li>
-            <strong>{{ chapter.time }}</strong
-            >{{ chapter.label }}
-          </li>
-        }
-      </ol>
-    </div>
+    <app-tutorial-landing
+      [rol]="audience.controls.rol.value"
+      (rolChange)="audience.controls.rol.setValue($event)"
+    />
   </section>
   <section class="section" id="para-quien" aria-labelledby="audiences-title">
     <div class="container flow">
@@ -516,48 +476,7 @@
           }
         </dl>
       </div>
-      <form
-        class="contact-card"
-        [formGroup]="contactForm"
-        (ngSubmit)="prepararCorreo()"
-        aria-label="Formulario de contacto"
-      >
-        <div class="grid two">
-          <mat-form-field appearance="outline" hideRequiredMarker
-            ><mat-label>Nombre</mat-label
-            ><input matInput formControlName="nombre" autocomplete="name" />
-            @if (contactForm.controls.nombre.touched && contactForm.controls.nombre.invalid) {
-              <mat-error>Ingresa tu nombre.</mat-error>
-            }
-          </mat-form-field>
-          <mat-form-field appearance="outline" hideRequiredMarker
-            ><mat-label>Correo</mat-label
-            ><input matInput type="email" formControlName="correo" autocomplete="email" />
-            @if (contactForm.controls.correo.touched && contactForm.controls.correo.invalid) {
-              <mat-error>Ingresa un correo electrónico válido.</mat-error>
-            }
-          </mat-form-field>
-        </div>
-        <mat-form-field appearance="outline" hideRequiredMarker
-          ><mat-label>Asunto</mat-label><input matInput formControlName="asunto" />
-          @if (contactForm.controls.asunto.touched && contactForm.controls.asunto.invalid) {
-            <mat-error>Ingresa el asunto.</mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline" hideRequiredMarker
-          ><mat-label>Mensaje</mat-label
-          ><textarea matInput formControlName="mensaje" rows="5"></textarea>
-          @if (contactForm.controls.mensaje.touched && contactForm.controls.mensaje.invalid) {
-            <mat-error>Escribe tu mensaje.</mat-error>
-          }
-        </mat-form-field>
-        <p class="contact-hint">
-          Se abrirá tu aplicación de correo para que revises y envíes el mensaje.
-        </p>
-        <button mat-flat-button type="submit" [disabled]="contactForm.invalid">
-          Preparar correo
-        </button>
-      </form>
+      <app-contacto-landing />
     </div>
   </section>
 </main>

@@ -16,6 +16,7 @@ import { GrupoRecursos, IntegranteGrupo } from '../models/recursos.models';
 import { AuthService } from './auth.service';
 import { RecursosApiService } from './recursos-api.service';
 import { errorApi, idPositivo } from './recursos-ui';
+import { HttpErrorResponse } from '@angular/common/http';
 @Injectable()
 export class ContextoGrupoService {
   private readonly api = inject(RecursosApiService);
@@ -27,6 +28,7 @@ export class ContextoGrupoService {
   readonly integrantes = signal<IntegranteGrupo[]>([]);
   readonly cargando = signal(false);
   readonly error = signal('');
+  readonly sinAcceso = signal(false);
   readonly usuario = this.auth.usuario;
   readonly administrador = computed(
     () => this.usuario() != null && this.grupo()?.idCreador === this.usuario()?.idUsuario,
@@ -37,14 +39,15 @@ export class ContextoGrupoService {
       this.integrantes().some((i) => i.idUsuario === this.usuario()?.idUsuario),
   );
   readonly puedeGestionarTemas = computed(
-    () => this.administrador() || (this.miembro() && this.grupo()?.tipoGrupo === 'ESTUDIANTES'),
+    () => this.grupo()?.estado === 'ACTIVO' &&
+      (this.administrador() || (this.miembro() && this.grupo()?.tipoGrupo === 'ESTUDIANTES')),
   );
   readonly puedePublicar = computed(
     () =>
-      this.administrador() ||
+      this.grupo()?.estado === 'ACTIVO' && (this.administrador() ||
       (this.miembro() &&
         (this.grupo()?.tipoGrupo === 'ESTUDIANTES' ||
-          this.grupo()?.permitirPublicaciones === true)),
+          this.grupo()?.permitirPublicaciones === true))),
   );
   constructor() {
     const ids = combineLatest(this.route.pathFromRoot.map((r) => r.paramMap)).pipe(
@@ -65,10 +68,12 @@ export class ContextoGrupoService {
           this.grupo.set(null);
           this.integrantes.set([]);
           this.error.set('');
+          this.sinAcceso.set(false);
           this.cargando.set(!!id);
           return id
             ? forkJoin({ grupo: this.api.grupo(id), integrantes: this.api.integrantes(id) }).pipe(
                 catchError((e) => {
+                  this.sinAcceso.set(e instanceof HttpErrorResponse && e.status === 403);
                   this.error.set(errorApi(e));
                   return of(null);
                 }),
@@ -81,6 +86,10 @@ export class ContextoGrupoService {
         if (datos) {
           this.grupo.set(datos.grupo);
           this.integrantes.set(datos.integrantes);
+          if (!this.miembro()) {
+            this.sinAcceso.set(true);
+            this.error.set('Aún no perteneces a este grupo. Solicita tu ingreso para consultar sus recursos.');
+          }
         }
         this.cargando.set(false);
       });

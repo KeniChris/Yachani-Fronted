@@ -6,6 +6,8 @@
   <header class="page-heading">
     <h1>No pudimos cargar este grupo</h1>
   </header>
+  <app-aviso-operacion tipo="error" [mensaje]="errorCarga()" />
+  <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
   <a mat-stroked-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
 } @else {
   @let g = grupo()!;
@@ -30,7 +32,11 @@
     <section class="panel seats" aria-labelledby="cupos-title">
       <h2 id="cupos-title">Cupos disponibles</h2>
       <p class="count">{{ g.integrantesActuales }} de {{ g.capacidadMaxima }} integrantes</p>
-      <small>Quedan {{ g.capacidadMaxima - g.integrantesActuales }} espacios.</small>
+      <small>Quedan {{ cuposDisponibles() }} espacios.</small>
+
+      @if (errorAccion()) {
+        <app-aviso-operacion tipo="error" [mensaje]="errorAccion()" />
+      }
 
       @switch (estadoSolicitud()) {
         @case ('enviada') {
@@ -45,8 +51,8 @@
           <a mat-stroked-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
         }
         @case ('sin-cupos') {
-          <div class="notice warning" role="alert">
-            <mat-icon fontSet="material-symbols-rounded">warning</mat-icon>
+          <div class="notice info" role="status">
+            <mat-icon fontSet="material-symbols-rounded">info</mat-icon>
             <div>
               <strong>Este grupo no tiene cupos</strong>
               <p>Busca otro grupo disponible.</p>
@@ -55,19 +61,29 @@
           <button mat-flat-button disabled>Sin cupos</button>
           <a mat-stroked-button routerLink="/grupos/descubrimiento">Explorar otros grupos</a>
         }
-        @case ('registrada') {
-          <div class="notice warning" role="alert">
-            <mat-icon fontSet="material-symbols-rounded">warning</mat-icon>
+        @case ('pendiente') {
+          <div class="notice info" role="status">
+            <mat-icon fontSet="material-symbols-rounded">hourglass_top</mat-icon>
             <div>
-              <strong>Ya tienes una solicitud registrada</strong>
-              <p>No puedes enviar otra solicitud al mismo grupo.</p>
+              <strong>Tu solicitud está pendiente</strong>
+              <p>El administrador todavía debe revisarla.</p>
             </div>
           </div>
           <button mat-flat-button disabled>Solicitud registrada</button>
           <a mat-stroked-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
         }
+        @case ('miembro') {
+          <app-aviso-operacion tipo="exito" mensaje="Ya formas parte de este grupo." />
+          <a mat-flat-button [routerLink]="['/grupos', g.idGrupo]">Entrar al grupo</a>
+        }
+        @case ('inactivo') {
+          <app-aviso-operacion mensaje="Este grupo está inactivo y no recibe nuevas solicitudes." />
+        }
+        @case ('solo-estudiantes') {
+          <app-aviso-operacion mensaje="Solo los estudiantes pueden solicitar ingreso a un grupo." />
+        }
         @default {
-          <button mat-flat-button type="button" (click)="solicitarIngreso()">Solicitar ingreso</button>
+          <button mat-flat-button type="button" [disabled]="!puedeSolicitar()" (click)="solicitarIngreso()">{{ enviando() ? 'Enviando…' : 'Solicitar ingreso' }}</button>
           <small>El administrador revisará tu solicitud antes de que puedas entrar.</small>
         }
       }

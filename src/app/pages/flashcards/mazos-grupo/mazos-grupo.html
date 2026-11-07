@@ -7,12 +7,13 @@
     <button mat-flat-button (click)="compartir()">Compartir un mazo</button>
   }
 </header>
-@if (contexto.error()) {
-  <p role="alert">{{ contexto.error() }}</p>
-  <button mat-button (click)="contexto.recargar()">Reintentar acceso</button>
+<app-acceso-grupo [contexto]="contexto" />
+@if (contexto.miembro() && !contexto.cargando()) {
+@if (!contexto.puedePublicar()) {
+  <app-aviso-operacion mensaje="Las publicaciones están desactivadas para tu cuenta en este grupo. Puedes consultar y repasar los mazos existentes." />
 }
 @if (error()) {
-  <p role="alert">{{ error() }}</p>
+  <app-aviso-operacion tipo="error" [mensaje]="error()" />
   <button mat-button (click)="cargar()">Reintentar</button>
 }
 <mat-form-field class="topic-filter" appearance="outline"
@@ -56,6 +57,8 @@
   } @empty {
     @if (!cargando() && !error()) {
       <p>Todavía no hay mazos compartidos{{ filtro.value ? ' en este tema' : '' }}.</p>
+      <p>{{ contexto.puedePublicar() ? 'Comparte un mazo con tarjetas para comenzar a repasar.' : 'Los mazos aparecerán aquí cuando se compartan.' }}</p>
     }
   }
 </div>
+}

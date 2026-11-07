@@ -14,7 +14,10 @@ export function errorApi(error: unknown): string {
     return 'No pudimos conectar con el servidor. Comprueba tu conexión e inténtalo nuevamente.';
   if (error.status === 401)
     return 'Tu sesión no está disponible o venció. Inicia sesión para continuar.';
-  if (error.status === 403) return 'No tienes permiso para realizar esta acción en el grupo.';
+  if (error.status === 403)
+    return typeof error.error?.mensaje === 'string' && error.error.mensaje.trim()
+      ? error.error.mensaje
+      : 'No tienes permiso para realizar esta acción en el grupo.';
   if (error.status === 404) return 'El contenido ya no está disponible o no tienes acceso a él.';
   if (error.status >= 500)
     return 'El servidor no pudo completar la operación. Inténtalo nuevamente.';
