@@ -194,90 +194,90 @@
   </mat-tab>
 
   <mat-tab label="Resúmenes">
-    <header class="summaries-heading">
-      <div>
-        <h2>Mis resúmenes</h2>
-        <p>Publica archivos breves para complementar tu perfil.</p>
-      </div>
+  <header class="summaries-heading">
+    <div>
+      <h2>Mis resúmenes</h2>
+      <p>Publica archivos breves para complementar tu perfil.</p>
+    </div>
 
-      <button
-        mat-flat-button
-        type="button"
-        (click)="
-          prepararResumen();
-          dialog.open(resumenDialog, {
-            width: '600px',
-            maxWidth: 'calc(100vw - 32px)',
-            data: 'publicar'
-          })
-        "
-      >
+    <button
+      mat-flat-button
+      type="button"
+      [disabled]="!perfil() || cargandoResumenes() || !!errorResumenes()"
+      (click)="abrirResumen(resumenDialog)"
+    >
+      Publicar resumen
+    </button>
+  </header>
+
+  @if (avisoResumen.clave(); as aviso) {
+    <div
+      class="notice success temporal"
+      [class.desvaneciendo]="avisoResumen.desvaneciendo()"
+      role="status"
+    >
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+        check_circle
+      </mat-icon>
+      <p>
+        {{ aviso === 'publicado'
+          ? 'Resumen publicado correctamente.'
+          : 'Resumen reemplazado correctamente.' }}
+      </p>
+    </div>
+  }
+
+  @if (errorDescargaResumen()) {
+    <p class="alert" role="alert">{{ errorDescargaResumen() }}</p>
+  }
+
+  @if (cargando() || cargandoResumenes()) {
+    <p role="status">Cargando tus resúmenes…</p>
+  } @else if (errorResumenes()) {
+    <p class="alert" role="alert">{{ errorResumenes() }}</p>
+    <button mat-stroked-button type="button" (click)="cargarResumenes()">
+      Reintentar
+    </button>
+  } @else if (perfil() && misResumenes().length === 0) {
+    <mat-card appearance="outlined" class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+        description
+      </mat-icon>
+      <h2>Aún no tienes resúmenes</h2>
+      <p>Agrega tu primer resumen en PDF o imagen.</p>
+
+      <button mat-flat-button type="button" (click)="abrirResumen(resumenDialog)">
         Publicar resumen
       </button>
-    </header>
+    </mat-card>
+  } @else if (perfil()) {
+    <mat-card appearance="outlined" class="content-card">
+      @for (resumen of misResumenes(); track resumen.idResumen) {
+        <article class="file-item summary-item">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+            {{ resumen.tipoArchivo === 'application/pdf' ? 'picture_as_pdf' : 'image' }}
+          </mat-icon>
 
-    @if (misResumenes.length === 0) {
-      <mat-card appearance="outlined" class="content-card empty-state">
-        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
-          description
-        </mat-icon>
-        <h2>Aún no tienes resúmenes</h2>
-        <p>Agrega tu primer resumen en PDF o imagen.</p>
+          <div class="file-copy">
+            <strong>{{ resumen.titulo }}</strong>
+            <span>{{ resumen.nombreArchivo }}</span>
+          </div>
 
-        <button
-          mat-flat-button
-          type="button"
-          (click)="
-            prepararResumen();
-            dialog.open(resumenDialog, {
-              width: '600px',
-              maxWidth: 'calc(100vw - 32px)',
-              data: 'publicar'
-            })
-          "
-        >
-          Publicar resumen
-        </button>
-      </mat-card>
-    } @else {
-      <mat-card appearance="outlined" class="content-card">
-        @for (resumen of misResumenes; track resumen.archivo) {
-          <article class="file-item summary-item">
-            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
-              picture_as_pdf
-            </mat-icon>
+          <div class="summary-actions">
+            <button mat-stroked-button type="button" (click)="descargarResumen(resumen)">
+              Descargar
+            </button>
+            <button mat-button type="button" (click)="abrirResumen(resumenDialog, resumen)">
+              Reemplazar
+            </button>
+          </div>
+        </article>
+      }
+    </mat-card>
 
-            <div class="file-copy">
-              <strong>{{ resumen.archivo }}</strong>
-              <span>{{ resumen.detalle }}</span>
-            </div>
-
-            <div class="summary-actions">
-              <a mat-stroked-button routerLink="/perfiles">Descargar</a>
-
-              <button
-                mat-button
-                type="button"
-                (click)="
-                  prepararResumen();
-                  resumenForm.controls.titulo.setValue(resumen.titulo);
-                  dialog.open(resumenDialog, {
-                    width: '600px',
-                    maxWidth: 'calc(100vw - 32px)',
-                    data: 'reemplazar'
-                  })
-                "
-              >
-                Reemplazar
-              </button>
-            </div>
-          </article>
-        }
-      </mat-card>
-
-      <p class="help">PDF, PNG o JPG/JPEG · Hasta 1 MB por archivo.</p>
-    }
-  </mat-tab>
+    <p class="help">PDF, PNG o JPG/JPEG · Hasta 1 MB por archivo.</p>
+  }
+</mat-tab>
 </mat-tab-group>
 
 <ng-template #academicoDialog>
@@ -529,10 +529,15 @@
 <ng-template #resumenDialog let-modo>
   <div class="profile-dialog">
     <div class="dialog-heading">
-      <h2>
-        {{ modo === 'reemplazar' ? 'Reemplazar resumen' : 'Publicar resumen' }}
-      </h2>
-      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+      <h2>{{ modo === 'reemplazar' ? 'Reemplazar resumen' : 'Publicar resumen' }}</h2>
+
+      <button
+        mat-icon-button
+        mat-dialog-close
+        type="button"
+        [disabled]="guardandoResumen()"
+        aria-label="Cerrar diálogo"
+      >
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
           close
         </mat-icon>
@@ -541,21 +546,23 @@
 
     <mat-dialog-content>
       <p>
-        {{
-          modo === 'reemplazar'
-            ? 'El nuevo archivo reemplazará al anterior.'
-            : 'Elige un título y un archivo breve.'
-        }}
+        {{ modo === 'reemplazar'
+          ? 'El nuevo archivo reemplazará al anterior.'
+          : 'Elige un título y un archivo breve.' }}
       </p>
 
-      <form [formGroup]="resumenForm">
+      @if (errorResumen()) {
+        <p class="alert" role="alert">{{ errorResumen() }}</p>
+      }
+
+      <form id="form-resumen" [formGroup]="resumenForm" (ngSubmit)="guardarResumen()">
         <mat-form-field appearance="outline">
           <mat-label>Título</mat-label>
-          <input matInput formControlName="titulo" required />
-          <mat-error>Ingresa un título.</mat-error>
+          <input matInput formControlName="titulo" maxlength="150" required />
+          <mat-error>Ingresa un título válido de hasta 150 caracteres.</mat-error>
         </mat-form-field>
 
-        <div class="upload-zone">
+        <div class="upload-zone" [class.upload-error]="errorArchivo()">
           <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
             upload
           </mat-icon>
@@ -568,9 +575,14 @@
 
           <small>PDF, PNG o JPG/JPEG · Máximo 1 MB.</small>
 
+          @if (errorArchivo()) {
+            <p class="alert" role="alert">{{ errorArchivo() }}</p>
+          }
+
           <button
             mat-stroked-button
             type="button"
+            [disabled]="guardandoResumen()"
             (click)="selector.click()"
           >
             {{ archivoSeleccionado() ? 'Cambiar archivo' : 'Elegir archivo' }}
@@ -581,6 +593,7 @@
             type="file"
             hidden
             accept=".pdf,.png,.jpg,.jpeg"
+            [disabled]="guardandoResumen()"
             (change)="seleccionarArchivo($event)"
           />
         </div>
@@ -588,15 +601,20 @@
     </mat-dialog-content>
 
     <mat-dialog-actions>
-      <button mat-stroked-button mat-dialog-close>Cancelar</button>
-      <a
+      <button mat-stroked-button mat-dialog-close type="button" [disabled]="guardandoResumen()">
+        Cancelar
+      </button>
+
+      <button
         mat-flat-button
-        mat-dialog-close
-        routerLink="/perfiles"
-        [disabled]="resumenForm.invalid"
+        type="submit"
+        form="form-resumen"
+        [disabled]="guardandoResumen() || resumenForm.invalid || !archivoSeleccionado()"
       >
-        {{ modo === 'reemplazar' ? 'Reemplazar archivo' : 'Publicar resumen' }}
-      </a>
+        {{ guardandoResumen()
+          ? 'Guardando…'
+          : modo === 'reemplazar' ? 'Reemplazar archivo' : 'Publicar resumen' }}
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>

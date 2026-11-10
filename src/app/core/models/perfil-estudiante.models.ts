@@ -42,3 +42,15 @@ export interface ConfiguracionEstudianteRequest {
   metodoPreferido: string;
   temasInteres: string[];
 }
+export interface ResumenResponse {
+  idResumen: number;
+  titulo: string;
+  nombreArchivo: string;
+  tipoArchivo: string;
+  tamanoArchivo: number;
+  fechaPublicacion: string;
+}
+export type PerfilEstudiantePublicoResponse = Pick<
+  PerfilAcademicoResponse,
+  'idUsuario' | 'nombres' | 'apellidos' | 'universidad' | 'carrera' | 'conocimientos'
+>;

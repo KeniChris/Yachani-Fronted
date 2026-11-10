@@ -7,6 +7,7 @@ import {
   ConocimientoAcademicoResponse,
   PerfilAcademicoRequest,
   PerfilAcademicoResponse,
+  PerfilEstudiantePublicoResponse,
   PreferenciasEstudioRequest,
 } from '../models/perfil-estudiante.models';
 
@@ -25,6 +26,12 @@ export class PerfilEstudianteService {
   consultarPerfil(idUsuario: number) {
     return this.http.get<PerfilAcademicoResponse>(
       this.perfilUrl(idUsuario),
+    );
+  }
+
+  consultarPerfilPublico(idUsuario: number) {
+    return this.http.get<PerfilEstudiantePublicoResponse>(
+      `${this.perfilUrl(idUsuario)}/publico`,
     );
   }
 

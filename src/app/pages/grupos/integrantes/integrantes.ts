@@ -36,6 +36,8 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class Integrantes implements OnInit {
   private readonly auth = inject(AuthService);
+    readonly usuarioSesion = this.auth.usuario;
+
   readonly puedeGestionar = computed(() => {
     const usuario = this.auth.usuario();
     return usuario != null && this.grupo()?.idCreador === usuario.idUsuario;
