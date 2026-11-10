@@ -1,68 +1,92 @@
-@if (estado === 'no-disponible') {
-  <h1>Perfil no disponible</h1>
-  <mat-card appearance="outlined" class="content-card empty-state">
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
-    <h2>No encontramos este perfil</h2>
-    <p>Puede que el usuario ya no esté disponible.</p>
-    <a mat-flat-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
-  </mat-card>
-} @else {
+@if (cargando()) {
+  <p role="status">Cargando perfil…</p>
+} @else if (datos(); as perfil) {
   <header class="page-heading">
-    <h1>Perfil de Lucía</h1>
+    <h1>Perfil de {{ perfil.estudiante.nombres }}</h1>
     <p>Conoce cómo estudia y participa en Yachani.</p>
   </header>
+
   <mat-card appearance="outlined" class="content-card profile-card">
     <div class="identity">
-      <span class="avatar" aria-hidden="true">LP</span>
+      <span class="avatar" aria-hidden="true">
+        {{ perfil.estudiante.nombres.charAt(0) }}{{ perfil.estudiante.apellidos.charAt(0) }}
+      </span>
       <div class="identity-copy">
-        <h2>Lucía Paredes</h2>
+        <h2>{{ perfil.estudiante.nombres }} {{ perfil.estudiante.apellidos }}</h2>
         <span class="role">Estudiante</span>
       </div>
     </div>
-    <p class="email">u20231f123&#64;upc.edu.pe</p>
-    <p>Universidad Peruana de Ciencias Aplicadas · Ingeniería de Sistemas</p>
   </mat-card>
+
   <div class="columns">
     <mat-card appearance="outlined" class="content-card">
       <h2>Datos académicos</h2>
       <dl>
         <div>
           <dt>Universidad</dt>
-          <dd>Universidad Peruana de Ciencias Aplicadas</dd>
+          <dd>{{ perfil.estudiante.universidad || 'Sin registrar' }}</dd>
         </div>
         <div>
           <dt>Carrera</dt>
-          <dd>Ingeniería de Sistemas</dd>
+          <dd>{{ perfil.estudiante.carrera || 'Sin registrar' }}</dd>
         </div>
       </dl>
     </mat-card>
+
     <mat-card appearance="outlined" class="content-card">
       <h2>Cursos y conocimientos</h2>
-      @for (curso of ['Cálculo I', 'Ingeniería de Software']; track curso) {
+      @for (curso of perfil.estudiante.conocimientos; track curso.idConocimiento) {
         <div class="course">
           <div class="course-copy">
-            <strong>{{ curso }}</strong>
-            <span>Nivel Intermedio</span>
+            <strong>{{ curso.curso }}</strong>
+            <span>{{ curso.nivel }}</span>
           </div>
         </div>
+      } @empty {
+        <p>Aún no hay cursos registrados.</p>
       }
     </mat-card>
   </div>
+
   <mat-card appearance="outlined" class="content-card">
     <h2>Resúmenes</h2>
-    <div class="file-item">
-      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">picture_as_pdf</mat-icon>
-      <div class="file-copy">
-        <strong>Guía de límites.pdf</strong>
-        <span>Lucía Paredes · PDF · 680 KB</span>
+
+    @if (errorDescarga()) {
+      <p role="alert">{{ errorDescarga() }}</p>
+    }
+
+    @for (resumen of perfil.resumenes; track resumen.idResumen) {
+      <div class="file-item">
+        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+          {{ resumen.tipoArchivo === 'application/pdf' ? 'picture_as_pdf' : 'image' }}
+        </mat-icon>
+
+        <div class="file-copy">
+          <strong>{{ resumen.titulo }}</strong>
+          <span>{{ resumen.nombreArchivo }}</span>
+        </div>
+
+        <button
+          mat-icon-button
+          type="button"
+          [attr.aria-label]="'Descargar ' + resumen.nombreArchivo"
+          (click)="descargarResumen(perfil.estudiante.idUsuario, resumen)"
+        >
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+            download
+          </mat-icon>
+        </button>
       </div>
-      <a
-        mat-icon-button
-        routerLink="/perfiles/otro-estudiante"
-        aria-label="Descargar Guía de límites.pdf"
-      >
-        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">download</mat-icon>
-      </a>
-    </div>
+    } @empty {
+      <p>Este estudiante aún no ha publicado resúmenes.</p>
+    }
+  </mat-card>
+} @else {
+  <h1>Perfil no disponible</h1>
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
+    <h2>No pudimos cargar este perfil</h2>
+    <p>Comprueba el enlace o vuelve a intentarlo más tarde.</p>
+    <a mat-flat-button routerLink="/grupos/gestion">Ir a Mis grupos</a>
   </mat-card>
 }

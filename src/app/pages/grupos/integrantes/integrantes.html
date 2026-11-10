@@ -35,9 +35,29 @@
           <span class="member-copy"
             ><strong>{{ tutor.nombreCompleto }}</strong><small>{{ grupo()?.tipoCreador === 'TUTOR' || grupo()?.tipoGrupo === 'TUTOR' ? 'Tutor' : 'Estudiante' }} · Creador del grupo</small></span
           >
-          <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
-            >chevron_right</mat-icon
-          >
+          @if (grupo()?.tipoCreador === 'TUTOR' || grupo()?.tipoGrupo === 'TUTOR') {
+  <mat-icon
+    fontSet="material-symbols-rounded"
+    class="chevron"
+    aria-hidden="true"
+  >
+    chevron_right
+  </mat-icon>
+} @else if (tutor.idUsuario !== usuarioSesion()?.idUsuario) {
+  <a
+    mat-icon-button
+    routerLink="/perfiles/otro-estudiante"
+    [queryParams]="{ idEstudiante: tutor.idUsuario }"
+    [attr.aria-label]="'Ver el perfil de ' + tutor.nombreCompleto"
+  >
+    <mat-icon
+      fontSet="material-symbols-rounded"
+      aria-hidden="true"
+    >
+      chevron_right
+    </mat-icon>
+  </a>
+}
         </li>
       </ul>
     }
@@ -56,9 +76,21 @@
         <li class="member">
           <span class="avatar" aria-hidden="true">{{ iniciales(estudiante.nombreCompleto) }}</span>
           <span class="member-copy"><strong>{{ estudiante.nombreCompleto }}</strong><small>Estudiante</small></span>
-          <mat-icon fontSet="material-symbols-rounded" class="chevron" aria-hidden="true"
-            >chevron_right</mat-icon
-          >
+          @if (estudiante.idUsuario !== usuarioSesion()?.idUsuario) {
+  <a
+    mat-icon-button
+    routerLink="/perfiles/otro-estudiante"
+    [queryParams]="{ idEstudiante: estudiante.idUsuario }"
+    [attr.aria-label]="'Ver el perfil de ' + estudiante.nombreCompleto"
+  >
+    <mat-icon
+      fontSet="material-symbols-rounded"
+      aria-hidden="true"
+    >
+      chevron_right
+    </mat-icon>
+  </a>
+}
           @if (puedeGestionar()) {
             <button
               mat-icon-button

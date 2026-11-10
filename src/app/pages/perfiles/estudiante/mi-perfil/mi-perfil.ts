@@ -2,9 +2,9 @@ import {
   Component,
   DestroyRef,
   inject,
-  Input,
   OnInit,
   signal,
+  TemplateRef,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -17,7 +17,11 @@ import {
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -29,8 +33,10 @@ import { PerfilEstudianteService } from '../../../../core/services/perfil-estudi
 import {
   ConocimientoAcademicoResponse,
   PerfilAcademicoResponse,
+  ResumenResponse,
 } from '../../../../core/models/perfil-estudiante.models';
 import { crearAvisoTemporal } from '../../../../core/services/aviso-temporal';
+import { ResumenService } from '../../../../core/services/resumen.service';
 
 @Component({
   selector: 'app-mi-perfil',
@@ -42,8 +48,8 @@ import { crearAvisoTemporal } from '../../../../core/services/aviso-temporal';
     MatCardModule,
     MatDialogModule,
     MatFormFieldModule,
-    MatIconModule,
     MatInputModule,
+    MatIconModule,
     MatSelectModule,
     MatTabsModule,
   ],
@@ -53,6 +59,7 @@ import { crearAvisoTemporal } from '../../../../core/services/aviso-temporal';
 export class MiPerfil implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly perfilService = inject(PerfilEstudianteService);
+  private readonly resumenService = inject(ResumenService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -146,34 +153,165 @@ export class MiPerfil implements OnInit {
     }),
   });
 
-  // La consulta y publicación de resúmenes se integran por separado.
-  @Input() resumenes = 'vacio';
-  @Input() archivoResumen = 'valido';
+  readonly misResumenes = signal<ResumenResponse[]>([]);
+  readonly cargandoResumenes = signal(false);
+  readonly errorResumenes = signal('');
+  readonly errorDescargaResumen = signal('');
+  readonly guardandoResumen = signal(false);
+  readonly errorResumen = signal('');
+  readonly errorArchivo = signal('');
+  readonly avisoResumen = crearAvisoTemporal();
 
-  readonly misResumenes: {
-    titulo: string;
-    archivo: string;
-    detalle: string;
-  }[] = [];
+  private resumenEditando: ResumenResponse | null = null;
+  private dialogoResumen: MatDialogRef<unknown> | null = null;
 
   readonly resumenForm = new FormGroup({
     titulo: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [
+        Validators.required,
+        Validators.pattern(/\S/),
+        Validators.maxLength(150),
+      ],
     }),
-    archivo: new FormControl(''),
   });
 
   readonly archivoSeleccionado = signal<File | null>(null);
 
-  prepararResumen(): void {
-    this.resumenForm.reset();
+  abrirResumen(
+    plantilla: TemplateRef<unknown>,
+    resumen: ResumenResponse | null = null,
+  ): void {
+    if (this.guardandoResumen()) {
+      return;
+    }
+
+    this.resumenEditando = resumen;
+    this.resumenForm.reset({ titulo: resumen?.titulo ?? '' });
     this.archivoSeleccionado.set(null);
+    this.errorArchivo.set('');
+    this.errorResumen.set('');
+
+    this.dialogoResumen = this.dialog.open(plantilla, {
+      width: '600px',
+      maxWidth: 'calc(100vw - 32px)',
+      data: resumen ? 'reemplazar' : 'publicar',
+    });
   }
 
   seleccionarArchivo(evento: Event): void {
     const input = evento.target as HTMLInputElement;
-    this.archivoSeleccionado.set(input.files?.[0] ?? null);
+    const archivo = input.files?.[0];
+
+    if (!archivo) {
+      return;
+    }
+
+    this.errorResumen.set('');
+
+    const mensaje = !/\.(pdf|png|jpe?g)$/i.test(archivo.name)
+      ? 'Selecciona un archivo PDF, PNG, JPG o JPEG.'
+      : archivo.size === 0 || archivo.size > 1024 * 1024
+        ? 'El archivo debe tener contenido y pesar como máximo 1 MB.'
+        : '';
+
+    this.errorArchivo.set(mensaje);
+    this.archivoSeleccionado.set(mensaje ? null : archivo);
+    input.value = '';
+  }
+
+  cargarResumenes(): void {
+    const idUsuario = this.perfil()?.idUsuario;
+
+    if (!idUsuario || this.cargandoResumenes() || this.guardandoResumen()) {
+      return;
+    }
+
+    this.cargandoResumenes.set(true);
+    this.errorResumenes.set('');
+
+    this.resumenService
+      .listar(idUsuario)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.cargandoResumenes.set(false)),
+      )
+      .subscribe({
+        next: (resumenes) => this.misResumenes.set(resumenes),
+        error: () => this.errorResumenes.set('No pudimos cargar tus resúmenes.'),
+      });
+  }
+
+  guardarResumen(): void {
+    const idUsuario = this.perfil()?.idUsuario;
+    const archivo = this.archivoSeleccionado();
+    const dialogo = this.dialogoResumen;
+
+    if (
+      !idUsuario ||
+      !archivo ||
+      !dialogo ||
+      this.resumenForm.invalid ||
+      this.guardandoResumen()
+    ) {
+      return;
+    }
+
+    const titulo = this.resumenForm.controls.titulo.value.trim();
+    const resumen = this.resumenEditando;
+    const solicitud = resumen
+      ? this.resumenService.reemplazar(idUsuario, resumen.idResumen, titulo, archivo)
+      : this.resumenService.publicar(idUsuario, titulo, archivo);
+
+    this.guardandoResumen.set(true);
+    this.errorResumen.set('');
+    this.resumenForm.disable();
+    dialogo.disableClose = true;
+
+    solicitud
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.guardandoResumen.set(false);
+          this.resumenForm.enable();
+          dialogo.disableClose = false;
+        }),
+      )
+      .subscribe({
+        next: (guardado) => {
+          this.misResumenes.update((lista) =>
+            resumen
+              ? lista.map((item) =>
+                  item.idResumen === guardado.idResumen ? guardado : item,
+                )
+              : [guardado, ...lista],
+          );
+
+          dialogo.close();
+          this.avisoResumen.mostrar(resumen ? 'reemplazado' : 'publicado');
+        },
+        error: (error: HttpErrorResponse) =>
+          this.errorResumen.set(
+            error.error?.mensaje || 'No pudimos guardar el resumen. Vuelve a intentarlo.',
+          ),
+      });
+  }
+
+  descargarResumen(resumen: ResumenResponse): void {
+    const idUsuario = this.perfil()?.idUsuario;
+
+    if (!idUsuario) {
+      return;
+    }
+
+    this.errorDescargaResumen.set('');
+
+    this.resumenService
+      .descargar(idUsuario, resumen)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => this.errorDescargaResumen.set('No pudimos descargar el archivo.'),
+      });
   }
 
   constructor(public readonly dialog: MatDialog) {}
@@ -409,6 +547,7 @@ export class MiPerfil implements OnInit {
       .subscribe({
         next: (datos) => {
           this.perfil.set(datos);
+          this.cargarResumenes();
 
           this.academicoForm.reset({
             universidad: datos.universidad ?? '',
