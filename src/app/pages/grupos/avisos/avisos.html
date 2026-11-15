@@ -1,85 +1,55 @@
 <header class="page-heading">
   <div>
     <h1>Avisos del grupo</h1>
-    <p>Información compartida por quien administra el grupo.</p>
+    <p>Información importante compartida en el grupo.</p>
   </div>
-  @if (rol === 'tutor') {
-    <button
-      mat-flat-button
-      type="button"
-      (click)="
-        form.reset();
-        dialog.open(avisoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: null })
-      "
-    >
-      Publicar aviso
-    </button>
+  @if (puedeGestionar()) {
+    <button mat-flat-button type="button" (click)="abrir(avisoDialog)">Publicar aviso</button>
   }
 </header>
 
 @if (aviso.clave()) {
   <div class="notice success temporal" [class.desvaneciendo]="aviso.desvaneciendo()" role="status">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
-    <div>
-      <p class="notice-title">Aviso publicado</p>
-      <p>Tu mensaje ya aparece en los avisos del grupo.</p>
-    </div>
-  </div>
-}
-@if (errorAccion()) {
-  <div class="notice" role="status">
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
-    <p class="notice-title">{{ errorAccion() }}</p>
+    <p class="notice-title">
+      {{ aviso.clave() === 'editado' ? 'Se cambió correctamente' : 'Aviso publicado' }}
+    </p>
   </div>
 }
 
 @if (cargando()) {
-  <section class="content-card empty-state">
+  <section class="content-card empty-state" role="status">
     <p>Cargando avisos…</p>
   </section>
 } @else if (error()) {
   <section class="content-card empty-state">
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
     <h2>No pudimos cargar los avisos</h2>
+    <p role="alert">{{ error() }}</p>
     <button mat-stroked-button type="button" (click)="cargar()">Reintentar</button>
   </section>
 } @else if (lista().length === 0) {
   <section class="content-card empty-state">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">campaign</mat-icon>
     <h2>No hay avisos publicados</h2>
-    <p>Publica un mensaje importante para tu grupo.</p>
-    @if (rol === 'tutor') {
-      <button
-        mat-flat-button
-        type="button"
-        (click)="
-          form.reset();
-          dialog.open(avisoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: null })
-        "
-      >
-        Publicar aviso
-      </button>
-    }
+    <p>
+      {{
+        puedeGestionar()
+          ? 'Publica un mensaje importante para tu grupo.'
+          : 'Los avisos del grupo aparecerán aquí.'
+      }}
+    </p>
   </section>
 } @else {
-  @for (aviso of lista(); track aviso.idAviso) {
+  @for (item of lista(); track item.idAviso) {
     <article class="content-card notice-card">
       <div class="card-heading">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">campaign</mat-icon>
-        <h2>{{ aviso.titulo }}</h2>
+        <h2>{{ item.titulo }}</h2>
       </div>
-      <p>{{ aviso.mensaje }}</p>
-      <p class="help">{{ aviso.nombreAutor }} · {{ aviso.fechaPublicacion }}</p>
-      @if (rol === 'tutor') {
-        <button
-          mat-button
-          type="button"
-          class="edit"
-          (click)="
-            form.reset({ titulo: aviso.titulo, mensaje: aviso.mensaje });
-            dialog.open(avisoDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)', data: aviso })
-          "
-        >
+      <p>{{ item.mensaje }}</p>
+      <p class="help">{{ item.nombreAutor }} · {{ item.fechaPublicacion | date: 'dd/MM/yyyy · HH:mm:ss' }}</p>
+      @if (puedeGestionar()) {
+        <button mat-button type="button" class="edit" (click)="abrir(avisoDialog, item)">
           Editar aviso
         </button>
       }
@@ -87,17 +57,23 @@
   }
 }
 
-<ng-template #avisoDialog let-avisoActual>
+<ng-template #avisoDialog let-avisoActual let-ref="dialogRef">
   <div class="dialog-shell">
     <div class="dialog-heading">
       <h2>{{ avisoActual ? 'Editar aviso' : 'Publicar aviso' }}</h2>
-      <button mat-icon-button type="button" mat-dialog-close aria-label="Cerrar diálogo">
+      <button
+        mat-icon-button
+        type="button"
+        mat-dialog-close
+        [disabled]="guardando()"
+        aria-label="Cerrar diálogo"
+      >
         <mat-icon fontSet="material-symbols-rounded">close</mat-icon>
       </button>
     </div>
+
     <mat-dialog-content>
-      <p>Comparte una indicación clara para el grupo.</p>
-      <form [formGroup]="form">
+      <form id="form-aviso" [formGroup]="form" (ngSubmit)="guardar(avisoActual, ref)">
         <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
           <mat-label>Título</mat-label>
           <input
@@ -105,12 +81,12 @@
             formControlName="titulo"
             maxlength="100"
             placeholder="Ej.: Material para la próxima sesión"
+            [readonly]="guardando()"
             required
           />
-          @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
-            <mat-error>Escribe el título del aviso.</mat-error>
-          }
+          <mat-error>Escribe un título de hasta 100 caracteres.</mat-error>
         </mat-form-field>
+
         <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
           <mat-label>Mensaje</mat-label>
           <textarea
@@ -118,19 +94,24 @@
             formControlName="mensaje"
             rows="4"
             maxlength="500"
-            placeholder="Ej.: Revisen la guía de derivadas disponible en Temas y materiales."
+            placeholder="Ej.: Revisen la guía de derivadas."
+            [readonly]="guardando()"
             required
           ></textarea>
-          @if (form.controls.mensaje.touched && form.controls.mensaje.invalid) {
-            <mat-error>Escribe el mensaje del aviso.</mat-error>
-          }
+          <mat-error>Escribe un mensaje de hasta 500 caracteres.</mat-error>
         </mat-form-field>
       </form>
+      @if (errorAccion()) {
+        <app-aviso-operacion tipo="error" [mensaje]="errorAccion()" />
+      }
     </mat-dialog-content>
+
     <mat-dialog-actions>
-      <button mat-stroked-button type="button" mat-dialog-close>Cancelar</button>
-      <button mat-flat-button type="button" [disabled]="form.invalid" (click)="guardar(avisoActual)">
-        {{ avisoActual ? 'Guardar cambios' : 'Publicar aviso' }}
+      <button mat-stroked-button type="button" mat-dialog-close [disabled]="guardando()">
+        Cancelar
+      </button>
+      <button mat-flat-button type="submit" form="form-aviso" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : avisoActual ? 'Guardar cambios' : 'Enviar' }}
       </button>
     </mat-dialog-actions>
   </div>

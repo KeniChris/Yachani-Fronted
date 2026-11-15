@@ -112,6 +112,7 @@ export class Notificaciones implements OnInit {
   private accion(n: NotificacionResponse): string {
     if (n.tipo === 'SOLICITUD_RECIBIDA') return 'Ver solicitudes';
     if (n.tipo === 'SOLICITUD_RECHAZADA' || n.idGrupo === null) return 'Explorar grupos';
+    if (n.tipo === 'AVISO_PUBLICADO') return 'Ver avisos';
     if (n.idSesion !== null) return 'Ver sesión';
     return 'Ver grupo';
   }
