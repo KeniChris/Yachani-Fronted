@@ -27,6 +27,14 @@
         <dt>Método de estudio</dt>
         <dd>{{ g.metodoEstudio }}</dd>
       </dl>
+      @if (g.tipoGrupo === 'TUTOR') {
+        <a
+          mat-stroked-button
+          routerLink="/perfiles/otro-tutor"
+          [queryParams]="{ idTutor: g.idCreador }"
+          >Ver reseñas</a
+        >
+      }
     </section>
 
     <section class="panel seats" aria-labelledby="cupos-title">
