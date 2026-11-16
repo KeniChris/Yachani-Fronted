@@ -1,69 +1,93 @@
-<mat-card appearance="outlined" class="content-card profile-card">
-  <div class="identity">
-    <span class="avatar" aria-hidden="true">CR</span>
-    <div class="identity-copy">
-      <h2>Carlos Ríos</h2>
-      <span class="role">Tutor</span>
+@if (cargando()) {
+  <p role="status">Cargando reseñas…</p>
+} @else if (datos(); as d) {
+  <mat-card appearance="outlined" class="content-card profile-card">
+    <div class="identity">
+      <span class="avatar" aria-hidden="true">
+        {{ inicialesDe(d.tutor.nombres + ' ' + d.tutor.apellidos) }}
+      </span>
+      <div class="identity-copy">
+        <h2>{{ d.tutor.nombres }} {{ d.tutor.apellidos }}</h2>
+        <span class="role">Tutor</span>
+      </div>
     </div>
-  </div>
-  <p class="email">u20231t456&#64;upc.edu.pe</p>
-  <p>Comparte conocimientos y acompaña a otros estudiantes.</p>
-</mat-card>
-<header class="reviews-heading">
-  <div>
-    <h1>Reseñas de Carlos</h1>
-    <p>Experiencias de estudiantes de sus grupos.</p>
-  </div>
-  <button
-    mat-flat-button
-    (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
-  >
-    Escribir reseña
-  </button>
-</header>
-@if (estado === 'vacio') {
-  <mat-card appearance="outlined" class="content-card empty-state">
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
-    <h2>Este tutor aún no tiene reseñas</h2>
-    <p>Si participas en uno de sus grupos, puedes compartir tu experiencia.</p>
-    <button
-      mat-flat-button
-      (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
-    >
-      Escribir reseña
-    </button>
+    <p class="email">{{ d.tutor.correo }}</p>
+    <p>{{ d.tutor.presentacion || 'Este tutor aún no ha registrado su presentación.' }}</p>
   </mat-card>
-} @else {
-  <mat-card appearance="outlined" class="content-card rating-summary">
-    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
-    <strong>4,8 de 5</strong>
-    <span>5 reseñas</span>
-  </mat-card>
-  <div class="reviews-grid">
-    @for (resena of resenas; track resena.autor) {
-      <mat-card appearance="outlined" class="content-card review-card">
-        <div class="review-head">
-          <span class="avatar small" aria-hidden="true">{{ resena.iniciales }}</span>
-          <div class="review-author">
-            <strong>{{ resena.autor }}</strong>
-            <span>{{ resena.fecha }}</span>
-          </div>
-        </div>
-        <div class="stars" aria-label="5 de 5 estrellas">
-          @for (estrella of estrellas; track estrella) {
-            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
-          }
-        </div>
-        <p class="review-text">{{ resena.comentario }}</p>
-      </mat-card>
+  <header class="reviews-heading">
+    <div>
+      <h1>Reseñas de {{ d.tutor.nombres }}</h1>
+      <p>Experiencias de estudiantes de sus grupos.</p>
+    </div>
+    @if (esEstudiante && d.tutor.totalResenas > 0) {
+      <button
+        mat-flat-button
+        type="button"
+        (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+      >
+        Escribir reseña
+      </button>
     }
-  </div>
-  <p class="help">Se muestran las 10 reseñas mejor calificadas; en empate, las más recientes.</p>
+  </header>
+  @if (d.tutor.totalResenas === 0) {
+    <mat-card appearance="outlined" class="content-card empty-state">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+      <h2>Este tutor aún no tiene reseñas</h2>
+      <p>{{ d.tutor.mensaje }}</p>
+      @if (esEstudiante) {
+        <button
+          mat-flat-button
+          type="button"
+          (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        >
+          Escribir reseña
+        </button>
+      }
+    </mat-card>
+  } @else {
+    <mat-card appearance="outlined" class="content-card rating-summary">
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+      <strong>{{ formatearPromedio(d.tutor.promedioCalificacion) }} de 5</strong>
+      <span>
+        {{ d.tutor.totalResenas }} {{ d.tutor.totalResenas === 1 ? 'reseña' : 'reseñas' }}
+      </span>
+    </mat-card>
+    <div class="reviews-grid">
+      @for (resena of d.resenas; track resena.idResena) {
+        <mat-card appearance="outlined" class="content-card review-card">
+          <div class="review-head">
+            <span class="avatar small" aria-hidden="true">{{ inicialesDe(resena.nombreEstudiante) }}</span>
+            <div class="review-author">
+              <strong>{{ resena.nombreEstudiante }}</strong>
+              <span>{{ resena.fechaPublicacion | date: 'd MMM y' }}</span>
+            </div>
+          </div>
+          <div class="stars" [attr.aria-label]="resena.calificacion + ' de 5 estrellas'">
+            @for (estrella of estrellas; track estrella) {
+              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+                {{ estrella <= resena.calificacion ? 'star' : 'star_outline' }}
+              </mat-icon>
+            }
+          </div>
+          <p class="review-text">{{ resena.comentario }}</p>
+        </mat-card>
+      }
+    </div>
+    <p class="help">Se muestran las 10 reseñas mejor calificadas; en empate, las más recientes.</p>
+  }
+} @else {
+  <h1>Reseñas no disponibles</h1>
+  <mat-card appearance="outlined" class="content-card empty-state">
+    <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
+    <h2>No encontramos a este tutor</h2>
+    <p>Comprueba el enlace o vuelve a intentarlo más tarde.</p>
+    <a mat-flat-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
+  </mat-card>
 }
 <ng-template #resenaDialog>
   <div class="profile-dialog">
     <div class="dialog-heading">
-      <h2>Reseñar a Carlos Ríos</h2>
+      <h2>Reseñar a {{ datos()?.tutor?.nombres }} {{ datos()?.tutor?.apellidos }}</h2>
       <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
       </button>
