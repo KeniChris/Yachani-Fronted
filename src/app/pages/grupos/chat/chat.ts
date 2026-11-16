@@ -2,11 +2,13 @@ import {
   afterNextRender,
   Component,
   DestroyRef,
+  effect,
   ElementRef,
   Injector,
   Input,
   OnInit,
   signal,
+  untracked,
   ViewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
@@ -24,7 +26,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Subscription } from 'rxjs';
 import { ChatService } from '../../../core/services/chat.service';
-import { MensajeChatResponse, MINUTOS_PARA_ELIMINAR } from '../../../core/models/chat.models';
+import { ChatTiempoRealService } from '../../../core/services/chat-tiempo-real.service';
+import {
+  EventoChat,
+  MensajeChatResponse,
+  MINUTOS_PARA_ELIMINAR,
+} from '../../../core/models/chat.models';
 import {
   ID_GRUPO_DEMO,
   idGrupoDesdeSlug,
@@ -33,9 +40,9 @@ import { SesionUsuarioService } from '../../../core/services/sesion-usuario.serv
 import { crearAvisoTemporal } from '../../../core/services/aviso-temporal';
 
 
-// Cada cuánto preguntamos al backend por mensajes nuevos. 5 s da la sensación de
-// mensajería instantánea sin saturar la API.
-const MILISEGUNDOS_REFRESCO = 5000;
+// Los mensajes nuevos llegan al instante por WebSocket. Solo si el socket está caído
+// volvemos a preguntar a la API cada cierto tiempo, para que el chat siga funcionando.
+const MILISEGUNDOS_RESPALDO = 15000;
 
 // Cuánto puede alejarse del final la vista y seguir considerándose "abajo". Si la
 // persona subió más que esto para leer mensajes viejos, no le movemos la pantalla.
@@ -58,7 +65,8 @@ const MARGEN_FINAL = 120;
 })
 export class Chat implements OnInit {
   // Variante visual mediante ?rol=tutor (CH08). Conectado a la API real: GET/POST/DELETE
-  // /api/grupos/{idGrupo}/mensajes. La app es zoneless: el estado que cambia tras una
+  // /api/grupos/{idGrupo}/mensajes, y a /topic/grupos/{idGrupo}/mensajes por WebSocket
+  // para recibir al momento lo que escriben o borran los demás. La app es zoneless: el estado que cambia tras una
   // respuesta HTTP tiene que ser signal(), si no la vista no se refresca.
   @Input() rol = 'estudiante';
   // Grupo activo según el :grupoId de la ruta padre.
@@ -103,6 +111,7 @@ export class Chat implements OnInit {
   constructor(
     public readonly dialog: MatDialog,
     private readonly api: ChatService,
+    private readonly tiempoReal: ChatTiempoRealService,
     private readonly sesion: SesionUsuarioService,
     private readonly destroyRef: DestroyRef,
     private readonly injector: Injector,
@@ -116,9 +125,23 @@ export class Chat implements OnInit {
     );
     // Refresca la ventana de borrado para que el botón desaparezca al cumplirse los 2 minutos.
     const reloj = setInterval(() => this.ahora.set(Date.now()), 10000);
-    // Sondeo periódico: trae los mensajes que escribieron los demás sin que haya que
-    // salir de la página ni recargarla.
-    const sondeo = setInterval(() => this.refrescar(), MILISEGUNDOS_REFRESCO);
+    // Tiempo real: cada mensaje que alguien envía o borra en el grupo llega por WebSocket.
+    const avisos = this.tiempoReal
+      .escucharGrupo(this.idGrupo)
+      .subscribe((evento) => this.alRecibir(evento));
+    // Al conectar (y sobre todo al reconectar tras un corte) pedimos la conversación una
+    // vez: lo que se escribió mientras no había conexión no llegó por el socket.
+    effect(
+      () => {
+        if (this.tiempoReal.conectado()) untracked(() => this.refrescar());
+      },
+      { injector: this.injector },
+    );
+    // Respaldo: si el socket está caído (backend reiniciándose, red que bloquea
+    // WebSockets...) seguimos trayendo mensajes por la API, aunque más despacio.
+    const sondeo = setInterval(() => {
+      if (!this.tiempoReal.conectado()) this.refrescar();
+    }, MILISEGUNDOS_RESPALDO);
     // Al volver a la pestaña no esperamos el siguiente ciclo: pedimos los mensajes ya.
     const alVolver = () => {
       if (!document.hidden) this.refrescar();
@@ -126,6 +149,7 @@ export class Chat implements OnInit {
     document.addEventListener('visibilitychange', alVolver);
     this.destroyRef.onDestroy(() => {
       escritura.unsubscribe();
+      avisos.unsubscribe();
       clearInterval(reloj);
       clearInterval(sondeo);
       document.removeEventListener('visibilitychange', alVolver);
@@ -159,7 +183,21 @@ export class Chat implements OnInit {
     });
   }
 
-  // Añade un mensaje al final, salvo que el sondeo ya lo hubiera traído.
+  // Aviso del WebSocket. Quien envía recibe su propio mensaje dos veces (respuesta del
+  // POST y aviso), así que agregar() descarta el repetido.
+  private alRecibir(evento: EventoChat) {
+    if (evento.tipo === 'CREADO') {
+      if (this.mensajes().some((m) => m.idMensaje === evento.mensaje.idMensaje)) return;
+      // Igual que en el refresco: si la persona estaba leyendo más arriba, no la movemos.
+      const bajar = this.estaAlFinal();
+      this.agregar(evento.mensaje);
+      if (bajar) this.bajarAlFinal(true);
+    } else {
+      this.mensajes.update((lista) => lista.filter((m) => m.idMensaje !== evento.idMensaje));
+    }
+  }
+
+  // Añade un mensaje al final, salvo que ya estuviera en la lista.
   private agregar(mensaje: MensajeChatResponse) {
     this.mensajes.update((lista) =>
       lista.some((m) => m.idMensaje === mensaje.idMensaje) ? lista : [...lista, mensaje],
