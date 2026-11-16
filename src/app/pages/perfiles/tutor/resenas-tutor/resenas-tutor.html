@@ -56,7 +56,7 @@
     </mat-card>
   } @else {
     <mat-card appearance="outlined" class="content-card rating-summary">
-      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+      <mat-icon fontSet="material-symbols-rounded" class="estrella-llena" aria-hidden="true">star</mat-icon>
       <strong>{{ formatearPromedio(d.tutor.promedioCalificacion) }} de 5</strong>
       <span>
         {{ d.tutor.totalResenas }} {{ d.tutor.totalResenas === 1 ? 'reseña' : 'reseñas' }}
@@ -74,9 +74,11 @@
           </div>
           <div class="stars" [attr.aria-label]="resena.calificacion + ' de 5 estrellas'">
             @for (estrella of estrellas; track estrella) {
-              <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
-                {{ estrella <= resena.calificacion ? 'star' : 'star_outline' }}
-              </mat-icon>
+              <mat-icon
+                fontSet="material-symbols-rounded"
+                aria-hidden="true"
+                [class.estrella-llena]="estrella <= resena.calificacion"
+              >star</mat-icon>
             }
           </div>
           <p class="review-text">{{ resena.comentario }}</p>
@@ -105,7 +107,7 @@
     <mat-dialog-content>
       @if (datos()?.tutor?.totalResenas === 0) {
         <div class="notice invitation" role="status">
-          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+          <mat-icon fontSet="material-symbols-rounded" class="estrella-llena" aria-hidden="true">star</mat-icon>
           <p>{{ datos()?.tutor?.mensaje }}</p>
         </div>
       }
@@ -122,9 +124,11 @@
                 [attr.aria-pressed]="resenaForm.controls.calificacion.value === estrella"
                 (click)="elegirCalificacion(estrella)"
               >
-                <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
-                  {{ estrella <= (resenaForm.controls.calificacion.value ?? 0) ? 'star' : 'star_outline' }}
-                </mat-icon>
+                <mat-icon
+                  fontSet="material-symbols-rounded"
+                  aria-hidden="true"
+                  [class.estrella-llena]="estrella <= (resenaForm.controls.calificacion.value ?? 0)"
+                >star</mat-icon>
               </button>
             }
           </div>

@@ -39,7 +39,7 @@
       <h2>Lo que dicen sus estudiantes</h2>
       @if (perfil.totalResenas > 0) {
         <div class="rating">
-          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+          <mat-icon fontSet="material-symbols-rounded" class="estrella-llena" aria-hidden="true">star</mat-icon>
           <strong>{{ formatearPromedio(perfil.promedioCalificacion) }}</strong>
           <span>
             · {{ perfil.totalResenas }} {{ perfil.totalResenas === 1 ? 'reseña' : 'reseñas' }}
