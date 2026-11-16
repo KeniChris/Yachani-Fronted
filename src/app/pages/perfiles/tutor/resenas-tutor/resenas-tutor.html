@@ -23,12 +23,22 @@
       <button
         mat-flat-button
         type="button"
-        (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+        (click)="abrirDialogo()"
       >
         Escribir reseña
       </button>
     }
   </header>
+  @if (avisoPublicada.clave()) {
+    <div
+      class="notice success temporal"
+      [class.desvaneciendo]="avisoPublicada.desvaneciendo()"
+      role="status"
+    >
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">check_circle</mat-icon>
+      <p>Reseña publicada.</p>
+    </div>
+  }
   @if (d.tutor.totalResenas === 0) {
     <mat-card appearance="outlined" class="content-card empty-state">
       <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
@@ -38,7 +48,7 @@
         <button
           mat-flat-button
           type="button"
-          (click)="dialog.open(resenaDialog, { width: '600px', maxWidth: 'calc(100vw - 32px)' })"
+          (click)="abrirDialogo()"
         >
           Escribir reseña
         </button>
@@ -88,13 +98,19 @@
   <div class="profile-dialog">
     <div class="dialog-heading">
       <h2>Reseñar a {{ datos()?.tutor?.nombres }} {{ datos()?.tutor?.apellidos }}</h2>
-      <button mat-icon-button mat-dialog-close aria-label="Cerrar diálogo">
+      <button mat-icon-button mat-dialog-close type="button" aria-label="Cerrar diálogo">
         <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">close</mat-icon>
       </button>
     </div>
     <mat-dialog-content>
+      @if (datos()?.tutor?.totalResenas === 0) {
+        <div class="notice invitation" role="status">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+          <p>{{ datos()?.tutor?.mensaje }}</p>
+        </div>
+      }
       <p>Comparte una experiencia respetuosa y útil para otros estudiantes.</p>
-      <form [formGroup]="resenaForm">
+      <form [formGroup]="resenaForm" (ngSubmit)="publicar()">
         <div class="star-field">
           <span class="field-label">Calificación *</span>
           <div class="star-picker" role="group" aria-label="Calificación">
@@ -103,13 +119,24 @@
                 mat-icon-button
                 type="button"
                 [attr.aria-label]="estrella + ' de 5 estrellas'"
-                (click)="resenaForm.controls.calificacion.setValue(estrella)"
+                [attr.aria-pressed]="resenaForm.controls.calificacion.value === estrella"
+                (click)="elegirCalificacion(estrella)"
               >
-                <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+                <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+                  {{ estrella <= (resenaForm.controls.calificacion.value ?? 0) ? 'star' : 'star_outline' }}
+                </mat-icon>
               </button>
             }
           </div>
-          <small>5 de 5 estrellas</small>
+          @if (
+            resenaForm.controls.calificacion.touched && resenaForm.controls.calificacion.invalid
+          ) {
+            <small class="field-error">Elige una calificación de 1 a 5 estrellas.</small>
+          } @else if (resenaForm.controls.calificacion.value) {
+            <small>{{ resenaForm.controls.calificacion.value }} de 5 estrellas</small>
+          } @else {
+            <small>Elige de 1 a 5 estrellas.</small>
+          }
         </div>
         <mat-form-field appearance="outline">
           <mat-label>Comentario</mat-label>
@@ -117,29 +144,39 @@
             matInput
             formControlName="comentario"
             rows="4"
-            placeholder="¿Cómo fue estudiar con este tutor?"
+            placeholder="Ej.: Explica con claridad y resuelve mis dudas."
             required
           ></textarea>
-          <mat-hint>Hasta 500 caracteres.</mat-hint>
+          <mat-hint align="end">{{ resenaForm.controls.comentario.value.length }}/500</mat-hint>
           <mat-error>
-            @if (resenaForm.controls.comentario.hasError('required')) {
-              Escribe tu comentario para publicar.
-            } @else {
+            @if (resenaForm.controls.comentario.hasError('maxlength')) {
               Máximo permitido: 500 caracteres.
+            } @else {
+              Escribe tu comentario para publicar.
             }
           </mat-error>
         </mat-form-field>
       </form>
+      @if (errorPublicar()) {
+        <div class="alert" role="alert">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">error</mat-icon>
+          <div>
+            <strong>No se publicó la reseña</strong>
+            <span>{{ errorPublicar() }}</span>
+          </div>
+        </div>
+      }
     </mat-dialog-content>
     <mat-dialog-actions>
-      <button mat-stroked-button mat-dialog-close>Cancelar</button>
-      <a
+      <button mat-stroked-button mat-dialog-close type="button">Cancelar</button>
+      <button
         mat-flat-button
-        mat-dialog-close
-        routerLink="/perfiles/otro-tutor/resenas"
-        [disabled]="resenaForm.invalid"
-        >Publicar reseña</a
+        type="button"
+        [disabled]="resenaForm.invalid || publicando()"
+        (click)="publicar()"
       >
+        {{ publicando() ? 'Publicando…' : 'Publicar reseña' }}
+      </button>
     </mat-dialog-actions>
   </div>
 </ng-template>
