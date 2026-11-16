@@ -22,15 +22,26 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { finalize } from 'rxjs';
+import { DatePipe } from '@angular/common';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { PerfilTutorService } from '../../../../core/services/perfil-tutor.service';
 import { TutorPerfilResponse } from '../../../../core/models/perfil-tutor.models';
+import {
+  PerfilTutorPublicoResponse,
+  ResenaResponse,
+} from '../../../../core/models/resena.models';
+import {
+  formatearPromedio,
+  inicialesDe,
+  ResenaService,
+} from '../../../../core/services/resena.service';
 
 @Component({
   selector: 'app-mi-perfil-tutor',
   standalone: true,
   imports: [
+    DatePipe,
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
@@ -47,6 +58,7 @@ import { TutorPerfilResponse } from '../../../../core/models/perfil-tutor.models
 export class MiPerfilTutor implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly perfilService = inject(PerfilTutorService);
+  private readonly resenaService = inject(ResenaService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -55,6 +67,16 @@ export class MiPerfilTutor implements OnInit {
   readonly perfil = signal<TutorPerfilResponse | null>(null);
   readonly guardando = signal(false);
   readonly errorGuardado = signal('');
+
+  // Promedio y las 10 reseñas más relevantes
+  readonly estrellas = [1, 2, 3, 4, 5];
+  readonly cargandoResenas = signal(true);
+  readonly misResenas = signal<{
+    tutor: PerfilTutorPublicoResponse;
+    resenas: ResenaResponse[];
+  } | null>(null);
+  readonly formatearPromedio = formatearPromedio;
+  readonly inicialesDe = inicialesDe;
 
   readonly metodos = [
     'Visual',
@@ -129,6 +151,7 @@ export class MiPerfilTutor implements OnInit {
         next: (datos) => {
           this.perfil.set(datos);
           this.prepararEdicion();
+          this.cargarResenas(usuario.idUsuario);
         },
         error: (error: HttpErrorResponse) => {
           this.errorCarga.set(
@@ -138,6 +161,21 @@ export class MiPerfilTutor implements OnInit {
           );
         },
       });
+  }
+
+  cargarResenas(idUsuario: number): void {
+    this.cargandoResenas.set(true);
+
+    forkJoin({
+      tutor: this.resenaService.consultarPerfilTutor(idUsuario),
+      resenas: this.resenaService.listar(idUsuario),
+    })
+      .pipe(
+        catchError(() => of(null)),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.cargandoResenas.set(false)),
+      )
+      .subscribe((datos) => this.misResenas.set(datos));
   }
 
   prepararEdicion(): void {

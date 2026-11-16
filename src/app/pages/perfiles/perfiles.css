@@ -354,3 +354,11 @@ dd {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.estrella-llena {
+  font-variation-settings: 'FILL' 1;
+}
+.stars mat-icon:not(.estrella-llena),
+.star-picker mat-icon:not(.estrella-llena) {
+  color: var(--color-muted);
+  opacity: 0.45;
+}

@@ -65,7 +65,23 @@
 
       <mat-card appearance="outlined" class="content-card">
         <h2>Lo que dicen tus estudiantes</h2>
-        <p>Las reseñas todavía no están disponibles.</p>
+        @if (cargandoResenas()) {
+          <p role="status">Cargando reseñas…</p>
+        } @else if (misResenas(); as r) {
+          @if (r.tutor.totalResenas > 0) {
+            <div class="rating">
+              <mat-icon fontSet="material-symbols-rounded" class="estrella-llena" aria-hidden="true">star</mat-icon>
+              <strong>{{ formatearPromedio(r.tutor.promedioCalificacion) }}</strong>
+              <span>
+                · {{ r.tutor.totalResenas }} {{ r.tutor.totalResenas === 1 ? 'reseña' : 'reseñas' }}
+              </span>
+            </div>
+          } @else {
+            <p>Aún no tienes calificaciones.</p>
+          }
+        } @else {
+          <p>No pudimos cargar tus reseñas.</p>
+        }
 
         <button mat-stroked-button class="card-action" type="button" (click)="perfilTabs.selectedIndex = 1">
           Ver reseñas
@@ -75,23 +91,70 @@
   </mat-tab>
 
   <mat-tab label="Mis reseñas">
-    <header class="reviews-heading">
-      <div>
-        <h2>Mis reseñas</h2>
-        <p>
-          Comentarios de estudiantes que han participado en tus grupos.
-        </p>
-      </div>
-    </header>
+    <div class="resenas-tab">
+      <header class="reviews-heading">
+        <div>
+          <h2>Mis reseñas</h2>
+          <p>
+            Comentarios de estudiantes que han participado en tus grupos.
+          </p>
+        </div>
+      </header>
 
-    <mat-card appearance="outlined" class="content-card empty-state">
-      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
-        star_outline
-      </mat-icon>
+      @if (cargandoResenas()) {
+        <p role="status">Cargando reseñas…</p>
+      } @else if (!misResenas()) {
+        <div role="alert">
+          <p>No pudimos cargar tus reseñas.</p>
+          <button mat-stroked-button type="button" (click)="cargarResenas(datos.idUsuario)">
+            Reintentar
+          </button>
+        </div>
+      } @else if (misResenas(); as r) {
+        @if (r.tutor.totalResenas === 0) {
+          <mat-card appearance="outlined" class="content-card empty-state">
+            <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
+              star_outline
+            </mat-icon>
 
-      <h2>Tus reseñas aparecerán aquí</h2>
-      <p>Opiniones de estudiantes que han participado en tus grupos.</p>
-    </mat-card>
+            <h2>Tus reseñas aparecerán aquí</h2>
+            <p>Opiniones de estudiantes que han participado en tus grupos.</p>
+          </mat-card>
+        } @else {
+          <mat-card appearance="outlined" class="content-card rating-summary">
+            <mat-icon fontSet="material-symbols-rounded" class="estrella-llena" aria-hidden="true">star</mat-icon>
+            <strong>{{ formatearPromedio(r.tutor.promedioCalificacion) }} de 5</strong>
+            <span>
+              {{ r.tutor.totalResenas }} {{ r.tutor.totalResenas === 1 ? 'reseña' : 'reseñas' }}
+            </span>
+          </mat-card>
+          <div class="reviews-grid">
+            @for (resena of r.resenas; track resena.idResena) {
+              <mat-card appearance="outlined" class="content-card review-card">
+                <div class="review-head">
+                  <span class="avatar small" aria-hidden="true">{{ inicialesDe(resena.nombreEstudiante) }}</span>
+                  <div class="review-author">
+                    <strong>{{ resena.nombreEstudiante }}</strong>
+                    <span>{{ resena.fechaPublicacion | date: 'd MMM y' }}</span>
+                  </div>
+                </div>
+                <div class="stars" [attr.aria-label]="resena.calificacion + ' de 5 estrellas'">
+                  @for (estrella of estrellas; track estrella) {
+                    <mat-icon
+                      fontSet="material-symbols-rounded"
+                      aria-hidden="true"
+                      [class.estrella-llena]="estrella <= resena.calificacion"
+                    >star</mat-icon>
+                  }
+                </div>
+                <p class="review-text">{{ resena.comentario }}</p>
+              </mat-card>
+            }
+          </div>
+          <p class="help">Se muestran las 10 reseñas mejor calificadas; en empate, las más recientes.</p>
+        }
+      }
+    </div>
   </mat-tab>
 </mat-tab-group>
 }
