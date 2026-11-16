@@ -1,4 +1,75 @@
-@if (estado === 'no-disponible') {
+@if (cargando()) {
+  <p role="status">Cargando perfil…</p>
+} @else if (tutor(); as perfil) {
+  <header class="page-heading">
+    <h1>Perfil de {{ perfil.nombres }}</h1>
+    <p>Conoce cómo estudia y participa en Yachani.</p>
+  </header>
+  <mat-card appearance="outlined" class="content-card profile-card">
+    <div class="identity">
+      <span class="avatar" aria-hidden="true">
+        {{ inicialesDe(perfil.nombres + ' ' + perfil.apellidos) }}
+      </span>
+      <div class="identity-copy">
+        <h2>{{ perfil.nombres }} {{ perfil.apellidos }}</h2>
+        <span class="role">Tutor</span>
+      </div>
+    </div>
+    <p class="email">{{ perfil.correo }}</p>
+    <p>
+      {{ perfil.universidad || 'Universidad sin registrar' }}
+      ·
+      {{ perfil.carrera || 'Carrera sin registrar' }}
+    </p>
+  </mat-card>
+  <div class="columns">
+    <mat-card appearance="outlined" class="content-card">
+      <h2>Sobre mí</h2>
+      <p class="about-text">
+        {{ perfil.presentacion || 'Este tutor aún no ha registrado su presentación.' }}
+      </p>
+      <dl>
+        <div>
+          <dt>Método de enseñanza</dt>
+          <dd>{{ perfil.metodoEnsenanza || 'Sin registrar' }}</dd>
+        </div>
+      </dl>
+    </mat-card>
+    <mat-card appearance="outlined" class="content-card">
+      <h2>Lo que dicen sus estudiantes</h2>
+      @if (perfil.totalResenas > 0) {
+        <div class="rating">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
+          <strong>{{ formatearPromedio(perfil.promedioCalificacion) }}</strong>
+          <span>
+            · {{ perfil.totalResenas }} {{ perfil.totalResenas === 1 ? 'reseña' : 'reseñas' }}
+          </span>
+        </div>
+      } @else {
+        <div class="rating">
+          <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star_outline</mat-icon>
+          <span>Sin calificaciones todavía</span>
+        </div>
+      }
+      <div class="rating-actions">
+        <a
+          mat-stroked-button
+          routerLink="/perfiles/otro-tutor/resenas"
+          [queryParams]="{ idTutor: perfil.idTutor }"
+          >Ver reseñas</a
+        >
+        @if (esEstudiante) {
+          <a
+            mat-flat-button
+            routerLink="/perfiles/otro-tutor/resenas"
+            [queryParams]="{ idTutor: perfil.idTutor, escribir: 'si' }"
+            >Escribir reseña</a
+          >
+        }
+      </div>
+    </mat-card>
+  </div>
+} @else {
   <h1>Perfil no disponible</h1>
   <mat-card appearance="outlined" class="content-card empty-state">
     <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">person</mat-icon>
@@ -6,47 +77,4 @@
     <p>Puede que el usuario ya no esté disponible.</p>
     <a mat-flat-button routerLink="/grupos/descubrimiento">Volver a explorar</a>
   </mat-card>
-} @else {
-  <header class="page-heading">
-    <h1>Perfil de Carlos</h1>
-    <p>Conoce cómo estudia y participa en Yachani.</p>
-  </header>
-  <mat-card appearance="outlined" class="content-card profile-card">
-    <div class="identity">
-      <span class="avatar" aria-hidden="true">CR</span>
-      <div class="identity-copy">
-        <h2>Carlos Ríos</h2>
-        <span class="role">Tutor</span>
-      </div>
-    </div>
-    <p class="email">u20231t456&#64;upc.edu.pe</p>
-    <p>Comparte conocimientos y acompaña a otros estudiantes.</p>
-  </mat-card>
-  <div class="columns">
-    <mat-card appearance="outlined" class="content-card">
-      <h2>Sobre mí</h2>
-      <p class="about-text">
-        Me gusta explicar los conceptos de cálculo con ejemplos cotidianos y resolver dudas paso a
-        paso. Estudio contigo hasta que puedas aplicar cada idea por tu cuenta.
-      </p>
-      <dl>
-        <div>
-          <dt>Método de enseñanza</dt>
-          <dd>Resolución de ejercicios</dd>
-        </div>
-      </dl>
-    </mat-card>
-    <mat-card appearance="outlined" class="content-card">
-      <h2>Lo que dicen sus estudiantes</h2>
-      <div class="rating">
-        <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">star</mat-icon>
-        <strong>4,8</strong>
-        <span>· 5 reseñas</span>
-      </div>
-      <div class="rating-actions">
-        <a mat-stroked-button routerLink="/perfiles/otro-tutor/resenas">Ver reseñas</a>
-        <a mat-flat-button routerLink="/perfiles/otro-tutor/resenas">Escribir reseña</a>
-      </div>
-    </mat-card>
-  </div>
 }
