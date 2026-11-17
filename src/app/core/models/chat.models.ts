@@ -14,6 +14,12 @@ export interface EnviarMensajeRequest {
   contenido: string;
 }
 
+// Coincide con com.yachaniapi.chat.evento.EventoChat: el aviso que llega por WebSocket
+// (/topic/grupos/{idGrupo}/mensajes) cuando alguien envía o elimina un mensaje.
+export type EventoChat =
+  | { tipo: 'CREADO'; idGrupo: number; mensaje: MensajeChatResponse; idMensaje: number }
+  | { tipo: 'ELIMINADO'; idGrupo: number; mensaje: null; idMensaje: number };
+
 // Mismo límite que ChatService.MINUTOS_PARA_ELIMINAR en el backend: pasado ese tiempo
 // el mensaje ya no se puede borrar.
 export const MINUTOS_PARA_ELIMINAR = 2;
