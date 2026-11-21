@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { METODOS_ESTUDIO_GRUPO } from '../../../core/models/grupo-estudio.models';
 import { GrupoEstudioService } from '../../../core/services/grupo-estudio.service';
 import { SesionUsuarioService } from '../../../core/services/sesion-usuario.service';
 
@@ -36,15 +37,7 @@ export class CrearGrupo {
   }
   // Límite de grupos alcanzado (G08 tutor, G14 estudiante) mediante ?crear=limite.
   @Input() crear = '';
-  // Mismos métodos que la configuración inicial del tutor.
-  readonly metodos = [
-    'Visual',
-    'Práctico',
-    'Teórico',
-    'Participativo',
-    'Resolución de ejercicios',
-    'Debate',
-  ];
+  readonly metodos = METODOS_ESTUDIO_GRUPO;
   // Formulario de creación: empieza vacío y los ejemplos de Figma van como placeholder.
   readonly form = new FormGroup({
     nombre: new FormControl('', { nonNullable: true, validators: Validators.required }),

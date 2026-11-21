@@ -608,3 +608,115 @@ test('Ingreso: si el grupo se llena durante el envío, actualiza los cupos sin m
   assert.equal(await page.getByText('Ya tienes una solicitud registrada', { exact: true }).count(), 0);
   assert.equal(await page.locator('.notice.warning').count(), 0);
 });
+
+test('Crear con IA: transcribe, deja editar el borrador y confirma el grupo con sus temas', { timeout: 60000 }, async (t) => {
+  const { s, context, page } = await sesion(t);
+  await page.addInitScript(() => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      const audio = new AudioContext();
+      const destino = audio.createMediaStreamDestination();
+      const tono = audio.createOscillator();
+      tono.connect(destino);
+      tono.start();
+      await audio.resume();
+      return destino.stream;
+    };
+  });
+  const frase = 'Quiero un grupo para resolver ejercicios de derivadas.';
+  let audio;
+  let borradorEnviado;
+  const creaciones = [];
+  await context.route('**/api/ia/voz/transcribir', (route) => {
+    if (route.request().method() !== 'POST') return route.fallback();
+    audio = {
+      tipo: route.request().headers()['content-type'],
+      token: route.request().headers().authorization,
+      datos: route.request().postDataBuffer().toString('latin1'),
+    };
+    return route.fulfill({ json: { texto: frase } });
+  });
+  await context.route('**/api/ia/tutorias/borrador', (route) => {
+    if (route.request().method() !== 'POST') return route.fallback();
+    borradorEnviado = route.request().postDataJSON();
+    return route.fulfill({ json: {
+      nombre: 'Derivadas para Cálculo I',
+      descripcion: 'Vamos a resolver ejercicios de derivadas.',
+      metodoEstudio: 'Resolución de ejercicios',
+      capacidadMaxima: null,
+      temasSugeridos: ['Reglas de derivación', 'Aplicaciones'],
+    } });
+  });
+  await context.route('**/api/grupos', (route) => {
+    if (route.request().method() !== 'POST') return route.fallback();
+    const datos = route.request().postDataJSON();
+    creaciones.push(datos);
+    if (creaciones.length === 1) {
+      return route.fulfill({ status: 409, json: { mensaje: 'Intenta nuevamente.' } });
+    }
+    const grupo = { ...s.grupo, ...datos, idGrupo: 99 };
+    s.grupos.push(grupo);
+    return route.fulfill({ status: 201, json: grupo });
+  });
+
+  await login(page, s);
+  await ir(page, '/grupos/crear-con-ia');
+  await page.getByRole('button', { name: 'Dictar instrucción' }).click();
+  await page.getByRole('button', { name: 'Detener y transcribir' }).click();
+  await ver(page.getByText('Voz transcrita. Revisa el texto y genera el borrador.'));
+  assert.match(audio.tipo, /^multipart\/form-data; boundary=/);
+  assert.match(audio.token, /^Bearer /);
+  assert.match(audio.datos, /name="audio"; filename="instruccion\.(webm|mp4)"/);
+  const instruccion = page.getByRole('textbox', { name: 'Instrucción para la IA' });
+  assert.equal(await instruccion.inputValue(), frase);
+
+  await page.getByRole('button', { name: 'Generar borrador' }).click();
+  await ver(page.getByText('Borrador listo. Revisa los datos y completa los campos pendientes.'));
+  assert.deepEqual(borradorEnviado, { instruccion: frase });
+  assert.equal(creaciones.length, 0);
+  const cupos = page.getByRole('spinbutton', { name: 'Cupos para estudiantes' });
+  assert.equal(await cupos.inputValue(), '');
+  assert.equal(await page.getByRole('textbox', { name: 'Tema 1' }).inputValue(), 'Reglas de derivación');
+
+  const crear = page.getByRole('button', { name: 'Crear grupo', exact: true });
+  await crear.click();
+  await ver(page.getByText('Completa los campos requeridos para crear el grupo.'));
+  assert.equal(creaciones.length, 0);
+  await cupos.fill('12');
+  await page.getByRole('textbox', { name: 'Nombre del grupo' }).fill('Derivadas con ejercicios');
+  await page.getByRole('button', { name: 'Quitar tema 2' }).click();
+  await page.getByRole('textbox', { name: 'Tema 1' }).fill('Regla de la cadena');
+  await crear.click();
+  await ver(page.getByText('Intenta nuevamente.'));
+  assert.equal(await cupos.inputValue(), '12');
+  await crear.click();
+  await page.waitForURL(/\/grupos\/gestion\?grupos=creado$/);
+  assert.equal(creaciones.length, 2);
+  assert.deepEqual(creaciones[1], creaciones[0]);
+  assert.deepEqual(creaciones[0], {
+    nombre: 'Derivadas con ejercicios',
+    descripcion: 'Vamos a resolver ejercicios de derivadas.',
+    metodoEstudio: 'Resolución de ejercicios',
+    capacidadMaxima: 12,
+    idCreador: 1,
+    temasIniciales: ['Regla de la cadena'],
+  });
+});
+
+test('Crear con IA: conserva los datos si falla el borrador y el formulario cabe en móvil', { timeout: 60000 }, async (t) => {
+  const { s, context, page } = await sesion(t, {}, { width: 375, height: 812 });
+  await context.route('**/api/ia/tutorias/borrador', (route) =>
+    route.fulfill({ status: 503, json: { mensaje: 'IA no disponible' } }),
+  );
+  await login(page, s);
+  await ir(page, '/grupos/crear-con-ia');
+  const instruccion = page.getByRole('textbox', { name: 'Instrucción para la IA' });
+  const nombre = page.getByRole('textbox', { name: 'Nombre del grupo' });
+  await nombre.fill('Tengo un nombre elegido');
+  await instruccion.fill('Quiero repasar derivadas con ejercicios.');
+  await page.getByRole('button', { name: 'Generar borrador' }).click();
+  await ver(page.getByText(/No pudimos generar el borrador/));
+  assert.equal(await instruccion.inputValue(), 'Quiero repasar derivadas con ejercicios.');
+  assert.equal(await nombre.inputValue(), 'Tengo un nombre elegido');
+  assert.equal(await nombre.isEnabled(), true);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+});
