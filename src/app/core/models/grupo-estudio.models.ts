@@ -1,5 +1,14 @@
 export type TipoGrupo = 'TUTOR' | 'ESTUDIANTES';
 
+export const METODOS_ESTUDIO_GRUPO = [
+  'Visual',
+  'Práctico',
+  'Teórico',
+  'Participativo',
+  'Resolución de ejercicios',
+  'Debate',
+];
+
 // Coincide con com.yachaniapi.grupoestudio.dto.response.GrupoResponse.
 export interface GrupoEstudioResponse {
   idGrupo: number;
@@ -26,6 +35,7 @@ export interface CrearGrupoRequest {
   metodoEstudio: string;
   capacidadMaxima: number;
   idCreador: number;
+  temasIniciales?: string[];
 }
 
 export interface FiltrarGruposParams {
