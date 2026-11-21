@@ -157,6 +157,7 @@ mat-form-field {
   font: var(--font-secondary);
 }
 
+
 @media (max-width: 767px) {
   .layout,
   .group-grid {
@@ -180,4 +181,25 @@ mat-form-field {
     width: fit-content;
     margin-inline: auto;
   }
+}
+.form-panel > button {
+  width: 100%;
+}
+
+.results:not(:empty) {
+  margin-top: var(--space-6);
+}
+
+.results > h2 {
+  margin-bottom: var(--space-4);
+}
+
+.group-card h3 {
+  margin: 0;
+  font: var(--font-card-title);
+  overflow-wrap: anywhere;
+}
+
+.group-card > a {
+  margin-top: auto;
 }

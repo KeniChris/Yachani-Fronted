@@ -8,34 +8,24 @@
     <p>Cargando tus preferencias…</p>
   </section>
 } @else if (errorPerfil()) {
-  <section class="panel" role="alert">
-    <p>{{ errorPerfil() }}</p>
-
-    <button
-      mat-stroked-button
-      type="button"
-      (click)="cargarPerfil()"
-    >
+  <section class="panel">
+    <p role="alert">{{ errorPerfil() }}</p>
+    <button mat-stroked-button type="button" (click)="cargarPerfil()">
       Reintentar
     </button>
   </section>
 } @else if (perfil(); as datos) {
   <div class="layout">
-    <form [formGroup]="form" class="panel form-panel">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="recomendar()"
+      class="panel form-panel"
+      [attr.aria-busy]="buscando()"
+    >
       <mat-form-field appearance="outline">
         <mat-label>Curso o tema</mat-label>
-
-        <input
-          matInput
-          formControlName="curso"
-          maxlength="120"
-          required
-        />
-
-        <mat-hint>
-          Puedes cambiarlo para esta búsqueda.
-        </mat-hint>
-
+        <input matInput formControlName="curso" maxlength="120" required />
+        <mat-hint>Puedes cambiarlo para esta búsqueda.</mat-hint>
         <mat-error>
           {{
             form.controls.curso.hasError('maxlength')
@@ -47,82 +37,91 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Método de estudio</mat-label>
-
         <mat-select formControlName="metodo">
           <mat-option value="">Cualquier método</mat-option>
-
           @for (metodo of metodos; track metodo) {
-            <mat-option [value]="metodo">
-              {{ metodo }}
-            </mat-option>
+            <mat-option [value]="metodo">{{ metodo }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Tipo de grupo</mat-label>
-
         <mat-select formControlName="tipo">
           <mat-option value="">Cualquier tipo</mat-option>
-
-          @for (tipo of tipos; track tipo) {
-            <mat-option [value]="tipo">
-              {{ tipo }}
-            </mat-option>
-          }
+          <mat-option value="TUTOR">Con tutor</mat-option>
+          <mat-option value="ESTUDIANTES">Entre estudiantes</mat-option>
         </mat-select>
-
-        <mat-hint>
-          Con tutor o entre estudiantes.
-        </mat-hint>
+        <mat-hint>Con tutor o entre estudiantes.</mat-hint>
       </mat-form-field>
 
-      <!-- Se habilitará al conectar el endpoint del agente. -->
       <button
         mat-flat-button
-        type="button"
-        disabled
+        type="submit"
+        [disabled]="buscando() || form.invalid"
         style="width: 100%"
       >
-        Recomendar grupos
+        {{ buscando() ? 'Buscando…' : 'Recomendar grupos' }}
       </button>
     </form>
 
     <aside class="panel help-panel">
-      <mat-icon
-        fontSet="material-symbols-rounded"
-        aria-hidden="true"
-      >
+      <mat-icon fontSet="material-symbols-rounded" aria-hidden="true">
         auto_awesome
       </mat-icon>
-
       <h2>Tus preferencias guardadas</h2>
-
-      <p>
-        Modalidad:
-        {{ datos.modalidadPreferida || 'Sin registrar' }}
-      </p>
-
-      <p>
-        Método:
-        {{ datos.metodoPreferido || 'Sin registrar' }}
-      </p>
+      <p>Modalidad: {{ datos.modalidadPreferida || 'Sin registrar' }}</p>
+      <p>Método: {{ datos.metodoPreferido || 'Sin registrar' }}</p>
 
       @if (datos.temasInteres.length) {
-        <p>
-          Temas de interés:
-          {{ datos.temasInteres.join(', ') }}
-        </p>
+        <p>Temas de interés: {{ datos.temasInteres.join(', ') }}</p>
       }
 
-      <p>
-        Los cambios de este formulario se usarán para la búsqueda.
-        Tus preferencias guardadas se mantienen.
-      </p>
-
-      <a mat-stroked-button routerLink="/perfiles">
-        Editar mis preferencias
-      </a>
+      <p>Los cambios de este formulario se usarán para esta búsqueda.</p>
+      <a mat-stroked-button routerLink="/perfiles">Editar mis preferencias</a>
     </aside>
   </div>
+
+  <section class="results" aria-live="polite">
+    @if (buscando()) {
+      <p class="panel" role="status">Comparando grupos disponibles…</p>
+    } @else if (errorBusqueda()) {
+      <p class="error-panel" role="alert">{{ errorBusqueda() }}</p>
+    } @else if (cursoConsultado()) {
+      <h2>Recomendaciones para {{ cursoConsultado() }}</h2>
+
+      @if (grupos().length) {
+        <div class="group-grid">
+          @for (grupo of grupos(); track grupo.idGrupo) {
+            <article class="panel group-card">
+              <h3>{{ grupo.nombre }}</h3>
+              <p>{{ grupo.descripcion }}</p>
+              <small>
+                {{ grupo.tipoGrupo === 'TUTOR' ? 'Con tutor' : 'Entre estudiantes' }}
+                · {{ grupo.metodoEstudio }}
+              </small>
+              <small>
+                {{ grupo.cuposDisponibles }}
+                {{ grupo.cuposDisponibles === 1 ? 'cupo disponible' : 'cupos disponibles' }}
+              </small>
+              <p>{{ grupo.motivo }}</p>
+              <a
+                mat-stroked-button
+                [routerLink]="['/grupos/descubrimiento', grupo.idGrupo]"
+              >
+                Ver grupo
+              </a>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="panel state-panel">
+          <p>No encontramos grupos afines con cupos. Prueba con otro curso o ajusta los filtros.</p>
+          <a mat-stroked-button routerLink="/grupos/descubrimiento">
+            Explorar grupos
+          </a>
+        </div>
+      }
+    }
+  </section>
 }
